@@ -1,0 +1,92 @@
+body {
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body,
+#mapid {
+  height: 100%;
+  width: 100%;
+}
+
+p,
+h1,
+h2,
+h3 {
+  font-family: Helvetica, Arial, sans-serif;
+  margin-top: 0px;
+}
+
+.sidenav {
+  position: absolute;
+  height: auto;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin: 10px;
+  background-color: #eff1f3;
+  z-index: 1000;
+  max-width: 300px;
+  overflow-y: scroll;
+  padding: 10px;
+  border-radius: 10px;
+  border-style: solid;
+  border-color: #e2e4e8;
+  border-width: 0.5px;
+}
+
+.sidebox {
+  background-color: #ffffff;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  padding: 10px;
+  box-shadow: 0px 3px 0px #e2e4e8;
+}
+
+.button {
+  --bg-color: #ff0000;
+  --bottom-color: #bb0000;
+  border: none;
+  color: #ffffff;
+  background-color: var(--bg-color);
+  padding: 2px 8px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  margin: 2px 2px;
+  cursor: pointer;
+  font-family: Helvetica, Arial, sans-serif;
+  border-radius: 4px;
+  transition-duration: 0.2s;
+  box-shadow: 0px 2px 0px var(--bottom-color);
+}
+
+.bluebutton {
+  --bg-color: #4f79ff;
+  --bottom-color: #3e5ec7;
+}
+
+.input {
+  background-color: #dddddd;
+  border: none;
+  border-radius: 2px;
+  font-size: 12px;
+  padding: 2px 8px;
+  box-shadow: 0px 2px 0px #aaaaaa;
+}
+
+.button:active {
+  transform: translateY(4px); /*Move down*/
+  box-shadow: 0px 0px 0px var(--bottom-color);
+}
+
+.button:focus {
+  outline: none;
+}
+
+.input:focus {
+  outline: none;
+}
