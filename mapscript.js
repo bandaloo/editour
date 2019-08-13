@@ -70,7 +70,7 @@ document.addEventListener("keydown", function(e) {
     endDraw();
   }
 });
-function hashBrown() {
+function randomHash() {
   return Math.random()
     .toString(36)
     .substring(7);
@@ -98,12 +98,17 @@ function endDraw() {
   drawnPoints.push(mouseLatLng);
 
   // handles coming up with same hash
+  let hash, regionName;
   while (!found) {
-    let regionName = "unnamed region " + hashBrown();
-    if (!regions[regionName]) {
+    hash = randomHash();
+    if (!regions[hash]) {
       found = true;
+      regionName = "unnamed region " + hash;
       // add region to the list of regions
-      regions[regionName] = drawnPoints;
+      regions[hash] = {
+        points: drawnPoints,
+        name: regionName
+      };
     }
   }
 
@@ -114,8 +119,9 @@ function endDraw() {
   polyline.remove();
   connectBack.remove();
   previewLine.remove();
-
   drawnPoints = [];
+
+  addRegionDiv(hash, regionName);
 }
 
 function onMapClick(e) {
@@ -133,54 +139,83 @@ function onMapClick(e) {
   }
 }
 
-function renameRegion(oldName, newName) {
-  if (!regions[newName]) {
-    regions[newName] = regions[oldName];
-    delete regions[oldName];
-  } else {
-    alert(`region with name ${newName} already exists`);
-  }
+function renameRegion(hash, newName) {
+  regions[hash].name = newName;
 }
 
 function addRegionDiv(hash, name) {
   let id = "id_" + hash;
-  let div = document.createElement("div");
-  //div.innerHTML = `<p>${hash}${name}</p>
-  //<button class="button">test</button>`;
-  let regionName = document.createElement("h3");
-  regionName.innerHTML = "test";
-  regionName.id = "name";
-  div.appendChild(regionName);
+  let regionDiv = document.createElement("div");
+  regionDiv.id = id;
+  regionDiv.className = "sidebox";
 
-  // TODO make delete button actually do something
+  let regionName = document.createElement("h3");
+  regionName.innerHTML = name;
+  regionName.id = "name";
+  regionDiv.appendChild(regionName);
+
+  let renameDiv = makeRenameDiv(hash, regionName);
+  renameDiv.display = "none";
+
+  let buttonDiv = document.createElement("div");
+  buttonDiv.classList.add("flex");
+
   let deleteButton = document.createElement("button");
-  deleteButton.classList.add("button", "bluebutton");
+  deleteButton.classList.add("button", "fillwidth");
   deleteButton.id = "deletebutton";
   deleteButton.innerHTML = "Delete";
-  div.appendChild(deleteButton);
+  buttonDiv.appendChild(deleteButton);
 
-  div.id = hash;
-  div.className = "sidebox";
-  sideNav.appendChild(div);
+  let renameButton = document.createElement("button");
+  renameButton.classList.add("button", "bluebutton", "fillwidth");
+  renameButton.id = "renamebutton";
+  renameButton.innerHTML = "Rename";
+  //renameButton.onclick = () => addRenameDiv(id);
+  renameButton.onclick = () => toggleDisplay(renameDiv, "flex");
+  buttonDiv.appendChild(renameButton);
+
+  let infoButton = document.createElement("button");
+  infoButton.classList.add("button", "orangebutton", "fillwidth");
+  infoButton.id = "infobutton";
+  infoButton.innerHTML = "Info";
+  buttonDiv.appendChild(infoButton);
+
+  regionDiv.appendChild(buttonDiv);
+  regionDiv.appendChild(renameDiv);
+  sideNav.appendChild(regionDiv);
 }
 
-function addRenameForm(hash) {
-  let regionDiv = document.getElementById("id_" + hash);
-  let changeDiv = document.createElement("div");
+function makeRenameDiv(hash, text) {
+  // TODO change this so it is passed in a div object from above
+  let renameDiv = document.createElement("div");
+  renameDiv.classList.add("flex", "sidebox");
+
+  let textDiv = document.createElement("div");
+  textDiv.classList.add("flex"); // TODO might not even need this
 
   let input = document.createElement("input");
   input.type = "text";
-  input.name = "regiontext";
-  input.className = "input";
+  input.name = "regiontext"; // TODO check if we need this
+  input.classList.add("input", "fillwidth");
 
   let button = document.createElement("button");
-  button.classList.add("button");
-  button.innerHTML = "Change";
+  button.classList.add("button", "greenbutton");
+  button.innerHTML = "Okay";
+  button.onclick = () => {
+    renameRegion(hash, input.value);
+    text.innerHTML = input.value;
+  };
 
-  changeDiv.appendChild(input);
-  changeDiv.appendChild(button);
+  renameDiv.appendChild(textDiv);
+  renameDiv.appendChild(input);
+  renameDiv.appendChild(button);
 
-  regionDiv.appendChild(changeDiv);
+  return renameDiv;
+}
+
+function toggleDisplay(div, original) {
+  console.log(div.style.display);
+  div.style.display = div.style.display == "none" ? original : "none";
 }
 
 function validateForm() {}

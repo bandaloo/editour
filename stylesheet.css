@@ -40,9 +40,13 @@ h3 {
 .sidebox {
   background-color: #ffffff;
   border-radius: 5px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  margin-top: 10px;
   padding: 10px;
   box-shadow: 0px 3px 0px #e2e4e8;
+  border: solid;
+  border-color: #e2e4e8;
+  border-width: 1px;
 }
 
 .button {
@@ -55,18 +59,29 @@ h3 {
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 12px;
+  font-size: 14px;
   margin: 2px 2px;
   cursor: pointer;
   font-family: Helvetica, Arial, sans-serif;
   border-radius: 4px;
   transition-duration: 0.2s;
   box-shadow: 0px 2px 0px var(--bottom-color);
+  font-weight: bold;
 }
 
 .bluebutton {
   --bg-color: #4f79ff;
   --bottom-color: #3e5ec7;
+}
+
+.greenbutton {
+  --bg-color: #3ddb62;
+  --bottom-color: #2aa347;
+}
+
+.orangebutton {
+  --bg-color: #fcba03;
+  --bottom-color: #d19a00;
 }
 
 .input {
@@ -79,7 +94,7 @@ h3 {
 }
 
 .button:active {
-  transform: translateY(4px); /*Move down*/
+  transform: translateY(2px); /*Move down*/
   box-shadow: 0px 0px 0px var(--bottom-color);
 }
 
@@ -89,4 +104,15 @@ h3 {
 
 .input:focus {
   outline: none;
+}
+.flex {
+  display: flex;
+}
+
+.vertical {
+  flex-direction: column;
+}
+
+.fillwidth {
+  flex: 1;
 }
