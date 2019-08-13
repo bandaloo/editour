@@ -1,18 +1,5 @@
 "use strict";
 
-// freezing an object is an enum basically
-const stateEnum = Object.freeze({
-  // don't use 0 due to boolean conversion
-  drawing: 1,
-  selecting: 2
-});
-
-const colorEnum = Object.freeze({
-  // TODO pick some better colors
-  drawing: "#ff0000",
-  region: "#0000ff"
-});
-
 // last position of mouse on mouse move
 var mouseLatLng;
 
@@ -144,73 +131,8 @@ function renameRegion(hash, newName) {
 }
 
 function addRegionDiv(hash, name) {
-  let id = "id_" + hash;
-  let regionDiv = document.createElement("div");
-  regionDiv.id = id;
-  regionDiv.className = "sidebox";
-
-  let regionName = document.createElement("h3");
-  regionName.innerHTML = name;
-  regionName.id = "name";
-  regionDiv.appendChild(regionName);
-
-  let renameDiv = makeRenameDiv(hash, regionName);
-  renameDiv.display = "none";
-
-  let buttonDiv = document.createElement("div");
-  buttonDiv.classList.add("flex");
-
-  let deleteButton = document.createElement("button");
-  deleteButton.classList.add("button", "fillwidth");
-  deleteButton.id = "deletebutton";
-  deleteButton.innerHTML = "Delete";
-  buttonDiv.appendChild(deleteButton);
-
-  let renameButton = document.createElement("button");
-  renameButton.classList.add("button", "bluebutton", "fillwidth");
-  renameButton.id = "renamebutton";
-  renameButton.innerHTML = "Rename";
-  //renameButton.onclick = () => addRenameDiv(id);
-  renameButton.onclick = () => toggleDisplay(renameDiv, "flex");
-  buttonDiv.appendChild(renameButton);
-
-  let infoButton = document.createElement("button");
-  infoButton.classList.add("button", "orangebutton", "fillwidth");
-  infoButton.id = "infobutton";
-  infoButton.innerHTML = "Info";
-  buttonDiv.appendChild(infoButton);
-
-  regionDiv.appendChild(buttonDiv);
-  regionDiv.appendChild(renameDiv);
-  sideNav.appendChild(regionDiv);
-}
-
-function makeRenameDiv(hash, text) {
-  // TODO change this so it is passed in a div object from above
-  let renameDiv = document.createElement("div");
-  renameDiv.classList.add("flex", "sidebox");
-
-  let textDiv = document.createElement("div");
-  textDiv.classList.add("flex"); // TODO might not even need this
-
-  let input = document.createElement("input");
-  input.type = "text";
-  input.name = "regiontext"; // TODO check if we need this
-  input.classList.add("input", "fillwidth");
-
-  let button = document.createElement("button");
-  button.classList.add("button", "greenbutton");
-  button.innerHTML = "Okay";
-  button.onclick = () => {
-    renameRegion(hash, input.value);
-    text.innerHTML = input.value;
-  };
-
-  renameDiv.appendChild(textDiv);
-  renameDiv.appendChild(input);
-  renameDiv.appendChild(button);
-
-  return renameDiv;
+  let regionCard = new RegionCard(hash, name);
+  sideNav.appendChild(regionCard.regionDiv);
 }
 
 function toggleDisplay(div, original) {
