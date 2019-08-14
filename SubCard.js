@@ -1,6 +1,5 @@
 // treat this class as abstract please
 class SubCard {
-  // TODO show and hide button with show and hide text
   // TODO can probably get rid of this constructor
   constructor(enclosingDiv, originalDisplay) {
     this.enclosingDiv = enclosingDiv;
@@ -8,11 +7,12 @@ class SubCard {
   }
 
   setToggleButton(toggleButton, hideString) {
-    this.toggleButton = hideString;
-    this.hideString = hideString;
+    this.toggleButton = toggleButton;
     this.showString = toggleButton.innerHTML;
+    this.hideString = hideString;
+
     toggleButton.onclick = () => {
-      this.toggleOtherCard(this);
+      this.toggleCard();
     };
   }
 
@@ -26,14 +26,17 @@ class SubCard {
   }
 
   toggleCard() {
-    this.toggleOtherCard(this);
+    this.toggleOtherCard(this, this.showString, this.hideString);
   }
 
-  toggleOtherCard(card) {
+  // TODO try to get rid of this function
+  toggleOtherCard(card, showString, hideString) {
     if (card.isHidden()) {
       card.whenMadeVisible();
+      this.toggleButton.innerHTML = hideString;
     } else {
       card.whenMadeHidden();
+      this.toggleButton.innerHTML = showString;
     }
     card.toggleHidden();
   }
