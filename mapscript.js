@@ -93,7 +93,7 @@ function endDraw() {
   console.log("end draw");
   state = stateEnum.selecting;
   let found = false;
-  drawnPoints.push(mouseLatLng);
+  drawnPoints.push([mouseLatLng.lat, mouseLatLng.lng]);
 
   let polygon = L.polygon(drawnPoints);
   // handles coming up with same hash

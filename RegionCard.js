@@ -2,10 +2,9 @@ let testob;
 class RegionCard {
   // TODO figure out what doesn't need to be a property
   constructor(hash, name = "unnamed region") {
-    //let id = "id_" + hash;
     this.hash = hash;
+
     this.regionDiv = document.createElement("div");
-    //this.regionDiv.id = id;
     this.regionDiv.className = "sidebox";
 
     this.regionName = document.createElement("h3");
@@ -34,13 +33,12 @@ class RegionCard {
     // append region card divs
     this.regionDiv.appendChild(this.buttonDiv);
 
-    // define the subcards
-    //this.renameSubCard = new RenameSubCard(this);
-    //let renameDiv = this.renameSubCard.renameDiv;
-
-    // make and add subcard divs
+    // make and add subcard divs (no need for them to be properties)
     let renameSubCard = new RenameSubCard(this);
     renameSubCard.addDiv(this.regionDiv);
+
+    let infoSubCard = new InfoSubCard(this);
+    infoSubCard.addDiv(this.regionDiv);
 
     // set onclick event to zoom to bounds of region
     this.regionDiv.onclick = () =>

@@ -25,8 +25,9 @@ class RenameSubCard extends SubCard {
     // setting stuff up for superclass
     this.enclosingDiv = this.renameDiv;
     this.originalDisplay = "flex";
-    console.log(superCard);
-    this.setToggleButton(superCard.renameButton, "Hide");
+
+    // set associated button text to change
+    this.setToggleButton(superCard.renameButton, "Cancel");
 
     // hide the card to start
     this.toggleCard();
