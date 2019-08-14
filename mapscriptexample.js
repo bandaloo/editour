@@ -1,7 +1,5 @@
 "use strict";
 
-var regions = [];
-
 // currently defaulted to Ritsumeikan University
 var mymap = L.map("mapid").setView([34.982153, 135.963641], 17);
 

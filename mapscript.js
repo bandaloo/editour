@@ -84,6 +84,7 @@ function endDraw() {
   let found = false;
   drawnPoints.push(mouseLatLng);
 
+  let polygon = L.polygon(drawnPoints);
   // handles coming up with same hash
   let hash, regionName;
   while (!found) {
@@ -93,14 +94,19 @@ function endDraw() {
       regionName = "unnamed region " + hash;
       // add region to the list of regions
       regions[hash] = {
-        points: drawnPoints,
-        name: regionName
+        points: drawnPoints, // TODO points is kind of redundant since poly stores these
+        name: regionName,
+        poly: polygon
       };
     }
   }
 
-  // add poly to the map
-  L.polygon(drawnPoints).addTo(myMap);
+  polygon.on("click", e => {
+    onPolyClick(e, regions[hash]);
+  });
+
+  // adds polygon to map
+  polygon.addTo(myMap);
 
   // remove lines from map
   polyline.remove();
@@ -143,6 +149,16 @@ function toggleDisplay(div, original) {
 function validateForm() {}
 
 myMap.on("click", onMapClick);
+
+let popup = L.popup(); // popup moved around and used for stuff
+// TODO hide popup when region is deleted
+
+function onPolyClick(e, region) {
+  popup
+    .setLatLng(e.latlng)
+    .setContent("<b>" + region.name + "<b>" + "<br>" + e.latlng)
+    .openOn(myMap);
+}
 
 myMap.on("mousemove", e => {
   if (drawnPoints.length > 0) {

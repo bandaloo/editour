@@ -10,7 +10,6 @@ class RegionCard {
 
     this.regionName = document.createElement("h3");
     this.regionName.innerHTML = name;
-    this.regionName.id = "name";
     this.regionDiv.appendChild(this.regionName);
 
     this.buttonDiv = document.createElement("div");
@@ -18,35 +17,34 @@ class RegionCard {
 
     this.deleteButton = document.createElement("button");
     this.deleteButton.classList.add("button", "fillwidth");
-    this.deleteButton.id = "deletebutton";
     this.deleteButton.innerHTML = "Delete";
     this.buttonDiv.appendChild(this.deleteButton);
 
     this.infoButton = document.createElement("button");
     this.infoButton.classList.add("button", "orangebutton", "fillwidth");
-    this.infoButton.id = "infobutton";
     this.infoButton.innerHTML = "Info";
     this.buttonDiv.appendChild(this.infoButton);
 
-    // TODO why is this an empty object?????
     this.renameSubCard = new RenameSubCard(this);
-    let testCard = new RenameSubCard(this);
-    console.log("test card");
-    console.log(testCard);
-    console.log(this.renameSubCard);
-    // TODO get rid of this next line
-    testob = this.renameSubCard;
     let renameDiv = this.renameSubCard.renameDiv;
+    testob = this.renameSubCard;
     renameDiv.display = "none";
 
     this.renameButton = document.createElement("button");
     this.renameButton.classList.add("button", "bluebutton", "fillwidth");
-    this.renameButton.id = "renamebutton";
     this.renameButton.innerHTML = "Rename";
-    this.renameButton.onclick = () => toggleDisplay(renameDiv, "flex");
+    //this.renameButton.onclick = () => toggleDisplay(renameDiv, "flex");
+    this.renameButton.onclick = () => {
+      this.renameSubCard.toggleCard();
+    };
     this.buttonDiv.appendChild(this.renameButton);
 
     this.regionDiv.appendChild(this.buttonDiv);
     this.regionDiv.appendChild(renameDiv);
+
+    // set onclick event to zoom to bounds of region
+    this.regionDiv.onclick = () =>
+      // padding is because sidebar covers map
+      myMap.flyToBounds(regions[hash].points, { paddingTopLeft: [300, 0] });
   }
 }
