@@ -1,9 +1,9 @@
 // treat this class as abstract please
 class SubCard {
   // TODO show and hide button with show and hide text
-  constructor(enclosingDiv, original) {
+  constructor(enclosingDiv, originalDisplay) {
     this.enclosingDiv = enclosingDiv;
-    this.original = original;
+    this.originalDisplay = originalDisplay;
   }
 
   isHidden() {
@@ -12,7 +12,7 @@ class SubCard {
 
   toggleHidden() {
     this.enclosingDiv.style.display =
-      this.enclosingDiv.style.display == "none" ? this.original : "none";
+      this.enclosingDiv.style.display == "none" ? this.originalDisplay : "none";
   }
 
   toggleCard() {

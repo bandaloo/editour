@@ -1,6 +1,6 @@
 class RenameSubCard extends SubCard {
   constructor(superCard) {
-    super();
+    super(); // need to call super first and define later
     this.superCard = superCard;
     // TODO get rid of renameDiv in place of enclosingDiv
     this.renameDiv = document.createElement("div");
@@ -25,14 +25,14 @@ class RenameSubCard extends SubCard {
 
     // setting stuff up for superclass
     this.enclosingDiv = this.renameDiv;
-    this.original = "flex";
+    this.originalDisplay = "flex";
+    this.toggleCard();
   }
 
   renameRegion(hash, newName) {
     regions[hash].name = newName;
   }
 
-  // TODO might not even need this
   whenMadeHidden() {
     this.textBox.value = "";
   }
