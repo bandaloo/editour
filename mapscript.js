@@ -9,6 +9,9 @@ var regions = {};
 // list of points, which are lists of length 2 and contain numbers
 var drawnPoints = [];
 
+// whether the user is holding shift
+var shifting = false;
+
 const sideNav = document.getElementById("sidenavid");
 
 // list of temporarily shown lines used for drawing
@@ -31,7 +34,8 @@ var state = stateEnum.selecting;
 var myMap = L.map("mapid", {
   center: [34.982153, 135.963641],
   zoom: 17,
-  zoomControl: false
+  zoomControl: false,
+  doubleClickZoom: false
 });
 
 // adding zoom control
@@ -50,13 +54,20 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 // set event listener for shortcuts
 document.addEventListener("keydown", function(e) {
   let code = e.keyCode;
-  let key = String.fromCharCode(code);
-  if (key == "S") {
-    startDraw();
-  } else if (key == "E") {
-    endDraw();
+  //let key = String.fromCharCode(code);
+  if (code == 16) {
+    shifting = true;
   }
 });
+
+document.addEventListener("keyup", function(e) {
+  let code = e.keyCode;
+  //let key = String.fromCharCode(code);
+  if (code == 16) {
+    shifting = false;
+  }
+});
+
 function randomHash() {
   return Math.random()
     .toString(36)
@@ -119,6 +130,13 @@ function endDraw() {
 
 function onMapClick(e) {
   console.log("clicked map at: " + e.latlng);
+  if (shifting) {
+    if (state == stateEnum.drawing) {
+      endDraw();
+    } else {
+      startDraw();
+    }
+  }
   if (state == stateEnum.drawing) {
     let coord = [e.latlng.lat, e.latlng.lng];
     drawnPoints.push(coord);
@@ -141,22 +159,17 @@ function addRegionDiv(hash, name) {
   sideNav.appendChild(regionCard.regionDiv);
 }
 
-function toggleDisplay(div, original) {
-  console.log(div.style.display);
-  div.style.display = div.style.display == "none" ? original : "none";
-}
-
 function validateForm() {}
 
 myMap.on("click", onMapClick);
 
-let popup = L.popup(); // popup moved around and used for stuff
+var popup = L.popup(); // popup moved around and used for stuff
 // TODO hide popup when region is deleted
 
 function onPolyClick(e, region) {
   popup
     .setLatLng(e.latlng)
-    .setContent("<b>" + region.name + "<b>" + "<br>" + e.latlng)
+    .setContent("<b>" + region.name + "</b>" + "<br>" + e.latlng)
     .openOn(myMap);
 }
 

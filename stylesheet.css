@@ -18,6 +18,10 @@ h3 {
   margin-top: 0px;
 }
 
+p {
+  margin-bottom: 0px;
+}
+
 .sidenav {
   position: absolute;
   height: auto;
@@ -105,6 +109,8 @@ h3 {
 .input:focus {
   outline: none;
 }
+
+/* probably don't need this class anymore */
 .flex {
   display: flex;
 }

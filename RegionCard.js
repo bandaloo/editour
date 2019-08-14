@@ -25,22 +25,22 @@ class RegionCard {
     this.infoButton.innerHTML = "Info";
     this.buttonDiv.appendChild(this.infoButton);
 
-    this.renameSubCard = new RenameSubCard(this);
-    let renameDiv = this.renameSubCard.renameDiv;
-    testob = this.renameSubCard;
-    renameDiv.display = "none";
-
     this.renameButton = document.createElement("button");
     this.renameButton.classList.add("button", "bluebutton", "fillwidth");
     this.renameButton.innerHTML = "Rename";
-    //this.renameButton.onclick = () => toggleDisplay(renameDiv, "flex");
-    this.renameButton.onclick = () => {
-      this.renameSubCard.toggleCard();
-    };
+
     this.buttonDiv.appendChild(this.renameButton);
 
+    // append region card divs
     this.regionDiv.appendChild(this.buttonDiv);
-    this.regionDiv.appendChild(renameDiv);
+
+    // define the subcards
+    //this.renameSubCard = new RenameSubCard(this);
+    //let renameDiv = this.renameSubCard.renameDiv;
+
+    // make and add subcard divs
+    let renameSubCard = new RenameSubCard(this);
+    renameSubCard.addDiv(this.regionDiv);
 
     // set onclick event to zoom to bounds of region
     this.regionDiv.onclick = () =>

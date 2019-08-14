@@ -4,12 +4,10 @@ class RenameSubCard extends SubCard {
     this.superCard = superCard;
     // TODO get rid of renameDiv in place of enclosingDiv
     this.renameDiv = document.createElement("div");
-    // might not even need to add flex if it starts hidden
-    this.renameDiv.classList.add("flex", "sidebox");
+    this.renameDiv.classList.add("sidebox");
 
     this.textBox = document.createElement("input");
     this.textBox.type = "text";
-    this.textBox.name = "regiontext"; // TODO check if we need this
     this.textBox.classList.add("input", "fillwidth");
 
     this.okayButton = document.createElement("button");
@@ -18,6 +16,7 @@ class RenameSubCard extends SubCard {
     this.okayButton.onclick = () => {
       renameRegion(superCard.hash, this.textBox.value);
       superCard.regionName.innerHTML = this.textBox.value;
+      this.toggleCard();
     };
 
     this.renameDiv.appendChild(this.textBox);
@@ -26,6 +25,10 @@ class RenameSubCard extends SubCard {
     // setting stuff up for superclass
     this.enclosingDiv = this.renameDiv;
     this.originalDisplay = "flex";
+    console.log(superCard);
+    this.setToggleButton(superCard.renameButton);
+
+    // hide the card to start
     this.toggleCard();
   }
 
