@@ -30,11 +30,11 @@ var previewLine = L.polyline([], {
 // set the default state to selecting, not drawing
 var state = stateEnum.selecting;
 
-// currently defaulted to Ritsumeikan University
+// increasing max zoom of the map causes it to freak out
 var myMap = L.map("mapid", {
   //center: [34.982153, 135.963641], //Ritsumeikan
   center: [35.039282, 135.730327], // Kinkakuji
-  zoom: 17, // going higher than this causes map to freak out
+  zoom: 17,
   zoomControl: false, // prevent zoom control from being added
   doubleClickZoom: false // double click annoying when drawing shapes
 });
@@ -186,7 +186,6 @@ function addRegionDiv(hash, name) {
 
 myMap.on("click", onMapClick);
 
-// TODO hide popup when region is deleted
 var popup = L.popup(); // popup moved around and used for stuff
 
 /**
@@ -199,7 +198,6 @@ function onPolyClick(e, region) {
     .setLatLng(e.latlng)
     .setContent("<b>" + region.name + "</b>" + "<br>" + e.latlng)
     .openOn(myMap);
-
   popup.poly = region.poly;
 }
 
