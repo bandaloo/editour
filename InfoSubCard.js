@@ -22,9 +22,9 @@ class InfoSubCard extends SubCard {
     }
 
     // set associated button text to change
-    this.setToggleButton(superCard.infoButton, "Hide");
+    this.setToggleButton(superCard.infoButton, "Hide Info");
 
     // hide the card to start
-    this.toggleCard();
+    //this.toggleCard();
   }
 }
