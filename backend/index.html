@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>Simple File Upload Example</title>
+    <link rel="stylesheet" href="style.css" type="text/css">
+  </head>
+  <body>
+    <h1>Simple file upload with asynchronous JavaScript</h1>
+    <form id="my-form">
+      <input type="text" name="name" placeholder="Name" required>
+      <br>
+      <input type="file" name="upload" multiple>
+      <br>
+      <input type="submit" value="Upload">
+    </form>
+
+    Status: <span id="status"></span>
+  </body>
+  <script>
+    const form = document.getElementById('my-form');
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      sendData(form);
+    })
+
+    const sendData = (f) => {
+      const xhr = new XMLHttpRequest();
+      let lastPos = 0;
+      const arr = window.location.href.split('/');
+      const url = arr[0] + '//' + arr[2];
+
+      // Bind the FormData object and the form element
+      const fd = new FormData(f);
+
+      // successful data submission
+      xhr.addEventListener('load', (event) => {
+        console.log(event.target.responseText);
+        if (JSON.parse(event.target.responseText).status === 201) {
+          document.getElementById('status').innerHTML = 'complete';
+        };
+      });
+
+      // error
+      xhr.addEventListener('error', (event) => {
+        console.error('Something went wrong :(');
+      });
+
+      // set up request
+      xhr.open('POST', url + '/upload');
+      xhr.send(fd);
+    };
+  </script>
+</html>
