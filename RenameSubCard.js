@@ -4,36 +4,43 @@ class RenameSubCard extends SubCard {
 
     this.textBox = document.createElement("input");
     this.textBox.type = "text";
-    this.textBox.classList.add("input", "fillwidth");
+    this.textBox.classList.add("fillwidth");
 
-    // does this need to be a property?
-    this.okayButton = document.createElement("button");
-    this.okayButton.classList.add("button", "greenbutton");
-    this.okayButton.innerHTML = "Okay";
-    this.okayButton.onclick = () => {
+    let okayButton = document.createElement("button");
+    okayButton.classList.add("button", "greenbutton");
+    okayButton.innerHTML = "Okay";
+    okayButton.onclick = () => {
       renameRegion(superCard.hash, this.textBox.value);
       superCard.regionName.innerHTML = this.textBox.value;
       this.toggleCard();
     };
 
     this.enclosingDiv.appendChild(this.textBox);
-    this.enclosingDiv.appendChild(this.okayButton);
+    this.enclosingDiv.appendChild(okayButton);
 
-    // set associated button text to change
     this.setToggleButton(superCard.renameButton, "Cancel Rename");
-
-    // hide the card to start
-    //this.toggleCard();
   }
 
+  /**
+   * Renames only the region data
+   * @param {string} hash
+   * @param {string} newName
+   */
   renameRegion(hash, newName) {
     regions[hash].name = newName;
   }
 
+  /**
+   * Clears the textbox when card is hidden (shouldn't really matter)
+   */
   whenMadeHidden() {
     this.textBox.value = "";
   }
 
+  /**
+   * Fills the textbox with the current name (useful if you just want to make a
+   * small change)
+   */
   whenMadeVisible() {
     console.log(this.superCard);
     this.textBox.value = regions[this.superCard.hash].name;

@@ -1,6 +1,6 @@
 "use strict";
 
-// last position of mouse on mouse move
+// last position of mouse on mouse move, important for drawing
 var mouseLatLng;
 
 // a list of region objects
@@ -12,9 +12,10 @@ var drawnPoints = [];
 // whether the user is holding shift
 var shifting = false;
 
+// div where all the region cards are added
 const sideNav = document.getElementById("sidenavid");
 
-// list of temporarily shown lines used for drawing
+// temporarily shown lines used for drawing
 var polyline = L.polyline([], { color: colorEnum.drawing });
 var connectBack = L.polyline([], {
   color: colorEnum.drawing,
@@ -26,19 +27,19 @@ var previewLine = L.polyline([], {
   opacity: 0.5
 });
 
-var connectToMouse;
-
+// set the default state to selecting, not drawing
 var state = stateEnum.selecting;
 
 // currently defaulted to Ritsumeikan University
 var myMap = L.map("mapid", {
-  center: [34.982153, 135.963641],
-  zoom: 17,
-  zoomControl: false,
-  doubleClickZoom: false
+  //center: [34.982153, 135.963641], //Ritsumeikan
+  center: [35.039282, 135.730327], // Kinkakuji
+  zoom: 17, // going higher than this causes map to freak out
+  zoomControl: false, // prevent zoom control from being added
+  doubleClickZoom: false // double click annoying when drawing shapes
 });
 
-// adding zoom control
+// adding zoom control to correct spot
 L.control
   .zoom({
     position: "topright"
@@ -68,12 +69,18 @@ document.addEventListener("keyup", function(e) {
   }
 });
 
+/**
+ * super simple hash for regions
+ */
 function randomHash() {
   return Math.random()
     .toString(36)
     .substring(7);
 }
 
+/**
+ * Begin drawing mode, allowing user to define region with clicks
+ */
 function startDraw() {
   console.log("start draw");
   state = stateEnum.drawing;
@@ -88,7 +95,10 @@ function startDraw() {
   previewLine.addTo(myMap);
 }
 
-// TODO make sure you can't create an illegal poly
+/**
+ * Terminates drawn polygon, adding card and poly to map, and removes temporary
+ * geometry that was used just for drawing
+ */
 function endDraw() {
   console.log("end draw");
   state = stateEnum.selecting;
@@ -105,7 +115,8 @@ function endDraw() {
       regionName = "unnamed region " + hash;
       // add region to the list of regions
       regions[hash] = {
-        points: drawnPoints, // TODO points is kind of redundant since poly stores these
+        // TODO points is kind of redundant since poly stores these
+        points: drawnPoints,
         name: regionName,
         poly: polygon
       };
@@ -128,6 +139,10 @@ function endDraw() {
   addRegionDiv(hash, regionName);
 }
 
+/**
+ * Deals with drawing on the map with shift click
+ * @param {Object} e
+ */
 function onMapClick(e) {
   console.log("clicked map at: " + e.latlng);
   if (shifting) {
@@ -150,27 +165,42 @@ function onMapClick(e) {
   }
 }
 
+/**
+ * Renames region in the regions object
+ * @param {string} hash
+ * @param {string} newName
+ */
 function renameRegion(hash, newName) {
   regions[hash].name = newName;
 }
 
+/**
+ * Adds region div to the document
+ * @param {string} hash
+ * @param {string} name
+ */
 function addRegionDiv(hash, name) {
   let regionCard = new RegionCard(hash, name);
   sideNav.appendChild(regionCard.regionDiv);
 }
 
-function validateForm() {}
-
 myMap.on("click", onMapClick);
 
-var popup = L.popup(); // popup moved around and used for stuff
 // TODO hide popup when region is deleted
+var popup = L.popup(); // popup moved around and used for stuff
 
+/**
+ * Brings up popup when clicking on region polygon on map
+ * @param {Object} e
+ * @param {Object} region
+ */
 function onPolyClick(e, region) {
   popup
     .setLatLng(e.latlng)
     .setContent("<b>" + region.name + "</b>" + "<br>" + e.latlng)
     .openOn(myMap);
+
+  popup.poly = region.poly;
 }
 
 myMap.on("mousemove", e => {
