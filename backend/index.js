@@ -1,6 +1,5 @@
 const express = require('express');
 const formidable = require('formidable');
-// const Zip = require('adm-zip');
 const archiver = require('archiver');
 const fs = require('fs');
 const app = express();
@@ -14,8 +13,10 @@ app.get('/', (req, res) => {
   // TODO serve the actual static front-end content
 });
 
+
 // static directory
 app.use(express.static(__dirname + '/static'));
+
 
 // endpoint for file uploads
 app.post('/upload', (req, res) => {
@@ -124,9 +125,40 @@ app.post('/upload', (req, res) => {
         return;
       } else {
         // TODO make this generate a new name and try again on EEXIST
+        // this should basically never happen so ¯\_(ツ)_/¯
       }
     }
     file.path = tempDirPath + file.name;
+  });
+});
+
+
+// endpoint to request a tour zip
+// should find the latest zip with a matching name and serve it
+app.get('/tour/:name', (req, res) => {
+  fs.readdir(toursLoc, (err, files) => {
+    if (err) {
+      res.status(500).send(JSON.stringify(
+          {'status': 500, 'message': 'unable to read from tours directory'}
+      ));
+      return;
+    }
+
+    // filter out files that don't start with the name we're looking for
+    files = files.filter((f) => f.startsWith(req.params.name));
+
+    console.log(files);
+    // if no files left 404
+    if (files.length < 1) {
+      res.status(404).send(JSON.stringify({
+        'status': 404,
+        'message': 'couldn\'t find tour with the name ' + req.params.name,
+      }));
+      return;
+    }
+
+    // return the lexigraphically last filename, it's the most recent
+    res.status(200).sendFile(toursLoc + files.sort()[files.length - 1]);
   });
 });
 
