@@ -10,16 +10,17 @@ class RegionCard {
     this.regionDiv.appendChild(this.regionName);
 
     this.deleteButton = document.createElement("button");
-    this.deleteButton.classList.add(
+    this.deleteButton.classList.add("button", "outlinebutton", "revealer");
+    this.deleteButton.innerHTML = "Delete";
+
+    this.mediaButton = document.createElement("button");
+    this.mediaButton.classList.add(
       "button",
-      "fillwidth",
+      "greenbutton",
       "outlinebutton",
       "revealer"
     );
-
-    // TODO move the black triangle to somewhere else
-    this.deleteButton.innerHTML = "Delete";
-    //this.buttonDiv.appendChild(this.deleteButton);
+    this.mediaButton.innerHTML = "Media";
 
     this.infoButton = document.createElement("button");
     this.infoButton.classList.add(
@@ -29,7 +30,6 @@ class RegionCard {
       "revealer"
     );
     this.infoButton.innerHTML = "Info";
-    //this.buttonDiv.appendChild(this.infoButton);
 
     this.renameButton = document.createElement("button");
     this.renameButton.classList.add(
@@ -39,13 +39,17 @@ class RegionCard {
       "revealer"
     );
     this.renameButton.innerHTML = "Rename";
-    //this.buttonDiv.appendChild(this.renameButton);
 
     // make and add subcard divs with revealers on top
     this.regionDiv.appendChild(this.renameButton);
 
     let renameSubCard = new RenameSubCard(this);
     renameSubCard.addDiv(this.regionDiv);
+
+    this.regionDiv.appendChild(this.mediaButton);
+
+    let mediaSubCard = new MediaSubCard(this);
+    mediaSubCard.addDiv(this.regionDiv);
 
     this.regionDiv.appendChild(this.infoButton);
 
