@@ -1,10 +1,13 @@
 class RenameSubCard extends SubCard {
   constructor(superCard) {
-    super(); // need to call super first and define later
-    this.superCard = superCard;
+    super(superCard, "flex");
+    console.log(this.originalDisplay);
+    console.log("ENCLOSING DIV");
+    console.log(this.enclosingDiv);
+    //this.superCard = superCard;
     // TODO get rid of renameDiv in place of enclosingDiv
-    this.renameDiv = document.createElement("div");
-    this.renameDiv.classList.add("sidebox");
+    //this.renameDiv = document.createElement("div");
+    //this.enclosingDiv.classList.add("sidebox");
 
     this.textBox = document.createElement("input");
     this.textBox.type = "text";
@@ -19,12 +22,8 @@ class RenameSubCard extends SubCard {
       this.toggleCard();
     };
 
-    this.renameDiv.appendChild(this.textBox);
-    this.renameDiv.appendChild(this.okayButton);
-
-    // setting stuff up for superclass
-    this.enclosingDiv = this.renameDiv;
-    this.originalDisplay = "flex";
+    this.enclosingDiv.appendChild(this.textBox);
+    this.enclosingDiv.appendChild(this.okayButton);
 
     // set associated button text to change
     this.setToggleButton(superCard.renameButton, "Cancel");

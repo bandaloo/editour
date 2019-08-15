@@ -44,8 +44,8 @@ p {
 .sidebox {
   background-color: #ffffff;
   border-radius: 5px;
-  margin-bottom: 10px;
-  margin-top: 10px;
+  margin-bottom: 20px;
+  margin-top: 4px;
   padding: 10px;
   box-shadow: 0px 3px 0px #e2e4e8;
   border: solid;
@@ -88,6 +88,21 @@ p {
   --bottom-color: #d19a00;
 }
 
+.outlinebutton {
+  --bottom-color: var(--bg-color);
+  border-color: var(--bg-color);
+  background-color: #ffffff;
+  border: solid 1px;
+  color: var(--bg-color);
+}
+
+.revealer {
+  text-align: left;
+  width: 100%;
+  display: block;
+  margin: 4px 0px;
+}
+
 .input {
   background-color: #dddddd;
   border: none;
@@ -113,6 +128,11 @@ p {
 /* probably don't need this class anymore */
 .flex {
   display: flex;
+}
+
+.sidebox.latbox {
+  margin-top: 4px;
+  margin-bottom: 4px;
 }
 
 .vertical {

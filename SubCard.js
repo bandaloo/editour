@@ -1,9 +1,13 @@
 // treat this class as abstract please
 class SubCard {
-  // TODO can probably get rid of this constructor
-  constructor(enclosingDiv, originalDisplay) {
-    this.enclosingDiv = enclosingDiv;
+  constructor(superCard, originalDisplay) {
+    this.superCard = superCard;
+    this.enclosingDiv = document.createElement("div");
+    this.enclosingDiv.classList.add("sidebox");
     this.originalDisplay = originalDisplay;
+
+    // can probably get rid of these and last two arguments
+    //this.originalDisplay = originalDisplay;
   }
 
   setToggleButton(toggleButton, hideString) {

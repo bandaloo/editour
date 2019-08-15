@@ -1,17 +1,14 @@
 class InfoSubCard extends SubCard {
   constructor(superCard) {
     // TODO move this to a function since multiple sideboxes need to do this
-    super();
-    this.superCard = superCard;
-    this.enclosingDiv = document.createElement("div");
-    this.enclosingDiv.classList.add("sidebox");
+    super(superCard, "block");
 
     let points = regions[superCard.hash].points;
     console.log(points);
 
     for (let i = 0; i < points.length; i++) {
       let coordDiv = document.createElement("div");
-      coordDiv.classList.add("sidebox");
+      coordDiv.classList.add("sidebox", "latbox");
 
       let p1 = document.createElement("p");
       p1.innerHTML = "lat: " + points[i][0];
@@ -23,8 +20,6 @@ class InfoSubCard extends SubCard {
 
       this.enclosingDiv.appendChild(coordDiv);
     }
-
-    this.originalDisplay = "block";
 
     // set associated button text to change
     this.setToggleButton(superCard.infoButton, "Hide");
