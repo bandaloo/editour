@@ -1,0 +1,24 @@
+{
+  "name": "ar-tour-app-backend",
+  "version": "0.0.1",
+  "description": "Backend for storing and organizing AR tours",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Joseph Petitti",
+  "dependencies": {
+    "express": "^4.17.1",
+    "formidable": "^1.2.1",
+    "jszip": "^3.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bandaloo/poly-region"
+  },
+  "devDependencies": {
+    "eslint": "^6.1.0",
+    "eslint-config-google": "^0.13.0"
+  }
+}
