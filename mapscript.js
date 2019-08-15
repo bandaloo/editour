@@ -147,7 +147,11 @@ function onMapClick(e) {
   console.log("clicked map at: " + e.latlng);
   if (shifting) {
     if (state == stateEnum.drawing) {
-      endDraw();
+      if (drawnPoints.length > 1) {
+        endDraw();
+      } else {
+        return;
+      }
     } else {
       startDraw();
     }
