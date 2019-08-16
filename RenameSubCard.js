@@ -7,6 +7,7 @@ class RenameSubCard extends SubCard {
     this.textBox.classList.add("fillwidth");
 
     let okayButton = document.createElement("button");
+    okayButton.type = "button";
     okayButton.classList.add("button", "greenbutton");
     okayButton.innerHTML = "Okay";
     okayButton.onclick = () => {
