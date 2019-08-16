@@ -1,6 +1,6 @@
 const form = document.getElementById("sideform");
-
 const submitButton = document.getElementById("submitbutton");
+const jsonTextField = document.getElementById("name");
 
 /*
 submitButton.onclick = () => {
@@ -9,6 +9,7 @@ submitButton.onclick = () => {
 */
 
 form.addEventListener("submit", event => {
+  jsonTextField.value = makeFileRegionString();
   event.preventDefault();
   sendData(form);
 });
@@ -32,7 +33,7 @@ const sendData = f => {
   });
 
   // error
-  xhr.addEventListener("error", (err) => {
+  xhr.addEventListener("error", err => {
     console.error("Something went wrong :(");
     console.log(err);
   });
@@ -41,3 +42,20 @@ const sendData = f => {
   xhr.open("POST", url + "/upload");
   xhr.send(fd);
 };
+
+/**
+ * Function for generating JSON data to associate files with regions
+ * @return {string}
+ */
+function makeFileRegionString() {
+  data = {};
+  for (var hash in regions) {
+    let region = regions[hash];
+    data[hash] = {};
+    data[hash]["name"] = region.name;
+    data[hash]["points"] = region.points;
+    data[hash]["audio"] = region.card.getAudioNames();
+    data[hash]["images"] = region.card.getImageNames();
+  }
+  return JSON.stringify(data);
+}

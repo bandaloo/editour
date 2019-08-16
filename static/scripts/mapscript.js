@@ -179,13 +179,14 @@ function renameRegion(hash, newName) {
 }
 
 /**
- * Adds region div to the document
+ * Adds region div to the document and region data for easy reference
  * @param {string} hash
  * @param {string} name
  */
 function addRegionDiv(hash, name) {
   let regionCard = new RegionCard(hash, name);
   sideNav.appendChild(regionCard.regionDiv);
+  regions[hash].card = regionCard;
 }
 
 myMap.on("click", onMapClick);
