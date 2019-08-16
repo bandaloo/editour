@@ -8,11 +8,12 @@ const toursLoc = __dirname + '/tours/'; // TODO maybe change this?
 const tempLoc = __dirname + '/temp/'; // TODO maybe change this?
 
 // serve index
-/*app.get('/', (req, res) => {
+/*
+app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
   // TODO serve the actual static front-end content
-});*/
-
+});
+*/
 
 // static directory
 app.use(express.static(__dirname + '/static'));
