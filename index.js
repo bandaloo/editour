@@ -48,61 +48,84 @@ app.post("/upload", (req, res) => {
       return;
     }
 
-    // create a file to stream archive data to
-    console.log("zipping and moving...");
-    const zipName = fields.name + "-" + new Date().valueOf() + ".zip";
-    const output = fs.createWriteStream(toursLoc + zipName);
-    const archive = archiver("zip");
+    // check for missing or invalid 'metadata field from client
+    if (typeof fields.metadata !== "string") {
+      console.error("Missing or invalid metadata field");
+      res.status(400).send(
+        JSON.stringify({
+          status: 400,
+          message: "Missing or invalid metadata field"
+        })
+      );
+      return;
+    }
 
-    // listen for all archive data to be written
-    // 'close' event is fired only when a file descriptor is involved
-    output.on("close", function() {
-      console.log("Zip written. " + archive.pointer() + " total bytes\n");
-      // send successful message to client
-      res
-        .status(201)
-        .send(JSON.stringify({ status: 201, message: "Received!" }));
-    });
-
-    // This event is fired when the data source is drained no matter what was
-    // the data source. It is not part of this library but rather from the
-    // NodeJS Stream API.
-    // @see: https://nodejs.org/api/stream.html#stream_event_end
-    output.on("end", function() {
-      console.log("Data has been drained");
-    });
-
-    // good practice to catch warnings (e.g. stat failures and other
-    // non-blocking errors)
-    archive.on("warning", function(err) {
-      if (err.code === "ENOENT") {
-        // log warning
-        console.error(err);
-      } else {
+    // write metadata to file in temp directory
+    fs.writeFile(tempDirPath + "metadata.json", fields.metadata, (err) => {
+      if (err) {
         // send errors back to client
         console.error(err);
         res.status(500).send(JSON.stringify({ status: 500, message: err }));
         return;
       }
+      console.log("wrote metadata.json");
+
+      // create a file to stream archive data to
+      console.log("zipping and moving...");
+      const zipName = fields.name + "-" + new Date().valueOf() + ".zip";
+      const output = fs.createWriteStream(toursLoc + zipName);
+      const archive = archiver("zip");
+
+      // listen for all archive data to be written
+      // 'close' event is fired only when a file descriptor is involved
+      output.on("close", function() {
+        console.log("Zip written. " + archive.pointer() + " total bytes\n");
+        // send successful message to client
+        res
+          .status(201)
+          .send(JSON.stringify({ status: 201, message: "Received!" }));
+      });
+
+      // This event is fired when the data source is drained no matter what was
+      // the data source. It is not part of this library but rather from the
+      // NodeJS Stream API.
+      // @see: https://nodejs.org/api/stream.html#stream_event_end
+      output.on("end", function() {
+        console.log("Data has been drained");
+      });
+
+      // good practice to catch warnings (e.g. stat failures and other
+      // non-blocking errors)
+      archive.on("warning", function(err) {
+        if (err.code === "ENOENT") {
+          // log warning
+          console.error(err);
+        } else {
+          // send errors back to client
+          console.error(err);
+          res.status(500).send(JSON.stringify({ status: 500, message: err }));
+          return;
+        }
+      });
+
+      // good practice to catch this error explicitly
+      archive.on("error", function(err) {
+        // send errors back to client
+        console.error(err);
+        res.status(500).send(JSON.stringify({ status: 500, message: err }));
+        return;
+      });
+
+      // pipe archive data to the file
+      archive.pipe(output);
+
+      // add the temp directory to the archive
+      archive.directory(tempDirPath, false);
+      // finalize to say we're done appending files
+      archive.finalize();
+
+      console.log("Completed");
     });
-
-    // good practice to catch this error explicitly
-    archive.on("error", function(err) {
-      // send errors back to client
-      console.error(err);
-      res.status(500).send(JSON.stringify({ status: 500, message: err }));
-      return;
-    });
-
-    // pipe archive data to the file
-    archive.pipe(output);
-
-    // add the temp directory to the archive
-    archive.directory(tempDirPath, false);
-    // finalize to say we're done appending files
-    archive.finalize();
-
-    console.log("Completed");
   });
 
   // log progress
