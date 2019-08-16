@@ -26,7 +26,8 @@ const sendData = f => {
   xhr.addEventListener("load", event => {
     console.log(event.target.responseText);
     if (JSON.parse(event.target.responseText).status === 201) {
-      document.getElementById("status").innerHTML = "complete";
+      // TODO show visually that the upload succeeded
+      // document.getElementById("status").innerHTML = "complete";
     }
   });
 
