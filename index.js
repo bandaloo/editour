@@ -12,155 +12,103 @@ app.use(express.static(__dirname + "/static"));
 
 // endpoint for file uploads
 app.post("/upload", (req, res) => {
+  // temporary directory for files to be saved to
   const tempDirPath = tempLoc + randName(10) + "/";
+  // create directory
+  try {
+    fs.mkdirSync(tempDirPath, { recursive: true });
+  } catch (err) {
+    if (err.code !== "EEXIST") {
+      returnError(res, 500, "server failed to create temp directory");
+      return;
+    } else {
+      console.error("other fileBegin error");
+      // TODO make this generate a new name and try again on EEXIST
+      // this should basically never happen so ¯\_(ツ)_/¯
+    }
+  }
+
+  // form object
   const form = new formidable.IncomingForm();
+  form.uploadDir = tempDirPath;
+  form.keepExtensions = true;
+  form.multiples = true;
 
   form.parse(req, (err, fields, files) => {
-    // send errors back to client
     if (err) {
-      console.error(err);
-      res.status(500).send(JSON.stringify({ status: 500, message: err }));
+      returnError(res, 400, "error parsing form");
       return;
     }
-
-    // simple check for empty files. TODO maybe this can be better?
-    for (const f in files) {
-      if (files[f].size === 0) {
-        console.error("File " + f + " size === 0");
-        res
-          .status(400)
-          .send(
-            JSON.stringify({ status: 400, message: "Empty file uploaded" })
-          );
-        return;
-      }
-    }
+    console.log("parsing request form...");
 
     // check for missing or invalid 'name' field from client
     if (typeof fields.name !== "string") {
-      console.error("Missing or invalid name field");
-      res.status(400).send(
-        JSON.stringify({
-          status: 400,
-          message: "Missing or invalid name field"
-        })
-      );
+      returnError(res, 400, "missing or invalid name field");
       return;
     }
 
     // check for missing or invalid 'metadata field from client
     if (typeof fields.metadata !== "string") {
-      console.error("Missing or invalid metadata field");
-      res.status(400).send(
-        JSON.stringify({
-          status: 400,
-          message: "Missing or invalid metadata field"
-        })
-      );
+      returnError(res, 400, "missing or invalid metadata field");
       return;
     }
 
-    // write metadata to file in temp directory
-    fs.writeFile(tempDirPath + "metadata.json", fields.metadata, (err) => {
-      if (err) {
-        // send errors back to client
-        console.error(err);
-        res.status(500).send(JSON.stringify({ status: 500, message: err }));
-        return;
-      }
-      console.log("wrote metadata.json");
+    // prepare archive
+    const tourName = fields.name
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[\/\?\=&]/g, "");
+    const zipName = tourName + "-" + new Date().valueOf() + ".zip";
+    const output = fs.createWriteStream(toursLoc + zipName);
+    const archive = archiver("zip");
 
-      // create a file to stream archive data to
-      console.log("zipping and moving...");
-      const zipName = fields.name + "-" + new Date().valueOf() + ".zip";
-      const output = fs.createWriteStream(toursLoc + zipName);
-      const archive = archiver("zip");
-
-      // listen for all archive data to be written
-      // 'close' event is fired only when a file descriptor is involved
-      output.on("close", function() {
-        console.log("Zip written. " + archive.pointer() + " total bytes\n");
-        // send successful message to client
-        res
-          .status(201)
-          .send(JSON.stringify({ status: 201, message: "Received!" }));
-      });
-
-      // This event is fired when the data source is drained no matter what was
-      // the data source. It is not part of this library but rather from the
-      // NodeJS Stream API.
-      // @see: https://nodejs.org/api/stream.html#stream_event_end
-      output.on("end", function() {
-        console.log("Data has been drained");
-      });
-
-      // good practice to catch warnings (e.g. stat failures and other
-      // non-blocking errors)
-      archive.on("warning", function(err) {
-        if (err.code === "ENOENT") {
-          // log warning
-          console.error(err);
-        } else {
-          // send errors back to client
-          console.error(err);
-          res.status(500).send(JSON.stringify({ status: 500, message: err }));
-          return;
-        }
-      });
-
-      // good practice to catch this error explicitly
-      archive.on("error", function(err) {
-        // send errors back to client
-        console.error(err);
-        res.status(500).send(JSON.stringify({ status: 500, message: err }));
-        return;
-      });
-
-      // pipe archive data to the file
-      archive.pipe(output);
-
-      // add the temp directory to the archive
-      archive.directory(tempDirPath, false);
-      // finalize to say we're done appending files
-      archive.finalize();
-
-      console.log("Completed");
+    // return errors to client
+    archive.on("error", err => {
+      returnError(res, 500, "error creating zip");
+      return;
     });
-  });
 
-  // log progress
-  form.on("progress", (bytesReceived, bytesExpected) => {
-    const percent = (bytesReceived / bytesExpected) * 100;
-    console.log(percent.toFixed(2) + "% complete...");
-  });
+    // log warnings but continue
+    archive.on("warning", err => {
+      console.error(err);
+    });
 
-  // log errors
-  form.on("error", err => {
-    console.error(err);
-    res.status(500).send(JSON.stringify({ status: 500, error: err }));
-    return;
-  });
+    // fired when file is done being written
+    output.on("close", () => {
+      console.log("zip written. " + archive.pointer() + " total bytes");
+      // send success
+      res
+        .status(201)
+        .send(JSON.stringify({ status: 201, message: "upload successful" }));
+    });
 
-  // save files to temp location initially
-  form.on("fileBegin", (name, file) => {
-    try {
-      fs.mkdirSync(tempDirPath, { recursive: true });
-    } catch (err) {
-      if (err.code !== "EEXIST") {
-        console.error(err);
-        res.status(500).send(
-          JSON.stringify({
-            status: 500,
-            message: "Server failed to save files"
-          })
-        );
-        return;
+    archive.pipe(output);
+
+    // add metadata as file
+    archive.append(fields.metadata, { name: "metadata.json" });
+
+    // add files of size > 0
+    for (const f in files) {
+      // Some members of `files' are actually arrays. These are from HTML file
+      // inputs with the `multiple' attribute
+      if (Array.isArray(files[f])) {
+        // add all files of arrays
+        for (const g of files[f]) {
+          if (g.size > 0) {
+            archive.file(g.path, { name: g.name });
+          }
+        }
       } else {
-        // TODO make this generate a new name and try again on EEXIST
-        // this should basically never happen so ¯\_(ツ)_/¯
+        // add singular files
+        if (files[f].size > 0) {
+          archive.file(files[f].path, { name: files[f].name });
+        }
       }
     }
-    file.path = tempDirPath + file.name;
+
+    // finish archive
+    archive.finalize();
   });
 });
 
@@ -210,6 +158,22 @@ const randName = n => {
     out += l[Math.floor(Math.random() * 36)];
   }
   return out;
+};
+
+/**
+ * Sends an error to the client with a specified status code and message
+ * @param {Response} res response object to send to
+ * @param {number} code HTTP status code
+ * @param {string} message message to send
+ */
+const returnError = (res, code, message) => {
+  console.error(message);
+  res.status(code).send(
+    JSON.stringify({
+      status: code,
+      message: message
+    })
+  );
 };
 
 app.listen(3000, () => {
