@@ -22,6 +22,14 @@ p {
   margin-bottom: 0px;
 }
 
+h3 {
+  cursor: pointer;
+}
+
+h3:hover {
+  color: #444444;
+}
+
 .sidenav {
   position: absolute;
   height: auto;
@@ -42,15 +50,21 @@ p {
 }
 
 .sidebox {
+  font-family: Helvetica, Arial, sans-serif;
   background-color: #ffffff;
   border-radius: 5px;
-  margin-bottom: 10px;
-  margin-top: 10px;
+  margin-bottom: 20px;
+  margin-top: 4px;
   padding: 10px;
   box-shadow: 0px 3px 0px #e2e4e8;
   border: solid;
   border-color: #e2e4e8;
   border-width: 1px;
+}
+
+.instructions {
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .button {
@@ -88,17 +102,34 @@ p {
   --bottom-color: #d19a00;
 }
 
+.outlinebutton {
+  --bottom-color: var(--bg-color);
+  border-color: var(--bg-color);
+  background-color: #ffffff;
+  border: solid 1px;
+  color: var(--bg-color);
+}
+
+/* could get rid of width and display */
+.revealer {
+  text-align: left;
+  width: 100%;
+  display: block;
+  margin: 4px 0px;
+}
+
 .input {
   background-color: #dddddd;
   border: none;
   border-radius: 2px;
   font-size: 12px;
   padding: 2px 8px;
+  margin-left: 2px;
   box-shadow: 0px 2px 0px #aaaaaa;
 }
 
 .button:active {
-  transform: translateY(2px); /*Move down*/
+  transform: translateY(2px);
   box-shadow: 0px 0px 0px var(--bottom-color);
 }
 
@@ -110,9 +141,13 @@ p {
   outline: none;
 }
 
-/* probably don't need this class anymore */
 .flex {
   display: flex;
+}
+
+.sidebox.latbox {
+  margin-top: 4px;
+  margin-bottom: 4px;
 }
 
 .vertical {
@@ -121,4 +156,9 @@ p {
 
 .fillwidth {
   flex: 1;
+}
+
+.hundredwidth {
+  width: 100%;
+  display: block;
 }

@@ -1,46 +1,46 @@
 class RenameSubCard extends SubCard {
   constructor(superCard) {
-    super(); // need to call super first and define later
-    this.superCard = superCard;
-    // TODO get rid of renameDiv in place of enclosingDiv
-    this.renameDiv = document.createElement("div");
-    this.renameDiv.classList.add("sidebox");
+    super(superCard, "flex");
 
     this.textBox = document.createElement("input");
     this.textBox.type = "text";
-    this.textBox.classList.add("input", "fillwidth");
+    this.textBox.classList.add("fillwidth");
 
-    this.okayButton = document.createElement("button");
-    this.okayButton.classList.add("button", "greenbutton");
-    this.okayButton.innerHTML = "Okay";
-    this.okayButton.onclick = () => {
+    let okayButton = document.createElement("button");
+    okayButton.classList.add("button", "greenbutton");
+    okayButton.innerHTML = "Okay";
+    okayButton.onclick = () => {
       renameRegion(superCard.hash, this.textBox.value);
       superCard.regionName.innerHTML = this.textBox.value;
       this.toggleCard();
     };
 
-    this.renameDiv.appendChild(this.textBox);
-    this.renameDiv.appendChild(this.okayButton);
+    this.enclosingDiv.appendChild(this.textBox);
+    this.enclosingDiv.appendChild(okayButton);
 
-    // setting stuff up for superclass
-    this.enclosingDiv = this.renameDiv;
-    this.originalDisplay = "flex";
-
-    // set associated button text to change
-    this.setToggleButton(superCard.renameButton, "Cancel");
-
-    // hide the card to start
-    this.toggleCard();
+    this.setToggleButton(superCard.renameButton, "Cancel Rename");
   }
 
+  /**
+   * Renames only the region data
+   * @param {string} hash
+   * @param {string} newName
+   */
   renameRegion(hash, newName) {
     regions[hash].name = newName;
   }
 
+  /**
+   * Clears the textbox when card is hidden (shouldn't really matter)
+   */
   whenMadeHidden() {
     this.textBox.value = "";
   }
 
+  /**
+   * Fills the textbox with the current name (useful if you just want to make a
+   * small change)
+   */
   whenMadeVisible() {
     console.log(this.superCard);
     this.textBox.value = regions[this.superCard.hash].name;

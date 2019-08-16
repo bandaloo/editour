@@ -1,8 +1,9 @@
 // treat this class as abstract please
 class SubCard {
-  // TODO can probably get rid of this constructor
-  constructor(enclosingDiv, originalDisplay) {
-    this.enclosingDiv = enclosingDiv;
+  constructor(superCard, originalDisplay) {
+    this.superCard = superCard;
+    this.enclosingDiv = document.createElement("div");
+    this.enclosingDiv.classList.add("sidebox");
     this.originalDisplay = originalDisplay;
   }
 
@@ -14,6 +15,9 @@ class SubCard {
     toggleButton.onclick = () => {
       this.toggleCard();
     };
+
+    // hide the card at the beginning, which also adds arrow
+    this.toggleCard();
   }
 
   isHidden() {
@@ -29,14 +33,13 @@ class SubCard {
     this.toggleOtherCard(this, this.showString, this.hideString);
   }
 
-  // TODO try to get rid of this function
   toggleOtherCard(card, showString, hideString) {
     if (card.isHidden()) {
       card.whenMadeVisible();
-      this.toggleButton.innerHTML = hideString;
+      this.toggleButton.innerHTML = "▼ " + hideString;
     } else {
       card.whenMadeHidden();
-      this.toggleButton.innerHTML = showString;
+      this.toggleButton.innerHTML = "► " + showString;
     }
     card.toggleHidden();
   }

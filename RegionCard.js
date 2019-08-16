@@ -1,6 +1,4 @@
-let testob;
 class RegionCard {
-  // TODO figure out what doesn't need to be a property
   constructor(hash, name = "unnamed region") {
     this.hash = hash;
 
@@ -11,38 +9,61 @@ class RegionCard {
     this.regionName.innerHTML = name;
     this.regionDiv.appendChild(this.regionName);
 
-    this.buttonDiv = document.createElement("div");
-    this.buttonDiv.classList.add("flex");
-
     this.deleteButton = document.createElement("button");
-    this.deleteButton.classList.add("button", "fillwidth");
+    this.deleteButton.classList.add("button", "outlinebutton", "revealer");
     this.deleteButton.innerHTML = "Delete";
-    this.buttonDiv.appendChild(this.deleteButton);
+
+    this.mediaButton = document.createElement("button");
+    this.mediaButton.classList.add(
+      "button",
+      "greenbutton",
+      "outlinebutton",
+      "revealer"
+    );
+    this.mediaButton.innerHTML = "Media";
 
     this.infoButton = document.createElement("button");
-    this.infoButton.classList.add("button", "orangebutton", "fillwidth");
+    this.infoButton.classList.add(
+      "button",
+      "orangebutton",
+      "outlinebutton",
+      "revealer"
+    );
     this.infoButton.innerHTML = "Info";
-    this.buttonDiv.appendChild(this.infoButton);
 
     this.renameButton = document.createElement("button");
-    this.renameButton.classList.add("button", "bluebutton", "fillwidth");
+    this.renameButton.classList.add(
+      "button",
+      "bluebutton",
+      "outlinebutton",
+      "revealer"
+    );
     this.renameButton.innerHTML = "Rename";
 
-    this.buttonDiv.appendChild(this.renameButton);
+    // make and add subcard divs with revealers on top
+    this.regionDiv.appendChild(this.renameButton);
 
-    // append region card divs
-    this.regionDiv.appendChild(this.buttonDiv);
-
-    // make and add subcard divs (no need for them to be properties)
     let renameSubCard = new RenameSubCard(this);
     renameSubCard.addDiv(this.regionDiv);
+
+    this.regionDiv.appendChild(this.mediaButton);
+
+    let mediaSubCard = new MediaSubCard(this);
+    mediaSubCard.addDiv(this.regionDiv);
+
+    this.regionDiv.appendChild(this.infoButton);
 
     let infoSubCard = new InfoSubCard(this);
     infoSubCard.addDiv(this.regionDiv);
 
+    this.regionDiv.appendChild(this.deleteButton);
+
+    let deleteSubCard = new DeleteSubCard(this);
+    deleteSubCard.addDiv(this.regionDiv);
+
     // set onclick event to zoom to bounds of region
-    this.regionDiv.onclick = () =>
+    this.regionName.onclick = () =>
       // padding is because sidebar covers map
-      myMap.flyToBounds(regions[hash].points, { paddingTopLeft: [300, 0] });
+      myMap.flyToBounds(regions[hash].points, { paddingTopLeft: [320, 0] });
   }
 }
