@@ -13,8 +13,8 @@
         <!-- input field not required because this gets populated procedurally -->
         <input
           type="text"
-          name="name"
-          id="name"
+          name="metadata"
+          id="metadata"
           placeholder="Region JSON"
           style="display: none"
         />
@@ -23,13 +23,17 @@
           To get started, <b>shift + click</b> on the map to start drawing a
           region. To finish drawing, press <b>shift + click</b> again. A card
           will appear in this side panel where you can edit the information.
-          <br />
-          Once you are done, hit this button to upload your data to the server.
+        </div>
+        <div class="sidebox flex">
           <input
-            type="submit"
-            value="Upload"
-            class="button greenbutton hundredwidth"
+            type="text"
+            name="name"
+            id="name"
+            placeholder="Name of Tour File"
+            class="fillwidth"
+            required
           />
+          <input type="submit" value="Upload" class="button greenbutton" />
         </div>
       </div>
     </form>
