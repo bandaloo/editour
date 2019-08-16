@@ -3,18 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <title>poly region</title>
-    <link rel="stylesheet" href="stylesheet.css" />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
-      integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
-      crossorigin=""
-    />
-    <script
-      src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
-      integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
-      crossorigin=""
-    ></script>
+    <link rel="stylesheet" href="styles/stylesheet.css" />
+    <link rel="stylesheet" href="styles/leaflet.css" />
+    <script src="scripts/leaflet.js"></script>
   </head>
   <body>
     <form id="sideform">
@@ -34,8 +25,8 @@
 
           <input
             type="text"
-            name="regionjson"
-            id="regionjson"
+            name="name"
+            id="name"
             placeholder="Region JSON"
             required
           />
@@ -43,14 +34,14 @@
       </div>
     </form>
     <div id="mapid" class="map"></div>
-    <script src="formhelpers.js"></script>
-    <script src="enums.js"></script>
-    <script src="SubCard.js"></script>
-    <script src="MediaSubCard.js"></script>
-    <script src="DeleteSubCard.js"></script>
-    <script src="InfoSubCard.js"></script>
-    <script src="RenameSubCard.js"></script>
-    <script src="RegionCard.js"></script>
-    <script src="mapscript.js"></script>
+    <script src="scripts/formhelpers.js"></script>
+    <script src="scripts/enums.js"></script>
+    <script src="scripts/SubCard.js"></script>
+    <script src="scripts/MediaSubCard.js"></script>
+    <script src="scripts/DeleteSubCard.js"></script>
+    <script src="scripts/InfoSubCard.js"></script>
+    <script src="scripts/RenameSubCard.js"></script>
+    <script src="scripts/RegionCard.js"></script>
+    <script src="scripts/mapscript.js"></script>
   </body>
 </html>

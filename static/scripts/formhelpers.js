@@ -31,8 +31,9 @@ const sendData = f => {
   });
 
   // error
-  xhr.addEventListener("error", () => {
+  xhr.addEventListener("error", (err) => {
     console.error("Something went wrong :(");
+    console.log(err);
   });
 
   // set up request
