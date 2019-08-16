@@ -9,10 +9,6 @@ submitButton.onclick = () => {
 */
 
 form.addEventListener("submit", event => {
-  if (isEmpty(regions)) {
-    alert("You must have at least one region to upload.");
-    return;
-  }
   jsonTextField.value = makeFileRegionString();
   event.preventDefault();
   sendData(form);
@@ -68,3 +64,12 @@ function makeFileRegionString() {
 function isEmpty(obj) {
   return Object.entries(obj).length === 0 && obj.constructor === Object;
 }
+
+submitButton.onclick = () => {
+  console.log("submit button clicked");
+  if (!isEmpty(regions)) {
+    form.submit();
+  } else {
+    alert("You must have at least one region to upload");
+  }
+};
