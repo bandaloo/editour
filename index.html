@@ -17,15 +17,33 @@
     ></script>
   </head>
   <body>
-    <div class="sidenav" id="sidenavid">
-      <div class="sidebox instructions" id="instructions">
-        <h2>Welcome to Editour!</h2>
-        To get started, <b>shift + click</b> on the map to start drawing a
-        region. To finish drawing, press <b>shift + click</b> again. A card will
-        appear in this side panel where you can edit the information.
+    <form id="sideform">
+      <div class="sidenav" id="sidenavid">
+        <div class="sidebox instructions" id="instructions">
+          <h2>Welcome to Editour!</h2>
+          To get started, <b>shift + click</b> on the map to start drawing a
+          region. To finish drawing, press <b>shift + click</b> again. A card
+          will appear in this side panel where you can edit the information.
+          <br />
+          Once you are done, hit this button to upload your data to the server.
+          <input
+            type="submit"
+            value="Upload"
+            class="button greenbutton hundredwidth"
+          />
+
+          <input
+            type="text"
+            name="regionjson"
+            id="regionjson"
+            placeholder="Region JSON"
+            required
+          />
+        </div>
       </div>
-    </div>
+    </form>
     <div id="mapid" class="map"></div>
+    <script src="formhelpers.js"></script>
     <script src="enums.js"></script>
     <script src="SubCard.js"></script>
     <script src="MediaSubCard.js"></script>

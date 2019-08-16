@@ -10,10 +10,12 @@ class RegionCard {
     this.regionDiv.appendChild(this.regionName);
 
     this.deleteButton = document.createElement("button");
+    this.deleteButton.type = "button";
     this.deleteButton.classList.add("button", "outlinebutton", "revealer");
     this.deleteButton.innerHTML = "Delete";
 
     this.mediaButton = document.createElement("button");
+    this.mediaButton.type = "button";
     this.mediaButton.classList.add(
       "button",
       "greenbutton",
@@ -23,6 +25,7 @@ class RegionCard {
     this.mediaButton.innerHTML = "Media";
 
     this.infoButton = document.createElement("button");
+    this.infoButton.type = "button";
     this.infoButton.classList.add(
       "button",
       "orangebutton",
@@ -32,6 +35,7 @@ class RegionCard {
     this.infoButton.innerHTML = "Info";
 
     this.renameButton = document.createElement("button");
+    this.renameButton.type = "button";
     this.renameButton.classList.add(
       "button",
       "bluebutton",
