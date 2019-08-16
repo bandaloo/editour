@@ -10,6 +10,14 @@
   <body>
     <form id="sideform">
       <div class="sidenav" id="sidenavid">
+        <!-- input field not required because this gets populated procedurally -->
+        <input
+          type="text"
+          name="name"
+          id="name"
+          placeholder="Region JSON"
+          style="display: none"
+        />
         <div class="sidebox instructions" id="instructions">
           <h2>Welcome to Editour!</h2>
           To get started, <b>shift + click</b> on the map to start drawing a
@@ -21,14 +29,6 @@
             type="submit"
             value="Upload"
             class="button greenbutton hundredwidth"
-          />
-
-          <input
-            type="text"
-            name="name"
-            id="name"
-            placeholder="Region JSON"
-            required
           />
         </div>
       </div>

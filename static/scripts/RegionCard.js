@@ -47,27 +47,46 @@ class RegionCard {
     // make and add subcard divs with revealers on top
     this.regionDiv.appendChild(this.renameButton);
 
-    let renameSubCard = new RenameSubCard(this);
-    renameSubCard.addDiv(this.regionDiv);
+    this.renameSubCard = new RenameSubCard(this);
+    this.renameSubCard.addDiv(this.regionDiv);
 
     this.regionDiv.appendChild(this.mediaButton);
 
-    let mediaSubCard = new MediaSubCard(this);
-    mediaSubCard.addDiv(this.regionDiv);
+    this.mediaSubCard = new MediaSubCard(this);
+    this.mediaSubCard.addDiv(this.regionDiv);
 
     this.regionDiv.appendChild(this.infoButton);
 
-    let infoSubCard = new InfoSubCard(this);
-    infoSubCard.addDiv(this.regionDiv);
+    this.infoSubCard = new InfoSubCard(this);
+    this.infoSubCard.addDiv(this.regionDiv);
 
     this.regionDiv.appendChild(this.deleteButton);
 
-    let deleteSubCard = new DeleteSubCard(this);
-    deleteSubCard.addDiv(this.regionDiv);
+    this.deleteSubCard = new DeleteSubCard(this);
+    this.deleteSubCard.addDiv(this.regionDiv);
 
     // set onclick event to zoom to bounds of region
     this.regionName.onclick = () =>
       // padding is because sidebar covers map
       myMap.flyToBounds(regions[hash].points, { paddingTopLeft: [320, 0] });
+  }
+
+  getAudioNames() {
+    return this.getNames(this.mediaSubCard.audioFileInput);
+  }
+
+  getImageNames() {
+    return this.getNames(this.mediaSubCard.imageFileInput);
+  }
+
+  getNames(fileInput) {
+    // would like to use map on FileList, but doesn't have Array.prototype in chain
+    //return this.mediaSubCard.audioFileInput.files.map(file => file.name);
+    let names = [];
+    let files = fileInput.files;
+    for (let i = 0; i < files.length; i++) {
+      names.push(files[i].name);
+    }
+    return names;
   }
 }
