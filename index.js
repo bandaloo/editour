@@ -29,18 +29,27 @@ app.post("/upload", (req, res) => {
       res.status(500).send(JSON.stringify({ status: 500, message: err }));
       return;
     }
-    console.log(fields);
-    console.log(files);
+
+    // simple check for empty files. TODO maybe this can be better?
+    for (const f in files) {
+      if (files[f].size === 0) {
+        res
+          .status(400)
+          .send(
+            JSON.stringify({ status: 400, message: "Empty file uploaded" })
+          );
+      }
+      return;
+    }
+
     // check for missing or invalid 'name' field from client
     if (typeof fields.name !== "string") {
-      res
-        .status(400)
-        .send(
-          JSON.stringify({
-            status: 400,
-            message: "Missing or invalid name field"
-          })
-        );
+      res.status(400).send(
+        JSON.stringify({
+          status: 400,
+          message: "Missing or invalid name field"
+        })
+      );
       return;
     }
 
@@ -114,25 +123,25 @@ app.post("/upload", (req, res) => {
 
   // save files to temp location initially
   form.on("fileBegin", (name, file) => {
-    try {
-      fs.mkdirSync(tempDirPath, { recursive: true });
-    } catch (err) {
-      if (err.code !== "EEXIST") {
-        res
-          .status(500)
-          .send(
+    if (file.size !== 0) {
+      try {
+        fs.mkdirSync(tempDirPath, { recursive: true });
+      } catch (err) {
+        if (err.code !== "EEXIST") {
+          res.status(500).send(
             JSON.stringify({
               status: 500,
               message: "Server failed to save files"
             })
           );
-        return;
-      } else {
-        // TODO make this generate a new name and try again on EEXIST
-        // this should basically never happen so ¯\_(ツ)_/¯
+          return;
+        } else {
+          // TODO make this generate a new name and try again on EEXIST
+          // this should basically never happen so ¯\_(ツ)_/¯
+        }
       }
+      file.path = tempDirPath + file.name;
     }
-    file.path = tempDirPath + file.name;
   });
 });
 
@@ -141,21 +150,18 @@ app.post("/upload", (req, res) => {
 app.get("/tour/:name", (req, res) => {
   fs.readdir(toursLoc, (err, files) => {
     if (err) {
-      res
-        .status(500)
-        .send(
-          JSON.stringify({
-            status: 500,
-            message: "unable to read from tours directory"
-          })
-        );
+      res.status(500).send(
+        JSON.stringify({
+          status: 500,
+          message: "unable to read from tours directory"
+        })
+      );
       return;
     }
 
     // filter out files that don't start with the name we're looking for
     files = files.filter(f => f.startsWith(req.params.name));
 
-    console.log(files);
     // if no files left 404
     if (files.length < 1) {
       res.status(404).send(
