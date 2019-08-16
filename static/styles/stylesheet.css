@@ -124,7 +124,6 @@ h3:hover {
   border-radius: 2px;
   font-size: 12px;
   padding: 2px 8px;
-  margin-left: 2px;
   box-shadow: 0px 2px 0px #aaaaaa;
 }
 
@@ -161,4 +160,9 @@ h3:hover {
 .hundredwidth {
   width: 100%;
   display: block;
+}
+
+.nosidemargins {
+  margin-left: 0px;
+  margin-right: 0px;
 }

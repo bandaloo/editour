@@ -1,6 +1,6 @@
 const form = document.getElementById("sideform");
 const submitButton = document.getElementById("submitbutton");
-const jsonTextField = document.getElementById("name");
+const jsonTextField = document.getElementById("metadata");
 
 /*
 submitButton.onclick = () => {
@@ -9,6 +9,10 @@ submitButton.onclick = () => {
 */
 
 form.addEventListener("submit", event => {
+  if (isEmpty(regions)) {
+    alert("You must have at least one region to upload.");
+    return;
+  }
   jsonTextField.value = makeFileRegionString();
   event.preventDefault();
   sendData(form);
@@ -58,4 +62,9 @@ function makeFileRegionString() {
     data[hash]["images"] = region.card.getImageNames();
   }
   return JSON.stringify(data);
+}
+
+// TODO check if we need this anymore
+function isEmpty(obj) {
+  return Object.entries(obj).length === 0 && obj.constructor === Object;
 }
