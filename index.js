@@ -7,14 +7,6 @@ const app = express();
 const toursLoc = __dirname + "/tours/"; // TODO maybe change this?
 const tempLoc = __dirname + "/temp/"; // TODO maybe change this?
 
-// serve index
-/*
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-  // TODO serve the actual static front-end content
-});
-*/
-
 // static directory
 app.use(express.static(__dirname + "/static"));
 
@@ -26,6 +18,7 @@ app.post("/upload", (req, res) => {
   form.parse(req, (err, fields, files) => {
     // send errors back to client
     if (err) {
+      console.error(err);
       res.status(500).send(JSON.stringify({ status: 500, message: err }));
       return;
     }
@@ -33,17 +26,19 @@ app.post("/upload", (req, res) => {
     // simple check for empty files. TODO maybe this can be better?
     for (const f in files) {
       if (files[f].size === 0) {
+        console.error("File " + f + " size === 0");
         res
           .status(400)
           .send(
             JSON.stringify({ status: 400, message: "Empty file uploaded" })
           );
+        return;
       }
-      return;
     }
 
     // check for missing or invalid 'name' field from client
     if (typeof fields.name !== "string") {
+      console.error("Missing or invalid name field");
       res.status(400).send(
         JSON.stringify({
           status: 400,
@@ -85,6 +80,7 @@ app.post("/upload", (req, res) => {
         console.error(err);
       } else {
         // send errors back to client
+        console.error(err);
         res.status(500).send(JSON.stringify({ status: 500, message: err }));
         return;
       }
@@ -93,6 +89,7 @@ app.post("/upload", (req, res) => {
     // good practice to catch this error explicitly
     archive.on("error", function(err) {
       // send errors back to client
+      console.error(err);
       res.status(500).send(JSON.stringify({ status: 500, message: err }));
       return;
     });
@@ -123,25 +120,24 @@ app.post("/upload", (req, res) => {
 
   // save files to temp location initially
   form.on("fileBegin", (name, file) => {
-    if (file.size !== 0) {
-      try {
-        fs.mkdirSync(tempDirPath, { recursive: true });
-      } catch (err) {
-        if (err.code !== "EEXIST") {
-          res.status(500).send(
-            JSON.stringify({
-              status: 500,
-              message: "Server failed to save files"
-            })
-          );
-          return;
-        } else {
-          // TODO make this generate a new name and try again on EEXIST
-          // this should basically never happen so ¯\_(ツ)_/¯
-        }
+    try {
+      fs.mkdirSync(tempDirPath, { recursive: true });
+    } catch (err) {
+      if (err.code !== "EEXIST") {
+        console.error(err);
+        res.status(500).send(
+          JSON.stringify({
+            status: 500,
+            message: "Server failed to save files"
+          })
+        );
+        return;
+      } else {
+        // TODO make this generate a new name and try again on EEXIST
+        // this should basically never happen so ¯\_(ツ)_/¯
       }
-      file.path = tempDirPath + file.name;
     }
+    file.path = tempDirPath + file.name;
   });
 });
 
@@ -150,6 +146,7 @@ app.post("/upload", (req, res) => {
 app.get("/tour/:name", (req, res) => {
   fs.readdir(toursLoc, (err, files) => {
     if (err) {
+      console.error(err);
       res.status(500).send(
         JSON.stringify({
           status: 500,
