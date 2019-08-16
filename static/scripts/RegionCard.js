@@ -6,6 +6,7 @@ class RegionCard {
     this.regionDiv.className = "sidebox";
 
     this.regionName = document.createElement("h3");
+    this.regionName.className = "regionname";
     this.regionName.innerHTML = name;
     this.regionDiv.appendChild(this.regionName);
 

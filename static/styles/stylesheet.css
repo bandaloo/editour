@@ -22,11 +22,11 @@ p {
   margin-bottom: 0px;
 }
 
-h3 {
+.regionname {
   cursor: pointer;
 }
 
-h3:hover {
+.regionname:hover {
   color: #444444;
 }
 
