@@ -6,7 +6,7 @@ class InfoSubCard extends SubCard {
 
     for (let i = 0; i < points.length; i++) {
       let coordDiv = document.createElement("div");
-      coordDiv.classList.add("sidebox", "latbox");
+      coordDiv.classList.add("sidebox", "internalbox");
 
       // create new p elements for latitude and longitude
       let p1 = document.createElement("p");
