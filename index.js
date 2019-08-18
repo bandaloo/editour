@@ -34,8 +34,10 @@ app.post("/upload", (req, res) => {
   form.keepExtensions = true;
   form.multiples = true;
 
+  // parse incoming form data
   form.parse(req, (err, fields, files) => {
     if (err) {
+      // if something goes wrong while parsing it's probably an invalid request
       returnError(res, 400, "error parsing form");
       return;
     }
@@ -53,13 +55,15 @@ app.post("/upload", (req, res) => {
       return;
     }
 
-    // prepare archive
+    // format input name to it's URL-friendly
     const tourName = fields.name
       .trim()
       .toLowerCase()
       .replace(/\s+/g, "-")
       .replace(/[\/\?\=&]/g, "");
     const zipName = tourName + "-" + new Date().valueOf() + ".zip";
+
+    // prepare archive
     const output = fs.createWriteStream(toursLoc + zipName);
     const archive = archiver("zip");
 
@@ -117,13 +121,7 @@ app.post("/upload", (req, res) => {
 app.get("/tour/:name", (req, res) => {
   fs.readdir(toursLoc, (err, files) => {
     if (err) {
-      console.error(err);
-      res.status(500).send(
-        JSON.stringify({
-          status: 500,
-          message: "unable to read from tours directory"
-        })
-      );
+      returnError(res, 500, "unable to read from tours directory");
       return;
     }
 
@@ -132,12 +130,7 @@ app.get("/tour/:name", (req, res) => {
 
     // if no files left 404
     if (files.length < 1) {
-      res.status(404).send(
-        JSON.stringify({
-          status: 404,
-          message: "couldn't find tour with the name " + req.params.name
-        })
-      );
+      returnError(res, 404, "couldn't find tour " + req.params.name);
       return;
     }
 
@@ -161,9 +154,10 @@ const randName = n => {
 };
 
 /**
- * Sends an error to the client with a specified status code and message
+ * Logs an error to the console, then sends it to the client with a specified
+ * status code and message
  * @param {Response} res response object to send to
- * @param {number} code HTTP status code
+ * @param {number} code HTTP status code, e.g. 404
  * @param {string} message message to send
  */
 const returnError = (res, code, message) => {
