@@ -22,11 +22,11 @@ p {
   margin-bottom: 0px;
 }
 
-h3 {
+.regionname {
   cursor: pointer;
 }
 
-h3:hover {
+.regionname:hover {
   color: #444444;
 }
 
@@ -53,8 +53,8 @@ h3:hover {
   font-family: Helvetica, Arial, sans-serif;
   background-color: #ffffff;
   border-radius: 5px;
-  margin-bottom: 20px;
-  margin-top: 4px;
+  margin-bottom: 8px;
+  margin-top: 0px;
   padding: 10px;
   box-shadow: 0px 3px 0px #e2e4e8;
   border: solid;
@@ -144,7 +144,7 @@ h3:hover {
   display: flex;
 }
 
-.sidebox.latbox {
+.sidebox.internalbox {
   margin-top: 4px;
   margin-bottom: 4px;
 }

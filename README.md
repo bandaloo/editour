@@ -12,6 +12,6 @@ npm start
 Navigate to `http://localhost:3000/` and upload some files. Then request them at
 `http://localhost:3000/tour/:name` (replace `:name` with the name you input)
 
-# Linter
+## Code Formatter
 
-Use Prettier when making PRs (sorry for the inconvenience)
+Use the Prettier code formatter when making PRs
