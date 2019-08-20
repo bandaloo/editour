@@ -9,7 +9,7 @@ submitButton.onclick = () => {
 */
 
 form.addEventListener("submit", event => {
-  jsonTextField.value = makeFileRegionString();
+  jsonTextField.value = JSON.stringify(makeFileRegionString());
   event.preventDefault();
   sendData(form);
 });
@@ -64,6 +64,7 @@ function makeFileRegionString() {
     // add the json region to json data
     data.regions.push(jsonRegion);
   }
+  console.log(data);
   return data;
 }
 
