@@ -48,14 +48,28 @@ const sendData = f => {
  * @return {string}
  */
 function makeFileRegionString() {
-  data = {};
+  data = { regions: [] };
   for (var hash in regions) {
-    let region = regions[hash];
-    data[hash] = {};
-    data[hash]["name"] = region.name;
-    data[hash]["points"] = region.points;
-    data[hash]["audio"] = region.card.getAudioNames();
-    data[hash]["images"] = region.card.getImageNames();
+    // real region to build a json region out of
+    let realRegion = regions[hash];
+
+    // json region to reflect the real region
+    let jsonRegion = {
+      name: realRegion.name,
+      points: listsToLatLngs(realRegion.points),
+      audio: realRegion.card.getAudioNames(),
+      images: realRegion.card.getImageNames()
+    };
+
+    // add the json region to json data
+    data.regions.push(jsonRegion);
   }
-  return JSON.stringify(data);
+  return data;
+}
+
+// TODO shouldn't need this once we change to lat lng coordinate objects
+function listsToLatLngs(lists) {
+  return lists.map(list => {
+    return { lat: list[0], lng: list[1] };
+  });
 }
