@@ -8,6 +8,7 @@ const toursLoc = __dirname + "/tours/"; // TODO maybe change this?
 const tempLoc = __dirname + "/temp/"; // TODO maybe change this?
 
 // static directory
+// requests that don't match any of the other endpoints will be served from here
 app.use(express.static(__dirname + "/static"));
 
 // endpoint for file uploads
@@ -55,6 +56,33 @@ app.post("/upload", (req, res) => {
       return;
     }
 
+    // check for duplicate filenames in metadata
+    try {
+      // this is a horrible one-line hack that parses the metadata field,
+      // extracts the arrays for the "audio" and "images" field of each region,
+      // and flattens them together into one big sorted array of filenames
+      /** @type string[] */
+      const filenames = [].concat
+        .apply(
+          [],
+          JSON.parse(fields.metadata)["regions"].map(
+            x => x["audio"].concat(x["images"])
+            // TODO ^ if more file fields are added they should be added here
+          )
+        )
+        .sort();
+
+      // now check to make sure all of the filenames are unique
+      for (let i = 0; i < filenames.length - 1; ++i) {
+        if (filenames[i] === filenames[i + 1]) {
+          throw new Error("Duplicate file found");
+        }
+      }
+    } catch (err) {
+      returnError(res, 400, "multiple files with the same name");
+      return;
+    }
+
     // format input name to it's URL-friendly
     const tourName = fields.name
       .trim()
@@ -96,6 +124,8 @@ app.post("/upload", (req, res) => {
     for (const f in files) {
       // Some members of `files' are actually arrays. These are from HTML file
       // inputs with the `multiple' attribute
+      // TODO it might be worth checking whether the filenames here correspond
+      // to filenames in the metadata field as an error check
       if (Array.isArray(files[f])) {
         // add all files of arrays
         for (const g of files[f]) {
