@@ -58,18 +58,18 @@ app.post("/upload", (req, res) => {
       }
       parsedMetadata = JSON.parse(fields.metadata);
     } catch (err) {
-        returnError(res, 400, "missing or invalid metadata field");
-        return;
+      returnError(res, 400, "missing or invalid metadata field");
+      return;
     }
 
-    console.log(parsedMetadata);
     // check for duplicate filenames in metadata
+    let filenames;
     try {
       // this is a horrible one-line hack that parses the metadata field,
       // extracts the arrays for the "audio" and "images" field of each region,
       // and flattens them together into one big sorted array of filenames
       /** @type string[] */
-      const filenames = [].concat
+      filenames = [].concat
         .apply(
           [],
           parsedMetadata["regions"].map(
@@ -87,6 +87,40 @@ app.post("/upload", (req, res) => {
       }
     } catch (err) {
       returnError(res, 400, "multiple files with the same name");
+      return;
+    }
+
+    try {
+      // make sure all uploaded filenames are in the metadata file
+      // we check this here so that it doesn't get halfway through writing the
+      // zip before realizing an error. That would leave us with a half-written,
+      // corrupted zip
+      for (const f in files) {
+        // Some members of `files' are actually arrays. These are from HTML file
+        // inputs with the `multiple' attribute
+        if (Array.isArray(files[f])) {
+          // add all files of array
+          for (const g of files[f]) {
+            // ignore files with size 0, they won't be added to the zip anyway
+            if (g.size > 0 && filenames.indexOf(g.name) < 0) {
+              throw new Error(
+                "uploaded file " + g.name + " not present in metadata"
+              );
+            }
+          }
+        } else {
+          // check singular file inputs
+          // ignore files with size 0, they won't be added to the zip anyway
+          if (files[f].size > 0 && filenames.indexOf(files[f].name) < 0) {
+            throw new Error(
+              "uploaded file " + files[f].name + " not present in metadata"
+            );
+          }
+        }
+      }
+    } catch (err) {
+      console.error(err.message);
+      returnError(res, 400, err.message);
       return;
     }
 
@@ -124,15 +158,10 @@ app.post("/upload", (req, res) => {
 
     archive.pipe(output);
 
-    // add metadata as file
-    archive.append(fields.metadata, { name: "metadata.json" });
-
     // add files of size > 0
     for (const f in files) {
       // Some members of `files' are actually arrays. These are from HTML file
       // inputs with the `multiple' attribute
-      // TODO it might be worth checking whether the filenames here correspond
-      // to filenames in the metadata field as an error check
       if (Array.isArray(files[f])) {
         // add all files of arrays
         for (const g of files[f]) {
@@ -141,12 +170,15 @@ app.post("/upload", (req, res) => {
           }
         }
       } else {
-        // add singular files
+        // add singular file inputs
         if (files[f].size > 0) {
           archive.file(files[f].path, { name: files[f].name });
         }
       }
     }
+
+    // add metadata as file
+    archive.append(fields.metadata, { name: "metadata.json" });
 
     // finish archive
     archive.finalize();
