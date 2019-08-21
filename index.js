@@ -51,11 +51,18 @@ app.post("/upload", (req, res) => {
     }
 
     // check for missing or invalid 'metadata field from client
-    if (typeof fields.metadata !== "string") {
-      returnError(res, 400, "missing or invalid metadata field");
-      return;
+    let parsedMetadata;
+    try {
+      if (typeof fields.metadata !== "string") {
+        throw new Error("invalid metadata type");
+      }
+      parsedMetadata = JSON.parse(fields.metadata);
+    } catch (err) {
+        returnError(res, 400, "missing or invalid metadata field");
+        return;
     }
 
+    console.log(parsedMetadata);
     // check for duplicate filenames in metadata
     try {
       // this is a horrible one-line hack that parses the metadata field,
@@ -65,7 +72,7 @@ app.post("/upload", (req, res) => {
       const filenames = [].concat
         .apply(
           [],
-          JSON.parse(fields.metadata)["regions"].map(
+          parsedMetadata["regions"].map(
             x => x["audio"].concat(x["images"])
             // TODO ^ if more file fields are added they should be added here
           )
