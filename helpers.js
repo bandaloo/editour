@@ -1,3 +1,4 @@
+// constants
 const toursLoc = __dirname + "/tours/"; // TODO maybe change this?
 const tempLoc = __dirname + "/temp/"; // TODO maybe change this?
 

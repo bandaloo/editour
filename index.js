@@ -20,9 +20,12 @@ app.post("/upload", (req, res) => {
       helpers.returnError(res, 500, "server failed to create temp directory");
       return;
     } else {
-      console.error("other fileBegin error");
+      console.error("EEXIST error");
       // TODO make this generate a new name and try again on EEXIST
-      // this should basically never happen so ¯\_(ツ)_/¯
+      // I think it should still work as long as two requests don't generate the
+      // same name while one of them is still writing, which is astronomically
+      // unlikely. The new files should just overwrite the old ones in the temp
+      // directory, which shouldn't matter ¯\_(ツ)_/¯
     }
   }
 
@@ -34,8 +37,8 @@ app.post("/upload", (req, res) => {
 
   // parse incoming form data
   form.parse(req, (err, fields, files) => {
-    // send everything to a helper function that parses the form and then sends a:w
-
+    // send everything to a helper function that parses the form and sends a
+    // status/message to the callback
     require("./parseForm")(err, fields, files, out => {
       if (out.status === 201) {
         // successful, send success message
