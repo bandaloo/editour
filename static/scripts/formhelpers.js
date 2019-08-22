@@ -25,10 +25,20 @@ const sendData = f => {
 
   // successful data submission
   xhr.addEventListener("load", event => {
-    console.log(event.target.responseText);
-    if (JSON.parse(event.target.responseText).status === 201) {
-      // TODO show visually that the upload succeeded
-      // document.getElementById("status").innerHTML = "complete";
+    let responseText = event.target.responseText;
+    let parsedResponse = JSON.parse(responseText);
+    console.log(responseText);
+    const uploadMessageElem = document.getElementById("uploadmessage");
+    if (parsedResponse.status === 201) {
+      uploadMessageElem.style.color = colorEnum.uploadSuccessful;
+      uploadMessageElem.innerHTML = "uploaded successfully!";
+    } else {
+      // 400 for client error; 500 if it's a serverside error
+      //alert(`there was a problem: status ${parsedResponse.status}`);
+      uploadMessageElem.style.color = colorEnum.uploadFailed;
+      uploadMessageElement.innerHTML = `there was a problem: ${
+        parsedResponse.message
+      }`;
     }
   });
 
