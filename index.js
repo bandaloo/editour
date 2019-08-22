@@ -71,7 +71,7 @@ app.get("/tour/:name", (req, res) => {
       return;
     }
 
-    // return the lexigraphically last filename, it's the most recent
+    // return the lexicographically last filename, it's the most recent
     res.status(200).sendFile(helpers.toursLoc + files.sort()[files.length - 1]);
   });
 });
