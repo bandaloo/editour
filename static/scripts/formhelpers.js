@@ -36,7 +36,7 @@ const sendData = f => {
       // 400 for client error; 500 if it's a serverside error
       //alert(`there was a problem: status ${parsedResponse.status}`);
       uploadMessageElem.style.color = colorEnum.uploadFailed;
-      uploadMessageElement.innerHTML = `there was a problem: ${
+      uploadMessageElem.innerHTML = `there was a problem: ${
         parsedResponse.message
       }`;
     }
