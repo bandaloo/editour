@@ -2,12 +2,6 @@ const form = document.getElementById("sideform");
 const submitButton = document.getElementById("submitbutton");
 const jsonTextField = document.getElementById("metadata");
 
-/*
-submitButton.onclick = () => {
-  sendData(form);
-};
-*/
-
 form.addEventListener("submit", event => {
   jsonTextField.value = JSON.stringify(makeFileRegionString());
   event.preventDefault();
@@ -27,16 +21,14 @@ const sendData = f => {
   xhr.addEventListener("load", event => {
     let responseText = event.target.responseText;
     let parsedResponse = JSON.parse(responseText);
-    console.log(responseText);
-    const uploadMessageElem = document.getElementById("uploadmessage");
+    const uploadMessageElem = document.getElementById("upload-message");
     if (parsedResponse.status === 201) {
       uploadMessageElem.style.color = colorEnum.uploadSuccessful;
-      uploadMessageElem.innerHTML = "uploaded successfully!";
+      uploadMessageElem.innerHTML = "Uploaded successfully!";
     } else {
       // 400 for client error; 500 if it's a serverside error
-      //alert(`there was a problem: status ${parsedResponse.status}`);
       uploadMessageElem.style.color = colorEnum.uploadFailed;
-      uploadMessageElem.innerHTML = `there was a problem: ${
+      uploadMessageElem.innerHTML = `There was a problem: ${
         parsedResponse.message
       }`;
     }
