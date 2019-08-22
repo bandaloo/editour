@@ -8,5 +8,7 @@ const stateEnum = Object.freeze({
 const colorEnum = Object.freeze({
   // TODO pick some better colors
   drawing: "#ff0000",
-  region: "#0000ff"
+  region: "#0000ff",
+  uploadSuccessful: "#3ddb62",
+  uploadFailed: "#f26868"
 });

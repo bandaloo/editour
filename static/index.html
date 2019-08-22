@@ -10,7 +10,6 @@
   <body>
     <form id="sideform">
       <div class="sidenav" id="sidenavid">
-        <!-- input field not required because this gets populated procedurally -->
         <input
           type="text"
           name="metadata"
@@ -24,16 +23,21 @@
           region. To finish drawing, press <b>shift + click</b> again. A card
           will appear in this side panel where you can edit the information.
         </div>
-        <div class="sidebox flex">
-          <input
-            type="text"
-            name="name"
-            id="name"
-            placeholder="Name of Tour File"
-            class="fillwidth"
-            required
-          />
-          <input type="submit" value="Upload" class="button greenbutton" />
+        <div class="sidebox">
+          <div class="flex">
+            <input
+              type="text"
+              name="tourName"
+              id="tour-name"
+              placeholder="Name of Tour File"
+              class="fillwidth"
+              required
+            />
+            <input type="submit" value="Upload" class="button greenbutton" />
+          </div>
+          <p class="sidebox uploadmessage" id="upload-message">
+            Tour not yet uploaded
+          </p>
         </div>
       </div>
     </form>

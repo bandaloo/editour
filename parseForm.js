@@ -29,7 +29,7 @@ const parseForm = (err, fields, files, cb) => {
   console.log("parsing request form...");
 
   // check for missing or invalid 'name' field from client
-  if (typeof fields.name !== "string") {
+  if (typeof fields.tourName !== "string") {
     cb(outObj(400, "missing or invalid name field"));
     return;
   }
@@ -108,7 +108,7 @@ const parseForm = (err, fields, files, cb) => {
   }
 
   // format input name to it's URL-friendly
-  const tourName = fields.name
+  const tourName = fields.tourName
     .trim()
     .toLowerCase()
     .replace(/\s+/g, "-")

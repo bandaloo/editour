@@ -15,6 +15,8 @@ var shifting = false;
 // div where all the region cards are added
 const sideNav = document.getElementById("sidenavid");
 
+const uploadMessageElem = document.getElementById("upload-message");
+
 // temporarily shown lines used for drawing
 var polyline = L.polyline([], { color: colorEnum.drawing });
 var connectBack = L.polyline([], {
