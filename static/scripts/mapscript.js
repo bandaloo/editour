@@ -34,8 +34,8 @@ var state = stateEnum.selecting;
 
 // increasing max zoom of the map causes it to freak out
 var myMap = L.map("mapid", {
-  //center: [34.982153, 135.963641], //Ritsumeikan
-  center: [35.039282, 135.730327], // Kinkakuji
+  center: [34.982153, 135.963641], //Ritsumeikan
+  //center: [35.039282, 135.730327], // Kinkakuji
   zoom: 17,
   zoomControl: false, // prevent zoom control from being added
   doubleClickZoom: false // double click annoying when drawing shapes

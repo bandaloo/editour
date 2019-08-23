@@ -18,6 +18,7 @@ const sendData = f => {
   const fd = new FormData(f);
 
   // successful data submission
+  // TODO change this to onload
   xhr.addEventListener("load", event => {
     let responseText = event.target.responseText;
     let parsedResponse = JSON.parse(responseText);
@@ -75,4 +76,31 @@ function listsToLatLngs(lists) {
   return lists.map(list => {
     return { lat: list[0], lng: list[1] };
   });
+}
+
+function requestTour(tourName) {
+  const href = window.location.href;
+  const xhr = new XMLHttpRequest();
+  const str = `${href}edit/${tourName}`;
+  console.log(str);
+
+  xhr.open("GET", str);
+
+  xhr.onload = event => {
+    if (xhr.status != 200) {
+      // TODO make a text box that has info just like the upload button
+      console.log("there was an error");
+    } else {
+      console.log("done");
+      let responseText = event.target.responseText;
+      let parsedResponse = JSON.parse(responseText);
+      // TODO rebuild everything from that metadata of parsedResponse
+    }
+  };
+
+  xhr.onerror = () => {
+    alert("request failed");
+  };
+
+  xhr.send();
 }
