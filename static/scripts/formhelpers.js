@@ -52,7 +52,7 @@ const sendData = f => {
  */
 function makeFileRegionString() {
   data = { regions: [] };
-  for (var hash in regions) {
+  for (let hash in regions) {
     // real region to build a json region out of
     let realRegion = regions[hash];
 
@@ -95,7 +95,7 @@ function requestTour(tourName) {
       let responseText = event.target.responseText;
       let parsedResponse = JSON.parse(responseText);
       console.log(parsedResponse.message);
-      // TODO rebuild everything from that metadata of parsedResponse
+      rebuild(JSON.parse(parsedResponse.message));
     }
   };
 

@@ -104,10 +104,21 @@ function startDraw() {
 function endDraw() {
   console.log("end draw");
   state = stateEnum.selecting;
-  let found = false;
   drawnPoints.push([mouseLatLng.lat, mouseLatLng.lng]);
 
-  let polygon = L.polygon(drawnPoints);
+  addRegion(drawnPoints);
+
+  // remove lines from map
+  polyline.remove();
+  connectBack.remove();
+  previewLine.remove();
+  drawnPoints = [];
+}
+
+function addRegion(regionPoints) {
+  let found = false;
+
+  let polygon = L.polygon(regionPoints);
   // handles coming up with same hash
   let hash, regionName;
   while (!found) {
@@ -118,7 +129,7 @@ function endDraw() {
       // add region to the list of regions
       regions[hash] = {
         // TODO points is kind of redundant since poly stores these
-        points: drawnPoints,
+        points: regionPoints,
         name: regionName,
         poly: polygon
       };
@@ -129,16 +140,10 @@ function endDraw() {
     onPolyClick(e, regions[hash]);
   });
 
+  addRegionDiv(hash, regionName);
+
   // adds polygon to map
   polygon.addTo(myMap);
-
-  // remove lines from map
-  polyline.remove();
-  connectBack.remove();
-  previewLine.remove();
-  drawnPoints = [];
-
-  addRegionDiv(hash, regionName);
 }
 
 /**
@@ -218,8 +223,11 @@ myMap.on("mousemove", e => {
   mouseLatLng = e.latlng;
 });
 
-// function to rebuild the entire tour from the parsed response json
-function rebuild(json) {
+/**
+ * Wipes out the map and rebuilds from metadata
+ * @param {Object} metadata
+ */
+function rebuild(metadata) {
   for (let hash in regions) {
     let region = regions[hash];
     // wipe out the map polygon
