@@ -65,8 +65,11 @@ app.get("/tour/:name", (req, res) => {
       return;
     }
 
-    // filter out files that don't start with the name we're looking for
-    files = files.filter(f => f.startsWith(req.params.name));
+    // filter out files that aren't the name we're looking for
+    // this regex works as long as the timestamp was made between 1973 and 5138
+    files = files.filter(f =>
+      new RegExp("^" + req.params.name + "-[0-9]{12,13}\\.zip$").test(f)
+    );
 
     // if no files left 404
     if (files.length < 1) {
@@ -87,8 +90,12 @@ app.get("/edit/:name", (req, res) => {
       helpers.returnError(res, 500, "unable to read from tours directory");
       return;
     }
-    // filter out files that don't start with the name we're looking for
-    files = files.filter(f => f.startsWith(req.params.name));
+
+    // filter out files that aren't the name we're looking for
+    // this regex works as long as the timestamp was made between 1973 and 5138
+    files = files.filter(f =>
+      new RegExp("^" + req.params.name + "-[0-9]{12,13}\\.zip$").test(f)
+    );
 
     // if no files left 404
     if (files.length < 1) {
