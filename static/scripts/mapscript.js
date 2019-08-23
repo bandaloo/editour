@@ -241,4 +241,9 @@ function rebuild(metadata) {
     // delete region data from regions
     delete regions[hash];
   }
+  console.log(metadata);
+  let newRegions = metadata.regions;
+  for (let i = 0; i < newRegions.length; i++) {
+    addRegion(newRegions[i].points, newRegions[i].name);
+  }
 }
