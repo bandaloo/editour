@@ -94,6 +94,7 @@ function requestTour(tourName) {
       console.log("done");
       let responseText = event.target.responseText;
       let parsedResponse = JSON.parse(responseText);
+      console.log(parsedResponse.message);
       // TODO rebuild everything from that metadata of parsedResponse
     }
   };

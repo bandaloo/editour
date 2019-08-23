@@ -217,3 +217,16 @@ myMap.on("mousemove", e => {
   }
   mouseLatLng = e.latlng;
 });
+
+// function to rebuild the entire tour from the parsed response json
+function rebuild(json) {
+  for (let hash in regions) {
+    let region = regions[hash];
+    // wipe out the map polygon
+    region.poly.remove();
+    // wipe out the region card
+    region.card.regionDiv.parentNode.removeChild(region.card.regionDiv);
+    // delete region data from regions
+    delete regions[hash];
+  }
+}
