@@ -115,7 +115,7 @@ function endDraw() {
   drawnPoints = [];
 }
 
-function addRegion(regionPoints) {
+function addRegion(regionPoints, name) {
   let found = false;
 
   let polygon = L.polygon(regionPoints);
@@ -125,7 +125,11 @@ function addRegion(regionPoints) {
     hash = randomHash();
     if (!regions[hash]) {
       found = true;
-      regionName = "unnamed region " + hash;
+      if (name === undefined) {
+        regionName = "unnamed region " + hash;
+      } else {
+        regionName = name;
+      }
       // add region to the list of regions
       regions[hash] = {
         // TODO points is kind of redundant since poly stores these
