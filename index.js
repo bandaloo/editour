@@ -3,6 +3,7 @@ const formidable = require("formidable");
 const fs = require("fs");
 const helpers = require("./helpers");
 const app = express();
+const admZip = require("adm-zip");
 
 // static directory
 // requests that don't match any of the other endpoints will be served from here
@@ -44,6 +45,7 @@ app.post("/upload", (req, res) => {
         // successful, send success message
         res
           .status(out.status)
+          .contentType("application/json")
           .send(JSON.stringify({ status: out.status, message: out.message }));
       } else {
         // something went wrong, send error
@@ -58,6 +60,7 @@ app.post("/upload", (req, res) => {
 app.get("/tour/:name", (req, res) => {
   fs.readdir(helpers.toursLoc, (err, files) => {
     if (err) {
+      // send errors back to client
       helpers.returnError(res, 500, "unable to read from tours directory");
       return;
     }
@@ -73,6 +76,37 @@ app.get("/tour/:name", (req, res) => {
 
     // return the lexicographically last filename, it's the most recent
     res.status(200).sendFile(helpers.toursLoc + files.sort()[files.length - 1]);
+  });
+});
+
+// endpoint to request just the metadata from a tour. Used for editing a tour
+app.get("/edit/:name", (req, res) => {
+  fs.readdir(helpers.toursLoc, (err, files) => {
+    if (err) {
+      // send errors back to client
+      helpers.returnError(res, 500, "unable to read from tours directory");
+      return;
+    }
+    // filter out files that don't start with the name we're looking for
+    files = files.filter(f => f.startsWith(req.params.name));
+
+    // if no files left 404
+    if (files.length < 1) {
+      helpers.returnError(res, 404, "couldn't find tour " + req.params.name);
+      return;
+    }
+
+    // the lexigraphically last filename is the one we want
+    const zip = new admZip(helpers.toursLoc + files.sort()[files.length - 1]);
+    res
+      .status(200)
+      .contentType("application/json")
+      .send(
+        JSON.stringify({
+          status: 200,
+          message: zip.readAsText("metadata.json")
+        })
+      );
   });
 });
 

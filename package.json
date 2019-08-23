@@ -1,6 +1,6 @@
 {
   "name": "ar-tour-app-backend",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Backend for storing and organizing AR tours",
   "main": "index.js",
   "scripts": {
@@ -9,6 +9,7 @@
   },
   "author": "Joseph Petitti",
   "dependencies": {
+    "adm-zip": "^0.4.13",
     "archiver": "^3.1.1",
     "express": "^4.17.1",
     "formidable": "^1.2.1"
