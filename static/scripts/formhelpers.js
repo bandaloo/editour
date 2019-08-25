@@ -79,7 +79,7 @@ function requestTour(tourName) {
 
   xhr.open("GET", str);
 
-  xhr.onload = event => {
+  xhr.addEventListener("load", event => {
     statusChanger(
       document.getElementById("download-message"),
       xhr.status,
@@ -87,11 +87,11 @@ function requestTour(tourName) {
       200,
       rebuild
     );
-  };
+  });
 
-  xhr.onerror = () => {
+  xhr.addEventListener("error", () => {
     alert("request failed");
-  };
+  });
 
   xhr.send();
 }

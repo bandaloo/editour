@@ -1,5 +1,9 @@
-// treat this class as abstract please
+/** @abstract */
 class SubCard {
+  /**
+   * @param {RegionCard} superCard
+   * @param {string} originalDisplay - whether to restore to block or flex
+   */
   constructor(superCard, originalDisplay) {
     this.superCard = superCard;
     this.enclosingDiv = document.createElement("div");
@@ -7,6 +11,11 @@ class SubCard {
     this.originalDisplay = originalDisplay;
   }
 
+  /**
+   * Sets which button to hide and show the subcard
+   * @param {HTMLButtonElement} toggleButton
+   * @param {string} hideString
+   */
   setToggleButton(toggleButton, hideString) {
     this.toggleButton = toggleButton;
     this.showString = toggleButton.innerHTML;
@@ -20,6 +29,10 @@ class SubCard {
     this.toggleCard();
   }
 
+  /**
+   * Returns whether the card is hidden or not
+   * @returns {boolean}
+   */
   isHidden() {
     return this.enclosingDiv.style.display == "none";
   }
@@ -33,6 +46,12 @@ class SubCard {
     this.toggleOtherCard(this, this.showString, this.hideString);
   }
 
+  /**
+   * Toggles a card to hide and show the subcard and augments button
+   * @param {SubCard} card
+   * @param {string} showString
+   * @param {string} hideString
+   */
   toggleOtherCard(card, showString, hideString) {
     if (card.isHidden()) {
       card.whenMadeVisible();
@@ -44,16 +63,17 @@ class SubCard {
     card.toggleHidden();
   }
 
+  /**
+   * Adds the subcard to the enclosing div (the region div)
+   * @param {HTMLDivElement} div
+   */
   addDiv(div) {
     div.appendChild(this.enclosingDiv);
   }
 
-  // override these
-  whenMadeVisible() {
-    console.log("card made visible");
-  }
+  // override this function
+  whenMadeVisible() {}
 
-  whenMadeHidden() {
-    console.log("card made hidden");
-  }
+  // override this function
+  whenMadeHidden() {}
 }

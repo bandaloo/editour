@@ -1,4 +1,7 @@
 class RenameSubCard extends SubCard {
+  /**
+   * @param {RegionCard} superCard
+   */
   constructor(superCard) {
     super(superCard, "flex");
 
