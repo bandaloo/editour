@@ -126,6 +126,8 @@ document.getElementById("download-button").onclick = () => {
   let tourName = document.getElementById("download-text").value;
   // TODO only change the box when the download worked
   let uploadText = document.getElementById("tour-name");
+  // TODO get rid of this (for now renaming is not enabled)
+  uploadText.readOnly = true;
   uploadText.value = tourName;
   requestTour(tourName);
 };
