@@ -41,14 +41,14 @@ const sendData = f => {
     console.log(err);
   });
 
-  // set up request
-  xhr.open("POST", url + "/upload");
+  // set up request (ternery for pointing to correct endpoint)
+  xhr.open("POST", url + (downloaded ? "/edit" : "/upload"));
   xhr.send(fd);
 };
 
 /**
  * Function for generating JSON data to associate files with regions
- * @return {string}
+ * @return {Object}
  */
 function makeFileRegionString() {
   data = { regions: [] };
@@ -59,10 +59,9 @@ function makeFileRegionString() {
     // json region to reflect the real region
     let jsonRegion = {
       name: realRegion.name,
-      //points: listsToLatLngs(realRegion.points),
       points: realRegion.points,
-      audio: realRegion.card.getAudioNames(),
-      images: realRegion.card.getImageNames()
+      audio: realRegion.card.getAudioNames().concat(realRegion.audio),
+      images: realRegion.card.getImageNames().concat(realRegion.images)
     };
 
     // add the json region to json data
@@ -115,6 +114,8 @@ function requestTour(tourName) {
 
 // set an onclick for the download button
 document.getElementById("download-button").onclick = () => {
+  // currently edited map will be posted to edit instead
+  downloaded = true;
   let tourName = document.getElementById("download-text").value;
   requestTour(tourName);
 };
