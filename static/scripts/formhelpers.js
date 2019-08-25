@@ -2,6 +2,9 @@ const form = document.getElementById("sideform");
 const submitButton = document.getElementById("submitbutton");
 const jsonTextField = document.getElementById("metadata");
 
+// determines whether to post to /upload or /edit
+var downloaded = false;
+
 form.addEventListener("submit", event => {
   jsonTextField.value = JSON.stringify(makeFileRegionString());
   event.preventDefault();
@@ -117,5 +120,8 @@ document.getElementById("download-button").onclick = () => {
   // currently edited map will be posted to edit instead
   downloaded = true;
   let tourName = document.getElementById("download-text").value;
+  // TODO only change the box when the download worked
+  let uploadText = document.getElementById("tour-name");
+  uploadText.value = tourName;
   requestTour(tourName);
 };

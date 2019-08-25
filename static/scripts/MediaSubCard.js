@@ -18,12 +18,19 @@ class MediaSubCard extends SubCard {
     this.audioFileInput.id = "audio_id_" + superCard.hash;
     this.audioFileInput.name = "audio_name_" + superCard.hash;
 
-    this.makeInternalDiv(
+    let removeFuncs = this.makeInternalDiv(
       "Audio file",
       this.audioFileInput,
       audio,
       regions[superCard.hash].audio
     );
+
+    // clear the original tags when audio file input is updated
+    this.audioFileInput.onchange = () => {
+      for (let i = 0; i < removeFuncs.length; i++) {
+        removeFuncs[i]();
+      }
+    };
 
     // setting up image file input
     this.imageFileInput = document.createElement("input");
@@ -61,7 +68,7 @@ class MediaSubCard extends SubCard {
     internalDiv.appendChild(input);
     this.enclosingDiv.appendChild(internalDiv);
 
-    let filenameTags = [];
+    let removeFuncs = [];
     // add the file names
     if (filenames !== undefined) {
       for (let i = 0; i < filenames.length; i++) {
@@ -87,13 +94,10 @@ class MediaSubCard extends SubCard {
         filenameDiv.appendChild(xButton);
         internalDiv.appendChild(filenameDiv);
 
-        filenameTags.push({
-          div: filenameDiv,
-          removeFunc: clickFunc
-        });
+        removeFuncs.push(clickFunc);
       }
     }
-    return filenameTags;
+    return removeFuncs;
   }
 
   removeFile(list, filename) {
