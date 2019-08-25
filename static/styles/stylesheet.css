@@ -177,6 +177,7 @@ p {
   overflow-wrap: break-word;
   min-width: 0px;
   vertical-align: middle;
+  margin: auto;
 }
 
 .xbutton {
