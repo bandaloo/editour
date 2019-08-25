@@ -23,19 +23,10 @@ const sendData = f => {
   // successful data submission
   // TODO change this to onload
   xhr.addEventListener("load", event => {
-    let responseText = event.target.responseText;
-    let parsedResponse = JSON.parse(responseText);
-    const uploadMessageElem = document.getElementById("upload-message");
-    if (parsedResponse.status === 201) {
-      uploadMessageElem.style.color = colorEnum.uploadSuccessful;
-      uploadMessageElem.innerHTML = "Uploaded successfully!";
-    } else {
-      // 400 for client error; 500 if it's a serverside error
-      uploadMessageElem.style.color = colorEnum.uploadFailed;
-      uploadMessageElem.innerHTML = `There was a problem: ${
-        parsedResponse.message
-      }`;
-    }
+    let uploadMsgElem = document.getElementById("upload-message");
+    statusChanger(uploadMsgElem, xhr.status, event, 201, text => {
+      uploadMsgElem.innerHTML += " File " + text;
+    });
   });
 
   // error
@@ -94,22 +85,13 @@ function requestTour(tourName) {
   xhr.open("GET", str);
 
   xhr.onload = event => {
-    let responseText = event.target.responseText;
-    let parsedResponse = JSON.parse(responseText);
-    const downloadMessageElem = document.getElementById("download-message");
-    if (xhr.status != 200) {
-      console.log("there was an error");
-      // TODO extract this code into function and refactor upload
-      downloadMessageElem.style.color = colorEnum.uploadFailed;
-      downloadMessageElem.innerHTML = `There was a problem: ${
-        parsedResponse.message
-      }`;
-    } else {
-      downloadMessageElem.style.color = colorEnum.uploadSuccessful;
-      downloadMessageElem.innerHTML = "Downloaded successfully!";
-      console.log(JSON.parse(parsedResponse.message));
-      rebuild(JSON.parse(parsedResponse.message));
-    }
+    statusChanger(
+      document.getElementById("download-message"),
+      xhr.status,
+      event,
+      200,
+      rebuild
+    );
   };
 
   xhr.onerror = () => {
@@ -117,6 +99,26 @@ function requestTour(tourName) {
   };
 
   xhr.send();
+}
+
+function statusChanger(msgElem, status, event, successCode, sCallback) {
+  if (status === 404) {
+    msgElem.style.color = colorEnum.uploadFailed;
+    msgElem.innerHTML = "Server not found";
+    // won't get a nice json response if it's a 404, so break out
+    return;
+  }
+  let responseText = event.target.responseText;
+  let parsedResponse = JSON.parse(responseText);
+  if (status !== successCode) {
+    msgElem.style.color = colorEnum.uploadFailed;
+    msgElem.innerHTML = `There was a problem: ${parsedResponse.message}`;
+  } else {
+    msgElem.style.color = colorEnum.uploadSuccessful;
+    msgElem.innerHTML = `Success!`;
+    console.log(parsedResponse);
+    sCallback(parsedResponse.message);
+  }
 }
 
 // set an onclick for the download button

@@ -15,8 +15,6 @@ var shifting = false;
 // div where all the region cards are added
 const sideNav = document.getElementById("sidenavid");
 
-const uploadMessageElem = document.getElementById("upload-message");
-
 // temporarily shown lines used for drawing
 var polyline = L.polyline([], { color: colorEnum.drawing });
 var connectBack = L.polyline([], {
@@ -240,9 +238,10 @@ myMap.on("mousemove", e => {
 
 /**
  * Wipes out the map and rebuilds from metadata
- * @param {Object} metadata
+ * @param {string} metadata - metadata to be parsed
  */
-function rebuild(metadata) {
+function rebuild(strMetadata) {
+  let metadata = JSON.parse(strMetadata);
   for (let hash in regions) {
     let region = regions[hash];
     // wipe out the map polygon
