@@ -1,32 +1,49 @@
-const form = document.getElementById("sideform");
-const submitButton = document.getElementById("submitbutton");
-const jsonTextField = document.getElementById("metadata");
+"use strict";
+
+const form = /** @type {HTMLFormElement} */ (document.getElementById(
+  "sideform"
+));
+const submitButton = /** @type {HTMLButtonElement} */ (document.getElementById(
+  "submitbutton"
+));
+const jsonTextField = /** @type {HTMLInputElement} */ (document.getElementById(
+  "metadata"
+));
 
 // determines whether to post to /upload or /edit
 var downloaded = false;
 
 form.addEventListener("submit", event => {
-  jsonTextField.value = JSON.stringify(makeFileRegionString());
+  jsonTextField.value = JSON.stringify(makeFileRegionData());
   event.preventDefault();
   sendData(form);
 });
 
-const sendData = f => {
+/**
+ * Sends data to one of the endpoints (either /edit or /upload)
+ * @param {HTMLFormElement} form
+ */
+function sendData(form) {
   console.log("sending form");
   const xhr = new XMLHttpRequest();
   const arr = window.location.href.split("/");
   const url = arr[0] + "//" + arr[2];
 
   // Bind the FormData object and the form element
-  const fd = new FormData(f);
+  const fd = new FormData(form);
 
   // successful data submission
-  // TODO change this to onload
   xhr.addEventListener("load", event => {
     let uploadMsgElem = document.getElementById("upload-message");
-    statusChanger(uploadMsgElem, xhr.status, event, 201, text => {
-      uploadMsgElem.innerHTML += " File " + text;
-    });
+    statusChanger(
+      uploadMsgElem,
+      xhr.status,
+      event,
+      201,
+      /** @type {string} */ text => {
+        uploadMsgElem.innerHTML += " File " + text;
+      }
+    );
   });
 
   // error
@@ -38,19 +55,37 @@ const sendData = f => {
   // set up request (ternery for pointing to correct endpoint)
   xhr.open("POST", url + (downloaded ? "/edit" : "/upload"));
   xhr.send(fd);
-};
+}
 
 /**
- * Function for generating JSON data to associate files with regions
- * @return {Object}
+ * @typedef {Object} Coordinate - latitude and longitude position
+ * @property {number} lat - latitude
+ * @property {lng} lng - longitude
  */
-function makeFileRegionString() {
-  data = { regions: [] };
+/**
+ * @typedef {Object} RegionDatum - the metadata to describe a region
+ * @property {string} name
+ * @property {Coordinate[]} points
+ * @property {string[]} audio
+ * @property {string[]} images
+ */
+/**
+ * @typedef {Object} RegionData - the metadata for the tour file
+ * @property {RegionDatum[]} regions The user's first name.
+ */
+/**
+ * Function for generating JSON data to associate files with regions
+ * @return {RegionData}
+ */
+function makeFileRegionData() {
+  /** @type {RegionData} */
+  let data = { regions: [] };
   for (let hash in regions) {
     // real region to build a json region out of
     let realRegion = regions[hash];
 
     // json region to reflect the real region
+    /** @type {RegionDatum} */
     let jsonRegion = {
       name: realRegion.name,
       points: realRegion.points,
@@ -69,13 +104,10 @@ function makeFileRegionString() {
   return data;
 }
 
-// TODO shouldn't need this once we change to lat lng coordinate objects
-function listsToLatLngs(lists) {
-  return lists.map(list => {
-    return { lat: list[0], lng: list[1] };
-  });
-}
-
+/**
+ * Request download of tour from server
+ * @param {string} tourName
+ */
 function requestTour(tourName) {
   const href = window.location.href;
   const xhr = new XMLHttpRequest();
@@ -84,7 +116,7 @@ function requestTour(tourName) {
 
   xhr.open("GET", str);
 
-  xhr.onload = event => {
+  xhr.addEventListener("load", event => {
     statusChanger(
       document.getElementById("download-message"),
       xhr.status,
@@ -92,29 +124,37 @@ function requestTour(tourName) {
       200,
       rebuild
     );
-  };
+  });
 
-  xhr.onerror = () => {
+  xhr.addEventListener("error", () => {
     alert("request failed");
-  };
+  });
 
   xhr.send();
 }
 
+/**
+ * Changes status of message area based on response from server
+ * @param {HTMLElement} msgElem
+ * @param {number} status
+ * @param {ProgressEvent} event
+ * @param {number} successCode
+ * @param {Function} sCallback
+ */
 function statusChanger(msgElem, status, event, successCode, sCallback) {
   if (status === 404) {
-    msgElem.style.color = colorEnum.uploadFailed;
+    msgElem.style.color = colorEnum.failed;
     msgElem.innerHTML = "Server not found";
     // won't get a nice json response if it's a 404, so break out
     return;
   }
-  let responseText = event.target.responseText;
+  let responseText = /** @type {XMLHttpRequest} */ (event.target).responseText;
   let parsedResponse = JSON.parse(responseText);
   if (status !== successCode) {
-    msgElem.style.color = colorEnum.uploadFailed;
+    msgElem.style.color = colorEnum.failed;
     msgElem.innerHTML = `There was a problem: ${parsedResponse.message}`;
   } else {
-    msgElem.style.color = colorEnum.uploadSuccessful;
+    msgElem.style.color = colorEnum.successful;
     msgElem.innerHTML = `Success!`;
     console.log(parsedResponse);
     sCallback(parsedResponse.message);
@@ -125,9 +165,13 @@ function statusChanger(msgElem, status, event, successCode, sCallback) {
 document.getElementById("download-button").onclick = () => {
   // currently edited map will be posted to edit instead
   downloaded = true;
-  let tourName = document.getElementById("download-text").value;
+  let tourName = /** @type {HTMLInputElement} */ (document.getElementById(
+    "download-text"
+  )).value;
   // TODO only change the box when the download worked
-  let uploadText = document.getElementById("tour-name");
+  let uploadText = /** @type {HTMLInputElement} */ (document.getElementById(
+    "tour-name"
+  ));
   // TODO get rid of this (for now renaming is not enabled)
   uploadText.readOnly = true;
   uploadText.value = tourName;

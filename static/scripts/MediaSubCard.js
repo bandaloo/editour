@@ -1,8 +1,10 @@
+"use strict";
+
 class MediaSubCard extends SubCard {
   /**
-   * Constructor for media card that will show audio and video when it is
+   * Constructor for media card that will show audio and images when it is
    * rebuilding from a downloaded file
-   * @param {Object} superCard
+   * @param {RegionCard} superCard
    * @param {string[]} [audio]
    * @param {string[]} [images]
    */
@@ -55,7 +57,7 @@ class MediaSubCard extends SubCard {
   /**
    * Makes internal file section div
    * @param {string} name
-   * @param {string} input
+   * @param {HTMLInputElement} input
    * @param {string[]} [filenames]
    * @param {string[]} [regionFiles] - the region files to remove from
    */
@@ -100,6 +102,11 @@ class MediaSubCard extends SubCard {
     return removeFuncs;
   }
 
+  /**
+   * Remove filename from list of filenames
+   * @param {string[]} list
+   * @param {string} filename
+   */
   removeFile(list, filename) {
     // remove without reassignment with splice
     for (let i = 0; i < list.length; i++) {

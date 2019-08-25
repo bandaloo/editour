@@ -15,13 +15,16 @@ var shifting = false;
 // div where all the region cards are added
 const sideNav = document.getElementById("sidenavid");
 
+// @ts-ignore
+let Leaflet = L;
+
 // temporarily shown lines used for drawing
-var polyline = L.polyline([], { color: colorEnum.drawing });
-var connectBack = L.polyline([], {
+var polyline = Leaflet.polyline([], { color: colorEnum.drawing });
+var connectBack = Leaflet.polyline([], {
   color: colorEnum.drawing,
   dashArray: "4"
 });
-var previewLine = L.polyline([], {
+var previewLine = Leaflet.polyline([], {
   color: colorEnum.drawing,
   dashArray: "4",
   opacity: 0.5
@@ -31,7 +34,7 @@ var previewLine = L.polyline([], {
 var state = stateEnum.selecting;
 
 // increasing max zoom of the map causes it to freak out
-var myMap = L.map("mapid", {
+var myMap = Leaflet.map("mapid", {
   center: [34.982153, 135.963641], //Ritsumeikan
   //center: [35.039282, 135.730327], // Kinkakuji
   zoom: 17,
@@ -40,14 +43,14 @@ var myMap = L.map("mapid", {
 });
 
 // adding zoom control to correct spot
-L.control
+Leaflet.control
   .zoom({
     position: "topright"
   })
   .addTo(myMap);
 
 // using tile layer from openstreetmap (doesn't require api key)
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+Leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(myMap);
@@ -82,7 +85,6 @@ function randomHash() {
  * Begin drawing mode, allowing user to define region with clicks
  */
 function startDraw() {
-  console.log("start draw");
   state = stateEnum.drawing;
   // clear the latlngs of the temp drawing polylines
   polyline.setLatLngs([]);
@@ -100,7 +102,6 @@ function startDraw() {
  * geometry that was used just for drawing
  */
 function endDraw() {
-  console.log("end draw");
   state = stateEnum.selecting;
   //drawnPoints.push([mouseLatLng.lat, mouseLatLng.lng]);
   drawnPoints.push(mouseLatLng);
@@ -118,7 +119,7 @@ function addRegion(regionPoints, name, audio, images) {
   // audio and images are optional
   let found = false;
 
-  let polygon = L.polygon(regionPoints);
+  let polygon = Leaflet.polygon(regionPoints);
   // handles coming up with same hash
   let hash, regionName;
   while (!found) {
@@ -211,7 +212,7 @@ function addRegionDiv(hash, name, audio, images) {
 
 myMap.on("click", onMapClick);
 
-var popup = L.popup(); // popup moved around and used for stuff
+var popup = Leaflet.popup(); // popup moved around and used for stuff
 
 /**
  * Brings up popup when clicking on region polygon on map
@@ -238,10 +239,11 @@ myMap.on("mousemove", e => {
 
 /**
  * Wipes out the map and rebuilds from metadata
- * @param {string} metadata - metadata to be parsed
+ * @param {string} strMetadata - metadata to be parsed
  */
 function rebuild(strMetadata) {
   let metadata = JSON.parse(strMetadata);
+  console.log(metadata);
   for (let hash in regions) {
     let region = regions[hash];
     // wipe out the map polygon
@@ -251,7 +253,6 @@ function rebuild(strMetadata) {
     // delete region data from regions
     delete regions[hash];
   }
-  console.log(metadata);
   let newRegions = metadata.regions;
   console.log(newRegions);
   for (let i = 0; i < newRegions.length; i++) {
