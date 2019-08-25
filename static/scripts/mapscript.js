@@ -116,7 +116,8 @@ function endDraw() {
   drawnPoints = [];
 }
 
-function addRegion(regionPoints, name) {
+function addRegion(regionPoints, name, audio, images) {
+  // audio and images are optional
   let found = false;
 
   let polygon = L.polygon(regionPoints);
@@ -138,6 +139,13 @@ function addRegion(regionPoints, name) {
         name: regionName,
         poly: polygon
       };
+
+      if (audio !== undefined) {
+        regions[hash].audio = audio;
+      }
+      if (images !== undefined) {
+        regions[hash].images = images;
+      }
     }
   }
 
@@ -145,7 +153,7 @@ function addRegion(regionPoints, name) {
     onPolyClick(e, regions[hash]);
   });
 
-  addRegionDiv(hash, regionName);
+  addRegionDiv(hash, regionName, audio, images);
 
   // adds polygon to map
   polygon.addTo(myMap);
@@ -169,7 +177,6 @@ function onMapClick(e) {
     }
   }
   if (state == stateEnum.drawing) {
-    //let coord = [e.latlng.lat, e.latlng.lng];
     let coord = e.latlng;
     drawnPoints.push(coord);
     polyline.addLatLng(coord);
@@ -195,9 +202,11 @@ function renameRegion(hash, newName) {
  * Adds region div to the document and region data for easy reference
  * @param {string} hash
  * @param {string} name
+ * @param {string[]} [audio]
+ * @param {string[]} [images]
  */
-function addRegionDiv(hash, name) {
-  let regionCard = new RegionCard(hash, name);
+function addRegionDiv(hash, name, audio, images) {
+  let regionCard = new RegionCard(hash, name, audio, images);
   sideNav.appendChild(regionCard.regionDiv);
   regions[hash].card = regionCard;
 }
@@ -245,7 +254,13 @@ function rebuild(metadata) {
   }
   console.log(metadata);
   let newRegions = metadata.regions;
+  console.log(newRegions);
   for (let i = 0; i < newRegions.length; i++) {
-    addRegion(newRegions[i].points, newRegions[i].name);
+    addRegion(
+      newRegions[i].points,
+      newRegions[i].name,
+      newRegions[i].audio,
+      newRegions[i].images
+    );
   }
 }
