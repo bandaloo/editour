@@ -1,6 +1,8 @@
 const form = document.getElementById("sideform");
 const submitButton = document.getElementById("submitbutton");
-const jsonTextField = document.getElementById("metadata");
+const jsonTextField = /** @type {HTMLInputElement} */ (document.getElementById(
+  "metadata"
+));
 
 // determines whether to post to /upload or /edit
 var downloaded = false;
@@ -45,7 +47,7 @@ const sendData = f => {
  * @return {Object}
  */
 function makeFileRegionString() {
-  data = { regions: [] };
+  let data = { regions: [] };
   for (let hash in regions) {
     // real region to build a json region out of
     let realRegion = regions[hash];
@@ -67,13 +69,6 @@ function makeFileRegionString() {
   }
   console.log(data);
   return data;
-}
-
-// TODO shouldn't need this once we change to lat lng coordinate objects
-function listsToLatLngs(lists) {
-  return lists.map(list => {
-    return { lat: list[0], lng: list[1] };
-  });
 }
 
 function requestTour(tourName) {
@@ -103,7 +98,7 @@ function requestTour(tourName) {
 
 function statusChanger(msgElem, status, event, successCode, sCallback) {
   if (status === 404) {
-    msgElem.style.color = colorEnum.uploadFailed;
+    msgElem.style.color = colorEnum.failed;
     msgElem.innerHTML = "Server not found";
     // won't get a nice json response if it's a 404, so break out
     return;
@@ -111,10 +106,10 @@ function statusChanger(msgElem, status, event, successCode, sCallback) {
   let responseText = event.target.responseText;
   let parsedResponse = JSON.parse(responseText);
   if (status !== successCode) {
-    msgElem.style.color = colorEnum.uploadFailed;
+    msgElem.style.color = colorEnum.failed;
     msgElem.innerHTML = `There was a problem: ${parsedResponse.message}`;
   } else {
-    msgElem.style.color = colorEnum.uploadSuccessful;
+    msgElem.style.color = colorEnum.successful;
     msgElem.innerHTML = `Success!`;
     console.log(parsedResponse);
     sCallback(parsedResponse.message);
@@ -125,9 +120,14 @@ function statusChanger(msgElem, status, event, successCode, sCallback) {
 document.getElementById("download-button").onclick = () => {
   // currently edited map will be posted to edit instead
   downloaded = true;
-  let tourName = document.getElementById("download-text").value;
+  let tourName = /** @type {HTMLInputElement} */ (document.getElementById(
+    "download-text"
+  )).value;
   // TODO only change the box when the download worked
-  let uploadText = document.getElementById("tour-name");
+
+  let uploadText = /** @type {HTMLInputElement} */ (document.getElementById(
+    "tour-name"
+  ));
   // TODO get rid of this (for now renaming is not enabled)
   uploadText.readOnly = true;
   uploadText.value = tourName;

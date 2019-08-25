@@ -9,6 +9,6 @@ const colorEnum = Object.freeze({
   // TODO pick some better colors
   drawing: "#ff0000",
   region: "#0000ff",
-  uploadSuccessful: "#3ddb62",
-  uploadFailed: "#f26868"
+  successful: "#3ddb62",
+  failed: "#f26868"
 });

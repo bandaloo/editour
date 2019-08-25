@@ -238,7 +238,7 @@ myMap.on("mousemove", e => {
 
 /**
  * Wipes out the map and rebuilds from metadata
- * @param {string} metadata - metadata to be parsed
+ * @param {Object} metadata - metadata to be parsed
  */
 function rebuild(strMetadata) {
   let metadata = JSON.parse(strMetadata);

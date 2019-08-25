@@ -4,9 +4,9 @@ class RegionCard {
    * @param {string} hash
    * @param {string} name
    * @param {string[]} [audio]
-   * @param {string[]} [video]
+   * @param {string[]} [images]
    */
-  constructor(hash, name = "unnamed region", audio, video) {
+  constructor(hash, name = "unnamed region", audio, images) {
     this.hash = hash;
 
     this.regionDiv = document.createElement("div");
@@ -60,7 +60,7 @@ class RegionCard {
 
     this.regionDiv.appendChild(this.mediaButton);
 
-    this.mediaSubCard = new MediaSubCard(this, audio, video);
+    this.mediaSubCard = new MediaSubCard(this, audio, images);
     this.mediaSubCard.addDiv(this.regionDiv);
 
     this.regionDiv.appendChild(this.infoButton);
