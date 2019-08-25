@@ -1,4 +1,7 @@
 class InfoSubCard extends SubCard {
+  /**
+   * @param {RegionCard} superCard
+   */
   constructor(superCard) {
     super(superCard, "block");
 
