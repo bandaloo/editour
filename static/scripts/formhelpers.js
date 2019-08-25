@@ -63,8 +63,12 @@ function makeFileRegionString() {
     let jsonRegion = {
       name: realRegion.name,
       points: realRegion.points,
-      audio: realRegion.card.getAudioNames().concat(realRegion.audio),
-      images: realRegion.card.getImageNames().concat(realRegion.images)
+      audio: realRegion.card
+        .getAudioNames()
+        .concat(realRegion.audio ? realRegion.audio : []),
+      images: realRegion.card
+        .getImageNames()
+        .concat(realRegion.images ? realRegion.images : [])
     };
 
     // add the json region to json data
