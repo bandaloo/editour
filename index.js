@@ -65,20 +65,16 @@ app.get("/tour/:name", (req, res) => {
       return;
     }
 
-    // filter out files that aren't the name we're looking for
-    // this regex works as long as the timestamp was made between 1973 and 5138
-    files = files.filter(f =>
-      new RegExp("^" + req.params.name + "-[0-9]{12,13}\\.zip$").test(f)
-    );
+    const filename = helpers.lookupFileName(files, req.params.name);
 
     // if no files left 404
-    if (files.length < 1) {
+    if (filename === null) {
       helpers.returnError(res, 404, "couldn't find tour " + req.params.name);
       return;
     }
 
     // return the lexicographically last filename, it's the most recent
-    res.status(200).sendFile(helpers.toursLoc + files.sort()[files.length - 1]);
+    res.status(200).sendFile(helpers.toursLoc + filename);
   });
 });
 
@@ -91,20 +87,16 @@ app.get("/edit/:name", (req, res) => {
       return;
     }
 
-    // filter out files that aren't the name we're looking for
-    // this regex works as long as the timestamp was made between 1973 and 5138
-    files = files.filter(f =>
-      new RegExp("^" + req.params.name + "-[0-9]{12,13}\\.zip$").test(f)
-    );
+    const filename = helpers.lookupFileName(files, req.params.name);
 
-    // if no files left 404
-    if (files.length < 1) {
+    if (filename === null) {
+      // no file found, send 404
       helpers.returnError(res, 404, "couldn't find tour " + req.params.name);
       return;
     }
 
     // the lexigraphically last filename is the one we want
-    const zip = new admZip(helpers.toursLoc + files.sort()[files.length - 1]);
+    const zip = new admZip(helpers.toursLoc + filename);
     res
       .status(200)
       .contentType("application/json")

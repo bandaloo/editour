@@ -33,9 +33,34 @@ const randName = n => {
   return out;
 };
 
+/**
+ * Looks up a filename in the toursLoc folder and returns the most recent
+ * matching filename. For example, if you search for `mytour', it will return
+ * something like `mytour-1566696661145.zip'
+ * @param {string[]} files list of filenames in the directory we're searching
+ * @param {string} name the name to look for
+ * @return {string | null} the full filename of the found file, or null if not found
+ */
+const lookupFileName = (files, name) => {
+  // filter out files that aren't the name we're looking for
+  // this regex works as long as the timestamp was made between 1973 and 5138
+  files = files.filter(f =>
+    new RegExp("^" + name + "-[0-9]{12,13}\\.zip$").test(f)
+  );
+
+  // if none left, return null because the filename we're looking for doesn't exist
+  if (files.length < 1) {
+    return null;
+  }
+
+  // return the lexigraphically last matching filename, that's the most recent
+  return files.sort()[files.length - 1];
+};
+
 module.exports = {
   toursLoc,
   tempLoc,
   returnError,
-  randName
+  randName,
+  lookupFileName
 };
