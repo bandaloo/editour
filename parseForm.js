@@ -134,7 +134,7 @@ const parseForm = (err, fields, files, cb) => {
   output.on("close", () => {
     console.log("zip written. " + archive.pointer() + " total bytes");
     // send success
-    cb(outObj(201, "upload successful"));
+    cb(outObj(201, "successfully uploaded as " + tourName));
     return;
   });
 
