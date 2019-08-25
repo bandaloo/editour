@@ -1,6 +1,6 @@
 class MediaSubCard extends SubCard {
   /**
-   * Constructor for media card that will show audio and video when it is
+   * Constructor for media card that will show audio and images when it is
    * rebuilding from a downloaded file
    * @param {Object} superCard
    * @param {string[]} [audio]
@@ -55,7 +55,7 @@ class MediaSubCard extends SubCard {
   /**
    * Makes internal file section div
    * @param {string} name
-   * @param {string} input
+   * @param {Object} input
    * @param {string[]} [filenames]
    * @param {string[]} [regionFiles] - the region files to remove from
    */

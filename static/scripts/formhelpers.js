@@ -8,7 +8,7 @@ const jsonTextField = /** @type {HTMLInputElement} */ (document.getElementById(
 var downloaded = false;
 
 form.addEventListener("submit", event => {
-  jsonTextField.value = JSON.stringify(makeFileRegionString());
+  jsonTextField.value = JSON.stringify(makeFileRegionData());
   event.preventDefault();
   sendData(form);
 });
@@ -46,7 +46,7 @@ const sendData = f => {
  * Function for generating JSON data to associate files with regions
  * @return {Object}
  */
-function makeFileRegionString() {
+function makeFileRegionData() {
   let data = { regions: [] };
   for (let hash in regions) {
     // real region to build a json region out of
