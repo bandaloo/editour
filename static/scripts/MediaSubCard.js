@@ -18,7 +18,12 @@ class MediaSubCard extends SubCard {
     this.audioFileInput.id = "audio_id_" + superCard.hash;
     this.audioFileInput.name = "audio_name_" + superCard.hash;
 
-    this.makeInternalDiv("Audio file", this.audioFileInput, audio);
+    this.makeInternalDiv(
+      "Audio file",
+      this.audioFileInput,
+      audio,
+      regions[superCard.hash].audio
+    );
 
     // setting up image file input
     this.imageFileInput = document.createElement("input");
@@ -30,7 +35,12 @@ class MediaSubCard extends SubCard {
     this.imageFileInput.id = "image_id_" + superCard.hash;
     this.imageFileInput.name = "image_name_" + superCard.hash;
 
-    this.makeInternalDiv("Image files", this.imageFileInput, images);
+    this.makeInternalDiv(
+      "Image files",
+      this.imageFileInput,
+      images,
+      regions[superCard.hash].images
+    );
 
     this.setToggleButton(superCard.mediaButton, "Hide Media");
   }
@@ -40,8 +50,9 @@ class MediaSubCard extends SubCard {
    * @param {string} name
    * @param {string} input
    * @param {string[]} [filenames]
+   * @param {string[]} [regionFiles] - the region files to remove from
    */
-  makeInternalDiv(name, input, filenames) {
+  makeInternalDiv(name, input, filenames, regionFiles) {
     let internalDiv = document.createElement("div");
     internalDiv.classList.add("sidebox", "internalbox");
     let nameHeader = document.createElement("h3");
@@ -63,9 +74,23 @@ class MediaSubCard extends SubCard {
         xButton.type = "button";
         xButton.classList.add("xbutton");
         xButton.innerHTML = "×";
+        // remove the file from the region data when x is clicked
+        xButton.onclick = () => {
+          this.removeFile(regionFiles, filenames[i]);
+          filenameDiv.parentNode.removeChild(filenameDiv);
+        };
         filenameDiv.appendChild(filenameText);
         filenameDiv.appendChild(xButton);
         internalDiv.appendChild(filenameDiv);
+      }
+    }
+  }
+
+  removeFile(list, filename) {
+    // remove without reassignment with splice
+    for (let i = 0; i < list.length; i++) {
+      if (list[i] === filename) {
+        list.splice(i, 1);
       }
     }
   }
