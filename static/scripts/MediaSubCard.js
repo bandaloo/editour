@@ -61,6 +61,7 @@ class MediaSubCard extends SubCard {
     internalDiv.appendChild(input);
     this.enclosingDiv.appendChild(internalDiv);
 
+    let filenameTags = [];
     // add the file names
     if (filenames !== undefined) {
       for (let i = 0; i < filenames.length; i++) {
@@ -75,15 +76,24 @@ class MediaSubCard extends SubCard {
         xButton.classList.add("xbutton");
         xButton.innerHTML = "×";
         // remove the file from the region data when x is clicked
-        xButton.onclick = () => {
+        const clickFunc = () => {
           this.removeFile(regionFiles, filenames[i]);
           filenameDiv.parentNode.removeChild(filenameDiv);
         };
+
+        xButton.onclick = clickFunc;
+
         filenameDiv.appendChild(filenameText);
         filenameDiv.appendChild(xButton);
         internalDiv.appendChild(filenameDiv);
+
+        filenameTags.push({
+          div: filenameDiv,
+          removeFunc: clickFunc
+        });
       }
     }
+    return filenameTags;
   }
 
   removeFile(list, filename) {
