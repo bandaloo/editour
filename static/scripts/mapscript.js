@@ -15,8 +15,6 @@ var shifting = false;
 // div where all the region cards are added
 const sideNav = document.getElementById("sidenavid");
 
-const uploadMessageElem = document.getElementById("upload-message");
-
 // temporarily shown lines used for drawing
 var polyline = L.polyline([], { color: colorEnum.drawing });
 var connectBack = L.polyline([], {
@@ -34,8 +32,8 @@ var state = stateEnum.selecting;
 
 // increasing max zoom of the map causes it to freak out
 var myMap = L.map("mapid", {
-  //center: [34.982153, 135.963641], //Ritsumeikan
-  center: [35.039282, 135.730327], // Kinkakuji
+  center: [34.982153, 135.963641], //Ritsumeikan
+  //center: [35.039282, 135.730327], // Kinkakuji
   zoom: 17,
   zoomControl: false, // prevent zoom control from being added
   doubleClickZoom: false // double click annoying when drawing shapes
@@ -104,24 +102,48 @@ function startDraw() {
 function endDraw() {
   console.log("end draw");
   state = stateEnum.selecting;
-  let found = false;
-  drawnPoints.push([mouseLatLng.lat, mouseLatLng.lng]);
+  //drawnPoints.push([mouseLatLng.lat, mouseLatLng.lng]);
+  drawnPoints.push(mouseLatLng);
 
-  let polygon = L.polygon(drawnPoints);
+  addRegion(drawnPoints);
+
+  // remove lines from map
+  polyline.remove();
+  connectBack.remove();
+  previewLine.remove();
+  drawnPoints = [];
+}
+
+function addRegion(regionPoints, name, audio, images) {
+  // audio and images are optional
+  let found = false;
+
+  let polygon = L.polygon(regionPoints);
   // handles coming up with same hash
   let hash, regionName;
   while (!found) {
     hash = randomHash();
     if (!regions[hash]) {
       found = true;
-      regionName = "unnamed region " + hash;
+      if (name === undefined) {
+        regionName = "unnamed region " + hash;
+      } else {
+        regionName = name;
+      }
       // add region to the list of regions
       regions[hash] = {
         // TODO points is kind of redundant since poly stores these
-        points: drawnPoints,
+        points: regionPoints,
         name: regionName,
         poly: polygon
       };
+
+      if (audio !== undefined) {
+        regions[hash].audio = audio;
+      }
+      if (images !== undefined) {
+        regions[hash].images = images;
+      }
     }
   }
 
@@ -129,16 +151,10 @@ function endDraw() {
     onPolyClick(e, regions[hash]);
   });
 
+  addRegionDiv(hash, regionName, audio, images);
+
   // adds polygon to map
   polygon.addTo(myMap);
-
-  // remove lines from map
-  polyline.remove();
-  connectBack.remove();
-  previewLine.remove();
-  drawnPoints = [];
-
-  addRegionDiv(hash, regionName);
 }
 
 /**
@@ -159,7 +175,7 @@ function onMapClick(e) {
     }
   }
   if (state == stateEnum.drawing) {
-    let coord = [e.latlng.lat, e.latlng.lng];
+    let coord = e.latlng;
     drawnPoints.push(coord);
     polyline.addLatLng(coord);
     if (drawnPoints.length > 2) {
@@ -184,9 +200,11 @@ function renameRegion(hash, newName) {
  * Adds region div to the document and region data for easy reference
  * @param {string} hash
  * @param {string} name
+ * @param {string[]} [audio]
+ * @param {string[]} [images]
  */
-function addRegionDiv(hash, name) {
-  let regionCard = new RegionCard(hash, name);
+function addRegionDiv(hash, name, audio, images) {
+  let regionCard = new RegionCard(hash, name, audio, images);
   sideNav.appendChild(regionCard.regionDiv);
   regions[hash].card = regionCard;
 }
@@ -217,3 +235,31 @@ myMap.on("mousemove", e => {
   }
   mouseLatLng = e.latlng;
 });
+
+/**
+ * Wipes out the map and rebuilds from metadata
+ * @param {string} metadata - metadata to be parsed
+ */
+function rebuild(strMetadata) {
+  let metadata = JSON.parse(strMetadata);
+  for (let hash in regions) {
+    let region = regions[hash];
+    // wipe out the map polygon
+    region.poly.remove();
+    // wipe out the region card
+    region.card.regionDiv.parentNode.removeChild(region.card.regionDiv);
+    // delete region data from regions
+    delete regions[hash];
+  }
+  console.log(metadata);
+  let newRegions = metadata.regions;
+  console.log(newRegions);
+  for (let i = 0; i < newRegions.length; i++) {
+    addRegion(
+      newRegions[i].points,
+      newRegions[i].name,
+      newRegions[i].audio,
+      newRegions[i].images
+    );
+  }
+}

@@ -60,6 +60,7 @@ p {
   border: solid;
   border-color: #e2e4e8;
   border-width: 1px;
+  overflow-wrap: break-word;
 }
 
 .instructions {
@@ -170,4 +171,26 @@ p {
 .uploadmessage {
   font-weight: bolder;
   color: #adadad;
+}
+
+.filename {
+  overflow-wrap: break-word;
+  min-width: 0px;
+  vertical-align: middle;
+  margin: auto;
+}
+
+.xbutton {
+  border: none;
+  padding-right: 0px;
+  font-size: 20pt;
+  cursor: pointer;
+}
+
+.xbutton:hover {
+  color: #aaaaaa;
+}
+
+.xbutton:focus {
+  outline: none;
 }
