@@ -1,5 +1,4 @@
 const fs = require("fs");
-const helpers = require("./helpers");
 const archiver = require("archiver");
 
 /**
@@ -18,15 +17,17 @@ const outObj = (s, m) => {
  * @param {Error} err a possible error in parsing the request
  * @param {Fields} fields fields submitted in the form
  * @param {Files} files uploaded files
+ * @param {Helpers} helpers a Helpers object that contains constants
+ * @param {Logger} logger a Logger object
  * @param {function ({status: number, message: string}) => void} cb callback
  */
-const parseForm = (err, fields, files, cb) => {
+const parseForm = (err, fields, files, helpers, logger, cb) => {
   if (err) {
     // if something goes wrong while parsing it's probably an invalid request
     cb(outObj(400, "error parsing form"));
     return;
   }
-  console.log("parsing request form...");
+  logger.log("Parsing request form...");
 
   // check for missing or invalid 'name' field from client
   if (typeof fields.tourName !== "string") {
@@ -80,8 +81,8 @@ const parseForm = (err, fields, files, cb) => {
     // zip before realizing an error. That would leave us with a half-written,
     // corrupted zip
     for (const f in files) {
-      // Some members of `files' are actually arrays. These are from HTML file
-      // inputs with the `multiple' attribute
+      // Some members of `files` are actually arrays. These are from HTML file
+      // inputs with the `multiple` attribute
       if (Array.isArray(files[f])) {
         // add all files of array
         for (const g of files[f]) {
@@ -127,12 +128,12 @@ const parseForm = (err, fields, files, cb) => {
 
   // log warnings but continue
   archive.on("warning", err => {
-    console.error(err);
+    logger.error(err);
   });
 
   // fired when file is done being written
   output.on("close", () => {
-    console.log("zip written. " + archive.pointer() + " total bytes");
+    logger.log("zip written. " + archive.pointer() + " total bytes");
     // send success
     cb(outObj(201, "successfully uploaded as " + tourName));
     return;
@@ -142,8 +143,8 @@ const parseForm = (err, fields, files, cb) => {
 
   // add files of size > 0
   for (const f in files) {
-    // Some members of `files' are actually arrays. These are from HTML file
-    // inputs with the `multiple' attribute
+    // Some members of `files` are actually arrays. These are from HTML file
+    // inputs with the `multiple` attribute
     if (Array.isArray(files[f])) {
       // add all files of arrays
       for (const g of files[f]) {

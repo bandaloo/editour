@@ -1,16 +1,24 @@
 const express = require("express");
 const formidable = require("formidable");
 const fs = require("fs");
-const helpers = require("./helpers");
+const Helpers = require("./Helpers");
 const app = express();
 const admZip = require("adm-zip");
+const Logger = require("./Logger");
 
 // static directory
 // requests that don't match any of the other endpoints will be served from here
 app.use(express.static(__dirname + "/static"));
 
+// initialize the logger and helpers
+const logger = new Logger();
+const helpers = new Helpers(logger);
+
 // endpoint for file uploads
 app.post("/upload", (req, res) => {
+  // log this request
+  logger.logRequest(req);
+
   // temporary directory for files to be saved to
   const tempDirPath = helpers.tempLoc + helpers.randName(10) + "/";
   // create directory
@@ -21,7 +29,7 @@ app.post("/upload", (req, res) => {
       helpers.returnError(res, 500, "server failed to create temp directory");
       return;
     } else {
-      console.error("EEXIST error");
+      logger.error("EEXIST error");
       // TODO make this generate a new name and try again on EEXIST
       // I think it should still work as long as two requests don't generate the
       // same name while one of them is still writing, which is astronomically
@@ -40,8 +48,9 @@ app.post("/upload", (req, res) => {
   form.parse(req, (err, fields, files) => {
     // send everything to a helper function that parses the form and sends a
     // status/message to the callback
-    require("./parseForm")(err, fields, files, out => {
+    require("./parseForm")(err, fields, files, helpers, logger, out => {
       if (out.status === 201) {
+        logger.log(out.message);
         // successful, send success message
         res
           .status(out.status)
@@ -58,6 +67,9 @@ app.post("/upload", (req, res) => {
 // endpoint to request a tour zip
 // should find the latest zip with a matching name and serve it
 app.get("/tour/:name", (req, res) => {
+  // log this request
+  logger.logRequest(req);
+
   fs.readdir(helpers.toursLoc, (err, files) => {
     if (err) {
       // send errors back to client
@@ -73,6 +85,7 @@ app.get("/tour/:name", (req, res) => {
       return;
     }
 
+    logger.log("Sending file: " + filename);
     // return the lexicographically last filename, it's the most recent
     res.status(200).sendFile(helpers.toursLoc + filename);
   });
@@ -80,6 +93,9 @@ app.get("/tour/:name", (req, res) => {
 
 // endpoint to request just the metadata from a tour. Used for editing a tour
 app.get("/edit/:name", (req, res) => {
+  // log this request
+  logger.logRequest(req);
+
   fs.readdir(helpers.toursLoc, (err, files) => {
     if (err) {
       // send errors back to client
@@ -95,6 +111,7 @@ app.get("/edit/:name", (req, res) => {
       return;
     }
 
+    logger.log("Sending file: " + filename);
     // the lexigraphically last filename is the one we want
     const zip = new admZip(helpers.toursLoc + filename);
     res
@@ -110,5 +127,6 @@ app.get("/edit/:name", (req, res) => {
 });
 
 app.listen(3000, () => {
+  logger.log("Started listening on port 3000...");
   console.log("Now listening on port 3000...");
 });
