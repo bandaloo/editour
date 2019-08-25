@@ -104,7 +104,8 @@ function startDraw() {
 function endDraw() {
   console.log("end draw");
   state = stateEnum.selecting;
-  drawnPoints.push([mouseLatLng.lat, mouseLatLng.lng]);
+  //drawnPoints.push([mouseLatLng.lat, mouseLatLng.lng]);
+  drawnPoints.push(mouseLatLng);
 
   addRegion(drawnPoints);
 
@@ -168,7 +169,8 @@ function onMapClick(e) {
     }
   }
   if (state == stateEnum.drawing) {
-    let coord = [e.latlng.lat, e.latlng.lng];
+    //let coord = [e.latlng.lat, e.latlng.lng];
+    let coord = e.latlng;
     drawnPoints.push(coord);
     polyline.addLatLng(coord);
     if (drawnPoints.length > 2) {

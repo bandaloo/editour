@@ -59,7 +59,8 @@ function makeFileRegionString() {
     // json region to reflect the real region
     let jsonRegion = {
       name: realRegion.name,
-      points: listsToLatLngs(realRegion.points),
+      //points: listsToLatLngs(realRegion.points),
+      points: realRegion.points,
       audio: realRegion.card.getAudioNames(),
       images: realRegion.card.getImageNames()
     };
@@ -87,14 +88,20 @@ function requestTour(tourName) {
   xhr.open("GET", str);
 
   xhr.onload = event => {
+    let responseText = event.target.responseText;
+    let parsedResponse = JSON.parse(responseText);
+    const downloadMessageElem = document.getElementById("download-message");
     if (xhr.status != 200) {
-      // TODO make a text box that has info just like the upload button
       console.log("there was an error");
+      // TODO extract this code into function and refactor upload
+      downloadMessageElem.style.color = colorEnum.uploadFailed;
+      downloadMessageElem.innerHTML = `There was a problem: ${
+        parsedResponse.message
+      }`;
     } else {
-      console.log("done");
-      let responseText = event.target.responseText;
-      let parsedResponse = JSON.parse(responseText);
-      console.log(parsedResponse.message);
+      downloadMessageElem.style.color = colorEnum.uploadSuccessful;
+      downloadMessageElem.innerHTML = "Downloaded successfully!";
+      console.log(JSON.parse(parsedResponse.message));
       rebuild(JSON.parse(parsedResponse.message));
     }
   };
@@ -105,3 +112,9 @@ function requestTour(tourName) {
 
   xhr.send();
 }
+
+// set an onclick for the download button
+document.getElementById("download-button").onclick = () => {
+  let tourName = document.getElementById("download-text").value;
+  requestTour(tourName);
+};

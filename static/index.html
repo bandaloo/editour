@@ -23,6 +23,7 @@
           region. To finish drawing, press <b>shift + click</b> again. A card
           will appear in this side panel where you can edit the information.
         </div>
+        <!-- upload box -->
         <div class="sidebox">
           <div class="flex">
             <input
@@ -37,6 +38,27 @@
           </div>
           <p class="sidebox uploadmessage" id="upload-message">
             Tour not yet uploaded
+          </p>
+        </div>
+        <!-- download box -->
+        <div class="sidebox">
+          <div class="flex">
+            <!-- no name attribute means this won't be submitted -->
+            <input
+              type="text"
+              id="download-text"
+              placeholder="Name of Tour File"
+              class="fillwidth"
+            />
+            <input
+              type="button"
+              id="download-button"
+              value="Download"
+              class="button bluebutton"
+            />
+          </div>
+          <p class="sidebox uploadmessage" id="download-message">
+            No tour downloaded
           </p>
         </div>
       </div>

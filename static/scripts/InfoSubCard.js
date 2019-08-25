@@ -10,9 +10,9 @@ class InfoSubCard extends SubCard {
 
       // create new p elements for latitude and longitude
       let p1 = document.createElement("p");
-      p1.innerHTML = "lat: " + points[i][0];
+      p1.innerHTML = "lat: " + points[i].lat;
       let p2 = document.createElement("p");
-      p2.innerHTML = "lon: " + points[i][1];
+      p2.innerHTML = "lon: " + points[i].lng;
 
       // add lat and lon elements to the coord div
       coordDiv.appendChild(p1);
