@@ -4,13 +4,13 @@
 class SubCard {
   /**
    * @param {RegionCard} superCard
-   * @param {string} originalDisplay - whether to restore to block or flex
+   * @param {string} origDisplay - whether to restore to block or flex
    */
-  constructor(superCard, originalDisplay) {
+  constructor(superCard, origDisplay) {
     this.superCard = superCard;
     this.enclosingDiv = document.createElement("div");
     this.enclosingDiv.classList.add("sidebox");
-    this.originalDisplay = originalDisplay;
+    this.origDisplay = origDisplay;
   }
 
   /**
@@ -36,14 +36,20 @@ class SubCard {
    * @returns {boolean}
    */
   isHidden() {
-    return this.enclosingDiv.style.display == "none";
+    return this.enclosingDiv.style.display === "none";
   }
 
+  /**
+   * Toggle div to be hidden or restore to original display
+   */
   toggleHidden() {
     this.enclosingDiv.style.display =
-      this.enclosingDiv.style.display == "none" ? this.originalDisplay : "none";
+      this.enclosingDiv.style.display === "none" ? this.origDisplay : "none";
   }
 
+  /**
+   * Toggle this card by calling toggleOtherCard on self
+   */
   toggleCard() {
     this.toggleOtherCard(this, this.showString, this.hideString);
   }

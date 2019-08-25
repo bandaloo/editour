@@ -1,7 +1,11 @@
 "use strict";
 
-const form = document.getElementById("sideform");
-const submitButton = document.getElementById("submitbutton");
+const form = /** @type {HTMLFormElement} */ (document.getElementById(
+  "sideform"
+));
+const submitButton = /** @type {HTMLButtonElement} */ (document.getElementById(
+  "submitbutton"
+));
 const jsonTextField = /** @type {HTMLInputElement} */ (document.getElementById(
   "metadata"
 ));
@@ -15,22 +19,31 @@ form.addEventListener("submit", event => {
   sendData(form);
 });
 
-const sendData = f => {
+/**
+ * Sends data to one of the endpoints (either /edit or /upload)
+ * @param {HTMLFormElement} form
+ */
+function sendData(form) {
   console.log("sending form");
   const xhr = new XMLHttpRequest();
   const arr = window.location.href.split("/");
   const url = arr[0] + "//" + arr[2];
 
   // Bind the FormData object and the form element
-  const fd = new FormData(f);
+  const fd = new FormData(form);
 
   // successful data submission
-  // TODO change this to onload
   xhr.addEventListener("load", event => {
     let uploadMsgElem = document.getElementById("upload-message");
-    statusChanger(uploadMsgElem, xhr.status, event, 201, text => {
-      uploadMsgElem.innerHTML += " File " + text;
-    });
+    statusChanger(
+      uploadMsgElem,
+      xhr.status,
+      event,
+      201,
+      /** @type {string} */ text => {
+        uploadMsgElem.innerHTML += " File " + text;
+      }
+    );
   });
 
   // error
@@ -42,19 +55,37 @@ const sendData = f => {
   // set up request (ternery for pointing to correct endpoint)
   xhr.open("POST", url + (downloaded ? "/edit" : "/upload"));
   xhr.send(fd);
-};
+}
 
 /**
+ * @typedef {Object} Coordinate - latitude and longitude position
+ * @property {number} lat - latitude
+ * @property {lng} lng - longitude
+ */
+/**
+ * @typedef {Object} RegionDatum - the metadata to describe a region
+ * @property {string} name
+ * @property {Coordinate[]} points
+ * @property {string[]} audio
+ * @property {string[]} images
+ */
+/**
+ * @typedef {Object} RegionData - the metadata for the tour file
+ * @property {RegionDatum[]} regions The user's first name.
+ */
+/**
  * Function for generating JSON data to associate files with regions
- * @return {Object}
+ * @return {RegionData}
  */
 function makeFileRegionData() {
+  /** @type {RegionData} */
   let data = { regions: [] };
   for (let hash in regions) {
     // real region to build a json region out of
     let realRegion = regions[hash];
 
     // json region to reflect the real region
+    /** @type {RegionDatum} */
     let jsonRegion = {
       name: realRegion.name,
       points: realRegion.points,
@@ -73,6 +104,10 @@ function makeFileRegionData() {
   return data;
 }
 
+/**
+ * Request download of tour from server
+ * @param {string} tourName
+ */
 function requestTour(tourName) {
   const href = window.location.href;
   const xhr = new XMLHttpRequest();
@@ -98,6 +133,14 @@ function requestTour(tourName) {
   xhr.send();
 }
 
+/**
+ * Changes status of message area based on response from server
+ * @param {HTMLElement} msgElem
+ * @param {number} status
+ * @param {ProgressEvent} event
+ * @param {number} successCode
+ * @param {Function} sCallback
+ */
 function statusChanger(msgElem, status, event, successCode, sCallback) {
   if (status === 404) {
     msgElem.style.color = colorEnum.failed;
@@ -105,7 +148,7 @@ function statusChanger(msgElem, status, event, successCode, sCallback) {
     // won't get a nice json response if it's a 404, so break out
     return;
   }
-  let responseText = event.target.responseText;
+  let responseText = /** @type {XMLHttpRequest} */ (event.target).responseText;
   let parsedResponse = JSON.parse(responseText);
   if (status !== successCode) {
     msgElem.style.color = colorEnum.failed;
@@ -126,7 +169,6 @@ document.getElementById("download-button").onclick = () => {
     "download-text"
   )).value;
   // TODO only change the box when the download worked
-
   let uploadText = /** @type {HTMLInputElement} */ (document.getElementById(
     "tour-name"
   ));

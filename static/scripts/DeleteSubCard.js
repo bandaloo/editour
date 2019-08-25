@@ -25,7 +25,7 @@ class DeleteSubCard extends SubCard {
    */
   deleteRegion() {
     console.log(this);
-    if (regions[this.superCard.hash].poly == popup.poly) {
+    if (regions[this.superCard.hash].poly === popup.poly) {
       myMap.closePopup();
     }
     regions[this.superCard.hash].poly.remove();
