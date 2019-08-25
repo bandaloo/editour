@@ -1,3 +1,5 @@
+"use strict";
+
 const form = document.getElementById("sideform");
 const submitButton = document.getElementById("submitbutton");
 const jsonTextField = /** @type {HTMLInputElement} */ (document.getElementById(

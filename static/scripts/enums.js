@@ -1,3 +1,5 @@
+"use strict";
+
 // freezing an Object is an enum basically
 const stateEnum = Object.freeze({
   // don't use 0 due to boolean conversion
@@ -6,7 +8,6 @@ const stateEnum = Object.freeze({
 });
 
 const colorEnum = Object.freeze({
-  // TODO pick some better colors
   drawing: "#ff0000",
   region: "#0000ff",
   successful: "#3ddb62",

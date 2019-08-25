@@ -1,3 +1,5 @@
+"use strict";
+
 class RenameSubCard extends SubCard {
   /**
    * @param {RegionCard} superCard

@@ -1,3 +1,5 @@
+"use strict";
+
 class RegionCard {
   /**
    * Construct a region card that appears on the side

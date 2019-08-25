@@ -1,3 +1,5 @@
+"use strict";
+
 class MediaSubCard extends SubCard {
   /**
    * Constructor for media card that will show audio and images when it is
