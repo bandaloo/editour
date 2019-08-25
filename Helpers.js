@@ -1,3 +1,6 @@
+const express = require("express");
+const Logger = require("./Logger");
+
 class Helpers {
   /**
    * basic constructor. Throws error if logger is ommitted
@@ -17,10 +20,9 @@ class Helpers {
   /**
    * Logs an error, then sends it to the client with a specified status code
    * and message
-   * @param {Response} res response object to send to
+   * @param {express.Response} res response object to send to
    * @param {number} code HTTP status code, e.g. 404
    * @param {string} message message to send
-   * @param {Logger} logger a logger object
    */
   returnError(res, code, message) {
     this.logger.error(message);

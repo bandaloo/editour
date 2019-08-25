@@ -5,6 +5,7 @@ const Helpers = require("./Helpers");
 const app = express();
 const admZip = require("adm-zip");
 const Logger = require("./Logger");
+const pHelpers = require("./pHelpers");
 
 // static directory
 // requests that don't match any of the other endpoints will be served from here
@@ -21,47 +22,49 @@ app.post("/upload", (req, res) => {
 
   // temporary directory for files to be saved to
   const tempDirPath = helpers.tempLoc + helpers.randName(10) + "/";
-  // create directory
-  try {
-    fs.mkdirSync(tempDirPath, { recursive: true });
-  } catch (err) {
-    if (err.code !== "EEXIST") {
-      helpers.returnError(res, 500, "server failed to create temp directory");
-      return;
-    } else {
-      logger.error("EEXIST error");
-      // TODO make this generate a new name and try again on EEXIST
-      // I think it should still work as long as two requests don't generate the
-      // same name while one of them is still writing, which is astronomically
-      // unlikely. The new files should just overwrite the old ones in the temp
-      // directory, which shouldn't matter ¯\_(ツ)_/¯
-    }
-  }
 
-  // form object
-  const form = new formidable.IncomingForm();
-  form.uploadDir = tempDirPath;
-  form.keepExtensions = true;
-  form.multiples = true;
+  // we're doing a lot of asynchronous calls in a row, so we'll use promises to
+  // make it a little cleaner and handle errors better
+  let tour, metadataString;
 
-  // parse incoming form data
-  form.parse(req, (err, fields, files) => {
-    // send everything to a helper function that parses the form and sends a
-    // status/message to the callback
-    require("./parseForm")(err, fields, files, helpers, logger, out => {
-      if (out.status === 201) {
-        logger.log(out.message);
-        // successful, send success message
-        res
-          .status(out.status)
-          .contentType("application/json")
-          .send(JSON.stringify({ status: out.status, message: out.message }));
-      } else {
-        // something went wrong, send error
-        helpers.returnError(res, out.status, out.message);
-      }
+  // first create the temp directory
+  pHelpers
+    .makeTempDir(tempDirPath)
+    .then(() => {
+      // write the incoming form into it
+      return pHelpers.acceptForm(tempDirPath, req);
+    })
+    .then(outObj => {
+      // save metadata and tour name for later
+      tour = outObj.tourName;
+      metadataString = outObj.metadata;
+      // verify files
+      return pHelpers.verify(tempDirPath, outObj.metadata);
+    })
+    .then(files => {
+      // zip up the files in the tours directory
+      return pHelpers.zipUp(
+        helpers.toursLoc,
+        tour,
+        tempDirPath,
+        files,
+        metadataString
+      );
+    })
+    .then(() => {
+      // send successful response back to the client
+      res.status(201).send(
+        JSON.stringify({
+          status: 201,
+          message: "Uploaded under the name '" + tour + "'"
+        })
+      );
+    })
+    .catch(errObj => {
+      console.error("caught something: " + errObj.message);
+      // send errors back to the client
+      helpers.returnError(res, errObj.status, errObj.message);
     });
-  });
 });
 
 // endpoint to request a tour zip
@@ -124,6 +127,70 @@ app.get("/edit/:name", (req, res) => {
         })
       );
   });
+});
+
+app.post("/edit", (req, res) => {
+  // log this request
+  logger.logRequest(req);
+
+  // we're doing a lot of asynchronous calls in a row, so we'll use promises to
+  // make it a little cleaner and handle errors better
+  const tempDirPath = helpers.tempLoc + helpers.randName(10) + "/";
+  /** @type {string} */
+  let tour;
+  /** @type {string} */
+  let metadataString;
+
+  // first create the temp directory
+  pHelpers
+    .makeTempDir(tempDirPath)
+    .then(() => {
+      // write the incoming form into it
+      return pHelpers.acceptForm(tempDirPath, req);
+    })
+    .then(outObj => {
+      // save tourName and metadata for later
+      tour = outObj.tourName;
+      metadataString = outObj.metadata;
+      // search for the right zip in the tours directory
+      return pHelpers.getTours(helpers.toursLoc);
+    })
+    .then(files => {
+      // find the full name of the tour
+      return pHelpers.findFileName(files, tour);
+    })
+    .then(zipName => {
+      // unzip the old zip into the new temp directory without overwriting files
+      return pHelpers.extractZip(helpers.toursLoc + zipName, tempDirPath);
+    })
+    .then(() => {
+      // make sure we have all the files we need
+      return pHelpers.verify(tempDirPath, metadataString);
+    })
+    .then(files => {
+      // finally zip the directory back up with the new metadata
+      return pHelpers.zipUp(
+        helpers.toursLoc,
+        tour,
+        tempDirPath,
+        files,
+        metadataString
+      );
+    })
+    .then(() => {
+      // send successful response back to the client
+      res.status(201).send(
+        JSON.stringify({
+          status: 201,
+          message: "Updated under the name '" + tour + "'"
+        })
+      );
+    })
+    .catch(errObj => {
+      console.error("caught something: " + errObj.message);
+      // send errors back to the client
+      helpers.returnError(res, errObj.status, errObj.message);
+    });
 });
 
 app.listen(3000, () => {
