@@ -59,7 +59,7 @@ Leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 document.addEventListener("keydown", function(e) {
   let code = e.keyCode;
   //let key = String.fromCharCode(code);
-  if (code == 16) {
+  if (code === 16) {
     shifting = true;
   }
 });
@@ -67,7 +67,7 @@ document.addEventListener("keydown", function(e) {
 document.addEventListener("keyup", function(e) {
   let code = e.keyCode;
   //let key = String.fromCharCode(code);
-  if (code == 16) {
+  if (code === 16) {
     shifting = false;
   }
 });
@@ -165,7 +165,7 @@ function addRegion(regionPoints, name, audio, images) {
 function onMapClick(e) {
   console.log("clicked map at: " + e.latlng);
   if (shifting) {
-    if (state == stateEnum.drawing) {
+    if (state === stateEnum.drawing) {
       if (drawnPoints.length > 1) {
         endDraw();
       } else {
@@ -175,7 +175,7 @@ function onMapClick(e) {
       startDraw();
     }
   }
-  if (state == stateEnum.drawing) {
+  if (state === stateEnum.drawing) {
     let coord = e.latlng;
     drawnPoints.push(coord);
     polyline.addLatLng(coord);

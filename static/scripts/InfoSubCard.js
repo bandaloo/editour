@@ -1,3 +1,5 @@
+"use strict";
+
 class InfoSubCard extends SubCard {
   /**
    * @param {RegionCard} superCard
