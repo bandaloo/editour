@@ -9,7 +9,7 @@ class RenameSubCard extends SubCard {
 
     this.textBox = document.createElement("input");
     this.textBox.type = "text";
-    this.textBox.classList.add("fillwidth");
+    this.textBox.classList.add("text", "fillwidth");
 
     let okayButton = document.createElement("button");
     okayButton.type = "button";

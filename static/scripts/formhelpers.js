@@ -13,11 +13,17 @@ const jsonTextField = /** @type {HTMLInputElement} */ (document.getElementById(
 // determines whether to post to /upload or /edit
 var downloaded = false;
 
-form.addEventListener("submit", event => {
+/**
+ * Action for hitting the upload button (really happens on form submit)
+ * @param {Event} event
+ */
+function hitUpload(event) {
   jsonTextField.value = JSON.stringify(makeFileRegionData());
   event.preventDefault();
   sendData(form);
-});
+}
+
+form.addEventListener("submit", hitUpload);
 
 /**
  * Sends data to one of the endpoints (either /edit or /upload)
@@ -35,15 +41,9 @@ function sendData(form) {
   // successful data submission
   xhr.addEventListener("load", event => {
     let uploadMsgElem = document.getElementById("upload-message");
-    statusChanger(
-      uploadMsgElem,
-      xhr.status,
-      event,
-      201,
-      /** @type {string} */ text => {
-        uploadMsgElem.innerHTML += " File " + text;
-      }
-    );
+    statusChanger(uploadMsgElem, xhr.status, event, 201, text => {
+      uploadMsgElem.innerHTML += " File " + text;
+    });
   });
 
   // error
@@ -149,6 +149,8 @@ function statusChanger(msgElem, status, event, successCode, sCallback) {
     return;
   }
   let responseText = /** @type {XMLHttpRequest} */ (event.target).responseText;
+  console.log(downloaded);
+  console.log(responseText);
   let parsedResponse = JSON.parse(responseText);
   if (status !== successCode) {
     msgElem.style.color = colorEnum.failed;
@@ -161,8 +163,7 @@ function statusChanger(msgElem, status, event, successCode, sCallback) {
   }
 }
 
-// set an onclick for the download button
-document.getElementById("download-button").onclick = () => {
+function hitDownload() {
   // currently edited map will be posted to edit instead
   downloaded = true;
   let tourName = /** @type {HTMLInputElement} */ (document.getElementById(
@@ -170,10 +171,33 @@ document.getElementById("download-button").onclick = () => {
   )).value;
   // TODO only change the box when the download worked
   let uploadText = /** @type {HTMLInputElement} */ (document.getElementById(
-    "tour-name"
+    "upload-text"
   ));
   // TODO get rid of this (for now renaming is not enabled)
   uploadText.readOnly = true;
   uploadText.value = tourName;
   requestTour(tourName);
-};
+}
+
+// set an onclick for the download button
+document.getElementById("download-button").onclick = hitDownload;
+
+form.addEventListener("keypress", event => {
+  if (event.keyCode == 13) {
+    event.preventDefault();
+  }
+});
+
+document.getElementById("download-text").addEventListener("keypress", event => {
+  if (event.keyCode == 13) {
+    console.log("hit enter on download textbox");
+    hitDownload();
+  }
+});
+
+document.getElementById("upload-text").addEventListener("keypress", event => {
+  if (event.keyCode == 13) {
+    console.log("hit enter on upload textbox");
+    hitUpload(event);
+  }
+});

@@ -194,3 +194,7 @@ p {
 .xbutton:focus {
   outline: none;
 }
+
+.text {
+  min-width: 0px;
+}
