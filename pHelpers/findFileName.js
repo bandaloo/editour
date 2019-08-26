@@ -9,7 +9,6 @@
 const findFileName = (files, name) => {
   return new Promise((resolve, reject) => {
     if (typeof files === "undefined") {
-      console.error("ASLKFJALKDSFJ");
       reject({
         status: 404,
         message: "No files found"
@@ -31,7 +30,8 @@ const findFileName = (files, name) => {
       });
     }
 
-    // return the lexigraphically last matching filename, that's the most recent
+    // return the lexicographically last matching filename, that's the most
+    // recent
     resolve(files.sort()[files.length - 1]);
   });
 };
