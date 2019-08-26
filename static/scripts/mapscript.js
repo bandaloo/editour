@@ -213,7 +213,7 @@ function addRegionDiv(hash, name, audio, images) {
 myMap.on("click", onMapClick);
 
 var popup = Leaflet.popup(); // popup moved around and used for stuff
-var marker = Leaflet.marker([0, 0]); // marker created when clicking on coordinate box
+var marker = Leaflet.marker({ lat: 0, lng: 0 }); // marker created when clicking on coordinate box
 marker.addTo(myMap);
 // TODO get rid of this
 console.log(marker.latlng);
