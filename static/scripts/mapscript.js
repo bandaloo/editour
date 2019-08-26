@@ -213,10 +213,7 @@ function addRegionDiv(hash, name, audio, images) {
 myMap.on("click", onMapClick);
 
 var popup = Leaflet.popup(); // popup moved around and used for stuff
-var marker = Leaflet.marker([0, 0]); // marker created when clicking on coordinate box
-marker.addTo(myMap);
-// TODO get rid of this
-console.log(marker.latlng);
+var marker = Leaflet.marker({ lat: 0, lng: 0 }); // marker created when clicking on coordinate box
 
 /**
  * Brings up popup when clicking on region polygon on map
@@ -246,6 +243,8 @@ myMap.on("mousemove", e => {
  * @param {string} strMetadata - metadata to be parsed
  */
 function rebuild(strMetadata) {
+  marker.remove();
+  myMap.closePopup();
   let metadata = JSON.parse(strMetadata);
   console.log(metadata);
   for (let hash in regions) {

@@ -29,18 +29,28 @@ class InfoSubCard extends SubCard {
       coordDiv.appendChild(coordParagraph);
       coordDiv.appendChild(xButton);
 
+      // clicking on the coordinate
       coordDiv.addEventListener("click", () => {
+        // not problematic to add to a map to which control already belongs
         let index = parseInt(coordDiv.getAttribute("data-index"));
         console.log(coordDiv.getAttribute("data-index"));
         marker.setLatLng(points[index]);
+        marker.addTo(myMap);
+        marker.point = points[index];
+        marker.poly = regions[superCard.hash].poly;
         myMap.panTo(points[index]);
       });
 
-      // deleting the point
-      const clickFunc = event => {
-        // TODO add check for deletion that's not just blocked by UI
+      // clicking on the X button
+      xButton.onclick = event => {
+        // TODO add check for deletion that's not just prevented by UI
         event.stopPropagation();
         event.preventDefault();
+
+        // delete the marker if the point under it is being deleted
+        if (marker.point === points[i]) {
+          marker.remove();
+        }
 
         let index = parseInt(coordDiv.getAttribute("data-index"));
         console.log(index);
@@ -53,12 +63,10 @@ class InfoSubCard extends SubCard {
         coordDiv.parentNode.removeChild(coordDiv);
         this.hideButtonsWhenTriangle();
       };
-
       this.coordData.push({ index: i, div: coordDiv, button: xButton });
-
-      xButton.onclick = clickFunc;
       this.enclosingDiv.appendChild(coordDiv);
     }
+
     this.hideButtonsWhenTriangle();
     this.setToggleButton(superCard.infoButton, "Hide Info");
   }

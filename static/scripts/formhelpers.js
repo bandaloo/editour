@@ -71,7 +71,7 @@ function sendData(form) {
  */
 /**
  * @typedef {Object} RegionData - the metadata for the tour file
- * @property {RegionDatum[]} regions The user's first name.
+ * @property {RegionDatum[]} regions
  */
 /**
  * Function for generating JSON data to associate files with regions
