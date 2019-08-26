@@ -158,8 +158,9 @@ p {
   margin-right: 0px;
 }
 
-.uploadmessage {
-  font-weight: bolder;
+.servermessage {
+  font-weight: bold;
+  font-family: "Roboto Mono";
   color: #adadad;
 }
 

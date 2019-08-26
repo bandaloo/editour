@@ -20,6 +20,9 @@ var downloaded = false;
 function hitUpload(event) {
   jsonTextField.value = JSON.stringify(makeFileRegionData());
   event.preventDefault();
+  let uploadMessage = document.getElementById("upload-message");
+  uploadMessage.innerHTML = "Uploading...";
+  uploadMessage.style.color = colorEnum.waiting;
   sendData(form);
 }
 
@@ -42,7 +45,7 @@ function sendData(form) {
   xhr.addEventListener("load", event => {
     let uploadMsgElem = document.getElementById("upload-message");
     statusChanger(uploadMsgElem, xhr.status, event, 201, text => {
-      uploadMsgElem.innerHTML += " File " + text;
+      uploadMsgElem.innerHTML += " " + text;
     });
   });
 
@@ -144,7 +147,7 @@ function requestTour(tourName) {
 function statusChanger(msgElem, status, event, successCode, sCallback) {
   if (status === 404) {
     msgElem.style.color = colorEnum.failed;
-    msgElem.innerHTML = "Server not found";
+    msgElem.innerHTML = "404 not found";
     // won't get a nice json response if it's a 404, so break out
     return;
   }
@@ -166,16 +169,20 @@ function statusChanger(msgElem, status, event, successCode, sCallback) {
 function hitDownload() {
   // currently edited map will be posted to edit instead
   downloaded = true;
-  let tourName = /** @type {HTMLInputElement} */ (document.getElementById(
+  const tourName = /** @type {HTMLInputElement} */ (document.getElementById(
     "download-text"
   )).value;
   // TODO only change the box when the download worked
-  let uploadText = /** @type {HTMLInputElement} */ (document.getElementById(
+  const uploadText = /** @type {HTMLInputElement} */ (document.getElementById(
     "upload-text"
   ));
   // TODO get rid of this (for now renaming is not enabled)
   uploadText.readOnly = true;
   uploadText.value = tourName;
+  // TODO extract this to function for hitDownload and hitUpload
+  let downloadMessage = document.getElementById("download-message");
+  downloadMessage.innerHTML = "Downloading...";
+  downloadMessage.style.color = colorEnum.waiting;
   requestTour(tourName);
 }
 
