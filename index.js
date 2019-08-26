@@ -1,18 +1,18 @@
 const express = require("express");
-const formidable = require("formidable");
-const fs = require("fs");
-const Helpers = require("./Helpers");
 const app = express();
 const admZip = require("adm-zip");
 const Logger = require("./Logger");
+const pHelpers = require("./pHelpers");
+const returnError = require("./returnError");
+const constants = require("./constants");
+const randName = require("./randName");
 
 // static directory
 // requests that don't match any of the other endpoints will be served from here
 app.use(express.static(__dirname + "/static"));
 
-// initialize the logger and helpers
-const logger = new Logger();
-const helpers = new Helpers(logger);
+// initialize the logger
+const logger = new Logger(constants.logPath);
 
 // endpoint for file uploads
 app.post("/upload", (req, res) => {
@@ -20,48 +20,53 @@ app.post("/upload", (req, res) => {
   logger.logRequest(req);
 
   // temporary directory for files to be saved to
-  const tempDirPath = helpers.tempLoc + helpers.randName(10) + "/";
-  // create directory
-  try {
-    fs.mkdirSync(tempDirPath, { recursive: true });
-  } catch (err) {
-    if (err.code !== "EEXIST") {
-      helpers.returnError(res, 500, "server failed to create temp directory");
-      return;
-    } else {
-      logger.error("EEXIST error");
-      // TODO make this generate a new name and try again on EEXIST
-      // I think it should still work as long as two requests don't generate the
-      // same name while one of them is still writing, which is astronomically
-      // unlikely. The new files should just overwrite the old ones in the temp
-      // directory, which shouldn't matter ¯\_(ツ)_/¯
-    }
-  }
+  const tempDirPath = constants.tempLoc + randName(10) + "/";
 
-  // form object
-  const form = new formidable.IncomingForm();
-  form.uploadDir = tempDirPath;
-  form.keepExtensions = true;
-  form.multiples = true;
+  // we're doing a lot of asynchronous calls in a row, so we'll use promises to
+  // make it a little cleaner and handle errors better
+  let tour, metadataString;
 
-  // parse incoming form data
-  form.parse(req, (err, fields, files) => {
-    // send everything to a helper function that parses the form and sends a
-    // status/message to the callback
-    require("./parseForm")(err, fields, files, helpers, logger, out => {
-      if (out.status === 201) {
-        logger.log(out.message);
-        // successful, send success message
-        res
-          .status(out.status)
-          .contentType("application/json")
-          .send(JSON.stringify({ status: out.status, message: out.message }));
-      } else {
-        // something went wrong, send error
-        helpers.returnError(res, out.status, out.message);
-      }
+  // first create the temp directory
+  pHelpers
+    .makeTempDir(tempDirPath)
+    .then(() => {
+      // write the incoming form into it
+      return pHelpers.acceptForm(tempDirPath, req);
+    })
+    .then(outObj => {
+      // save metadata and tour name for later
+      tour = outObj.tourName;
+      metadataString = outObj.metadata;
+      // verify files
+      return pHelpers.verify(tempDirPath, outObj.metadata);
+    })
+    .then(files => {
+      // zip up the files in the tours directory
+      return pHelpers.zipUp(
+        constants.toursLoc,
+        tour,
+        tempDirPath,
+        files,
+        metadataString
+      );
+    })
+    .then(() => {
+      // send successful response back to the client
+      res
+        .status(201)
+        .header("Content-type", "application/json")
+        .send(
+          JSON.stringify({
+            status: 201,
+            message: "Uploaded under the name '" + tour + "'"
+          })
+        );
+    })
+    .catch(errObj => {
+      console.error("caught something: " + errObj.message);
+      // send errors back to the client
+      returnError(res, errObj.status, errObj.message, logger);
     });
-  });
 });
 
 // endpoint to request a tour zip
@@ -70,25 +75,21 @@ app.get("/tour/:name", (req, res) => {
   // log this request
   logger.logRequest(req);
 
-  fs.readdir(helpers.toursLoc, (err, files) => {
-    if (err) {
-      // send errors back to client
-      helpers.returnError(res, 500, "unable to read from tours directory");
-      return;
-    }
-
-    const filename = helpers.lookupFileName(files, req.params.name);
-
-    // if no files left 404
-    if (filename === null) {
-      helpers.returnError(res, 404, "couldn't find tour " + req.params.name);
-      return;
-    }
-
-    logger.log("Sending file: " + filename);
-    // return the lexicographically last filename, it's the most recent
-    res.status(200).sendFile(helpers.toursLoc + filename);
-  });
+  // read files from the tours directory
+  pHelpers
+    .getTours(constants.toursLoc)
+    .then(files => {
+      // find the full name of the tour
+      return pHelpers.findFileName(files, req.params.name);
+    })
+    .then(zipFile => {
+      logger.log("Sending file: " + zipFile);
+      res.status(200).sendFile(constants.toursLoc + zipFile);
+    })
+    .catch(errObj => {
+      // send errors back to the client
+      returnError(res, errObj.status, errObj.message, logger);
+    });
 });
 
 // endpoint to request just the metadata from a tour. Used for editing a tour
@@ -96,34 +97,97 @@ app.get("/edit/:name", (req, res) => {
   // log this request
   logger.logRequest(req);
 
-  fs.readdir(helpers.toursLoc, (err, files) => {
-    if (err) {
-      // send errors back to client
-      helpers.returnError(res, 500, "unable to read from tours directory");
-      return;
-    }
+  // read files from the tours directory
+  pHelpers
+    .getTours(constants.toursLoc)
+    .then(files => {
+      // find the full name of the tour
+      return pHelpers.findFileName(files, req.params.name);
+    })
+    .then(zipFile => {
+      logger.log("Sending metadata from " + zipFile);
+      const zip = new admZip(constants.toursLoc + zipFile);
+      res
+        .status(200)
+        .contentType("application/json")
+        .send(
+          JSON.stringify({
+            status: 200,
+            message: zip.readAsText("metadata.json")
+          })
+        );
+    })
+    .catch(errObj => {
+      // send errors back to the client
+      returnError(res, errObj.status, errObj.message, logger);
+    });
+});
 
-    const filename = helpers.lookupFileName(files, req.params.name);
+app.post("/edit", (req, res) => {
+  // log this request
+  logger.logRequest(req);
 
-    if (filename === null) {
-      // no file found, send 404
-      helpers.returnError(res, 404, "couldn't find tour " + req.params.name);
-      return;
-    }
+  // we're doing a lot of asynchronous calls in a row, so we'll use promises to
+  // make it a little cleaner and handle errors better
+  const tempDirPath = constants.tempLoc + randName(10) + "/";
+  /** @type {string} */
+  let tour;
+  /** @type {string} */
+  let metadataString;
 
-    logger.log("Sending file: " + filename);
-    // the lexigraphically last filename is the one we want
-    const zip = new admZip(helpers.toursLoc + filename);
-    res
-      .status(200)
-      .contentType("application/json")
-      .send(
-        JSON.stringify({
-          status: 200,
-          message: zip.readAsText("metadata.json")
-        })
+  // first create the temp directory
+  pHelpers
+    .makeTempDir(tempDirPath)
+    .then(() => {
+      // write the incoming form into it
+      return pHelpers.acceptForm(tempDirPath, req);
+    })
+    .then(outObj => {
+      // save tourName and metadata for later
+      tour = outObj.tourName;
+      metadataString = outObj.metadata;
+      // search for the right zip in the tours directory
+      return pHelpers.getTours(constants.toursLoc);
+    })
+    .then(files => {
+      // find the full name of the tour
+      return pHelpers.findFileName(files, tour);
+    })
+    .then(zipName => {
+      // unzip the old zip into the new temp directory without overwriting files
+      return pHelpers.extractZip(constants.toursLoc + zipName, tempDirPath);
+    })
+    .then(() => {
+      // make sure we have all the files we need
+      return pHelpers.verify(tempDirPath, metadataString);
+    })
+    .then(files => {
+      // finally zip the directory back up with the new metadata
+      return pHelpers.zipUp(
+        constants.toursLoc,
+        tour,
+        tempDirPath,
+        files,
+        metadataString
       );
-  });
+    })
+    .then(() => {
+      // send successful response back to the client
+      res
+        .status(201)
+        .header("Content-type", "application/json")
+        .send(
+          JSON.stringify({
+            status: 201,
+            message: "Updated under the name '" + tour + "'"
+          })
+        );
+    })
+    .catch(errObj => {
+      console.error("caught something: " + errObj.message);
+      // send errors back to the client
+      returnError(res, errObj.status, errObj.message, logger);
+    });
 });
 
 app.listen(3000, () => {
