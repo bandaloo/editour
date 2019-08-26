@@ -8,12 +8,17 @@ class InfoSubCard extends SubCard {
     super(superCard, "block");
 
     let points = regions[superCard.hash].points;
+    let poly = regions[superCard.hash].poly;
+
+    /** @type {{index: number, div: HTMLElement}[]} */
+    this.coordData = [];
 
     for (let i = 0; i < points.length; i++) {
       let xButton = makeXButton();
 
       let coordDiv = document.createElement("div");
       coordDiv.classList.add("sidebox", "coordbox", "flex");
+      coordDiv.setAttribute("data-index", i.toString());
 
       // create new p elements for latitude and longitude
       const coordParagraph = document.createElement("p");
@@ -25,15 +30,29 @@ class InfoSubCard extends SubCard {
       coordDiv.appendChild(xButton);
 
       coordDiv.addEventListener("click", () => {
-        //marker.remove();
-        marker.setLatLng(points[i]);
-        myMap.panTo(points[i]);
+        let index = parseInt(coordDiv.getAttribute("data-index"));
+        console.log(coordDiv.getAttribute("data-index"));
+        marker.setLatLng(points[index]);
+        myMap.panTo(points[index]);
       });
 
-      const clickFunc = () => {
-        // TODO remove the point from the poly
+      const clickFunc = event => {
+        event.stopPropagation();
+        event.preventDefault();
+
+        let index = parseInt(coordDiv.getAttribute("data-index"));
+        console.log(index);
+        points.splice(index, 1); // remove points from the region data
+        poly.setLatLngs(points); // change the points of the poly
+        this.coordData.splice(index, 1); // cut this object out of coordData
+        // TODO bump all the indices down for the coordDivs
+        for (let j = 0; j < this.coordData.length; j++) {
+          this.coordData[j].div.setAttribute("data-index", j.toString());
+        }
         coordDiv.parentNode.removeChild(coordDiv);
       };
+
+      this.coordData.push({ index: i, div: coordDiv });
 
       xButton.onclick = clickFunc;
       this.enclosingDiv.appendChild(coordDiv);
