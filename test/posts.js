@@ -8,7 +8,7 @@ const server = supertest.agent("localhost:3000");
 const testFileDir = __dirname + "/files/";
 
 describe("POST Methods", function() {
-  describe("/upload endpoint", function() {
+  describe("POST /upload endpoint", function() {
     it("Should return 201 and create zip from correct form submission", function(done) {
       const metadata = {
         regions: [
@@ -71,6 +71,206 @@ describe("POST Methods", function() {
         })
         .then(res => {
           assert.strictEqual(res.status, 200);
+          done();
+        })
+        .catch(err => {
+          done(err);
+        });
+    });
+
+    it("Should return 400 with no tourName field", function(done) {
+      const metadata = {
+        regions: [
+          {
+            name: "my region",
+            points: [
+              { lat: 34.97463008623145, lng: 135.95066070556643 },
+              { lat: 34.97473558142708, lng: 135.95984458923343 },
+              { lat: 34.97698611323032, lng: 135.9720325469971 }
+            ],
+            audio: [],
+            images: []
+          }
+        ]
+      };
+      new Promise((resolve, reject) => {
+        server
+          .post("/upload")
+          .expect("Content-type", /json/)
+          .expect(400)
+          .attach("audio_name_x6ozqq", testFileDir + "cruel-angels-thesis.mp3")
+          .attach("image_name_x6ozqq", testFileDir + "shinji.png")
+          .attach("image_name_x6ozqq", testFileDir + "misato.jpg")
+          // .field("tourName", "myTest")
+          .field("metadata", JSON.stringify(metadata))
+          .end((err, res) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(res);
+          });
+      })
+        .then(res => {
+          assert.strictEqual(res.status, 400);
+          assert.strictEqual(res.body.status, 400);
+          assert.strictEqual(
+            res.body.message,
+            "Missing or invalid tourName field"
+          );
+          done();
+        })
+        .catch(err => {
+          done(err);
+        });
+    });
+
+    it("Should return 400 with no metadata field", function(done) {
+      const metadata = {
+        regions: [
+          {
+            name: "my region",
+            points: [
+              { lat: 34.97463008623145, lng: 135.95066070556643 },
+              { lat: 34.97473558142708, lng: 135.95984458923343 },
+              { lat: 34.97698611323032, lng: 135.9720325469971 }
+            ],
+            audio: [],
+            images: []
+          }
+        ]
+      };
+      new Promise((resolve, reject) => {
+        server
+          .post("/upload")
+          .expect("Content-type", /json/)
+          .expect(400)
+          .attach("audio_name_x6ozqq", testFileDir + "cruel-angels-thesis.mp3")
+          .attach("image_name_x6ozqq", testFileDir + "shinji.png")
+          .attach("image_name_x6ozqq", testFileDir + "misato.jpg")
+          .field("tourName", "myTest")
+          // .field("metadata", JSON.stringify(metadata))
+          .end((err, res) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(res);
+          });
+      })
+        .then(res => {
+          assert.strictEqual(res.status, 400);
+          assert.strictEqual(res.body.status, 400);
+          assert.strictEqual(
+            res.body.message,
+            "Missing or invalid metadata field"
+          );
+          done();
+        })
+        .catch(err => {
+          done(err);
+        });
+    });
+
+    it("Should return 400 with duplicate files in metadata", function(done) {
+      const metadata = {
+        regions: [
+          {
+            name: "my region",
+            points: [
+              { lat: 34.97463008623145, lng: 135.95066070556643 },
+              { lat: 34.97473558142708, lng: 135.95984458923343 },
+              { lat: 34.97698611323032, lng: 135.9720325469971 }
+            ],
+            audio: ["cruel-angels-thesis.mp3"],
+            images: []
+          },
+          {
+            name: "my other region",
+            points: [
+              { lat: 34.83141242342445, lng: 135.99029230923093 },
+              { lat: 34.90213295023509, lng: 135.9920589235823 },
+              { lat: 34.9930290101391, lng: 135.99320930239209 }
+            ],
+            audio: ["cruel-angels-thesis.mp3"],
+            images: ["shinji.png"]
+          }
+        ]
+      };
+      new Promise((resolve, reject) => {
+        server
+          .post("/upload")
+          .expect("Content-type", /json/)
+          .expect(400)
+          .attach("audio_name_x6ozqq", testFileDir + "cruel-angels-thesis.mp3")
+          .attach("image_name_x6ozqq", testFileDir + "shinji.png")
+          .field("tourName", "myTest")
+          .field("metadata", JSON.stringify(metadata))
+          .end((err, res) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(res);
+          });
+      })
+        .then(res => {
+          assert.strictEqual(res.status, 400);
+          assert.strictEqual(res.body.status, 400);
+          assert.strictEqual(res.body.message, "Duplicate files in metadata");
+          done();
+        })
+        .catch(err => {
+          done(err);
+        });
+    });
+
+    it("Should return 400 with files in metadata missing from upload", function(done) {
+      const metadata = {
+        regions: [
+          {
+            name: "my region",
+            points: [
+              { lat: 34.97463008623145, lng: 135.95066070556643 },
+              { lat: 34.97473558142708, lng: 135.95984458923343 },
+              { lat: 34.97698611323032, lng: 135.9720325469971 }
+            ],
+            audio: ["gunbuster-opening.mp3"],
+            images: ["this-file-does-not-exist.wav"]
+          },
+          {
+            name: "my other region",
+            points: [
+              { lat: 34.83141242342445, lng: 135.99029230923093 },
+              { lat: 34.90213295023509, lng: 135.9920589235823 },
+              { lat: 34.9930290101391, lng: 135.99320930239209 }
+            ],
+            audio: ["cruel-angels-thesis.mp3"],
+            images: ["shinji.png"]
+          }
+        ]
+      };
+      new Promise((resolve, reject) => {
+        server
+          .post("/upload")
+          .expect("Content-type", /json/)
+          .expect(400)
+          .attach("audio_name_x6ozqq", testFileDir + "cruel-angels-thesis.mp3")
+          .attach("audio_name_x6ozqq", testFileDir + "gunbuster-opening.mp3")
+          .attach("image_name_x6ozqq", testFileDir + "shinji.png")
+          .field("tourName", "myTest")
+          .field("metadata", JSON.stringify(metadata))
+          .end((err, res) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(res);
+          });
+      })
+        .then(res => {
+          assert.strictEqual(res.status, 400);
+          assert.strictEqual(res.body.status, 400);
+          assert.strictEqual(
+            res.body.message,
+            "File this-file-does-not-exist.wav in metadata not present on disk"
+          );
           done();
         })
         .catch(err => {
