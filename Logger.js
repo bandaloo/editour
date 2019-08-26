@@ -1,4 +1,5 @@
 const fs = require("fs");
+const express = require("express");
 
 /**
  * This object handles logging events from the server. By default logs are
@@ -12,7 +13,7 @@ class Logger {
    * To follow UNIX conventions you may want to pass it something like this:
    * `new Logger('/var/log/editour');`
    *
-   * @param {string} logFilePath the path to the location where the log file
+   * @param {string} [logFilePath] the path to the location where the log file
    * will be written. Optional.
    * @constructor
    */
@@ -52,7 +53,7 @@ class Logger {
 
   /**
    * logs information about a request
-   * @param {Request} req the request object
+   * @param {express.Request} req the request object
    */
   logRequest(req) {
     let s = req.ip + " " + '"' + req.method + " " + req.path + " ";

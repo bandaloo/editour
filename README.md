@@ -15,3 +15,8 @@ Navigate to `http://localhost:3000/` and upload some files. Then request them at
 ## Code Formatter
 
 Use the Prettier code formatter when making PRs
+
+## Testing
+
+We used mocha for testing. Make sure the server is running with `npm start`
+first, then run `npm test` and make sure all tests pass before pushing
