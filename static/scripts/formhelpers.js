@@ -109,9 +109,9 @@ function makeFileRegionData() {
  * @param {string} tourName
  */
 function requestTour(tourName) {
-  const href = window.location.href;
+  const host = window.location.host;
   const xhr = new XMLHttpRequest();
-  const str = `${href}edit/${tourName}`;
+  const str = `http://${host}/edit/${tourName}`;
   console.log(str);
 
   xhr.open("GET", str);
