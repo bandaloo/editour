@@ -145,11 +145,6 @@ p {
   display: flex;
 }
 
-.sidebox.internalbox {
-  margin-top: 4px;
-  margin-bottom: 4px;
-}
-
 .vertical {
   flex-direction: column;
 }
@@ -185,6 +180,7 @@ p {
   padding-right: 0px;
   font-size: 20pt;
   cursor: pointer;
+  background: transparent;
 }
 
 .xbutton:hover {
@@ -197,4 +193,12 @@ p {
 
 .text {
   min-width: 0px;
+}
+
+.coordbox {
+  cursor: pointer;
+}
+
+.coordbox:hover {
+  background-color: #fff5d4;
 }

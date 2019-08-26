@@ -213,6 +213,10 @@ function addRegionDiv(hash, name, audio, images) {
 myMap.on("click", onMapClick);
 
 var popup = Leaflet.popup(); // popup moved around and used for stuff
+var marker = Leaflet.marker([0, 0]); // marker created when clicking on coordinate box
+marker.addTo(myMap);
+// TODO get rid of this
+console.log(marker.latlng);
 
 /**
  * Brings up popup when clicking on region polygon on map
@@ -263,4 +267,12 @@ function rebuild(strMetadata) {
       newRegions[i].images
     );
   }
+}
+
+function makeXButton() {
+  let xButton = document.createElement("button");
+  xButton.type = "button";
+  xButton.classList.add("xbutton");
+  xButton.innerHTML = "×";
+  return xButton;
 }

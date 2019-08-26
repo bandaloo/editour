@@ -10,19 +10,32 @@ class InfoSubCard extends SubCard {
     let points = regions[superCard.hash].points;
 
     for (let i = 0; i < points.length; i++) {
+      let xButton = makeXButton();
+
       let coordDiv = document.createElement("div");
-      coordDiv.classList.add("sidebox", "internalbox");
+      coordDiv.classList.add("sidebox", "coordbox", "flex");
 
       // create new p elements for latitude and longitude
-      let p1 = document.createElement("p");
-      p1.innerHTML = "lat: " + points[i].lat;
-      let p2 = document.createElement("p");
-      p2.innerHTML = "lon: " + points[i].lng;
+      const coordParagraph = document.createElement("p");
+      const fLat = points[i].lat.toFixed(5);
+      const fLng = points[i].lng.toFixed(5);
+      coordParagraph.innerHTML = `latitude: ${fLat}<br>longitude: ${fLng}`;
+      coordParagraph.classList.add("fillwidth");
+      coordDiv.appendChild(coordParagraph);
+      coordDiv.appendChild(xButton);
 
-      // add lat and lon elements to the coord div
-      coordDiv.appendChild(p1);
-      coordDiv.appendChild(p2);
+      coordDiv.addEventListener("click", () => {
+        //marker.remove();
+        marker.setLatLng(points[i]);
+        myMap.panTo(points[i]);
+      });
 
+      const clickFunc = () => {
+        // TODO remove the point from the poly
+        coordDiv.parentNode.removeChild(coordDiv);
+      };
+
+      xButton.onclick = clickFunc;
       this.enclosingDiv.appendChild(coordDiv);
     }
 
