@@ -10,7 +10,7 @@ class InfoSubCard extends SubCard {
     let points = regions[superCard.hash].points;
     let poly = regions[superCard.hash].poly;
 
-    /** @type {{index: number, div: HTMLElement}[]} */
+    /** @type {{index: number, button: HTMLButtonElement, div: HTMLElement}[]} */
     this.coordData = [];
 
     for (let i = 0; i < points.length; i++) {
@@ -36,7 +36,9 @@ class InfoSubCard extends SubCard {
         myMap.panTo(points[index]);
       });
 
+      // deleting the point
       const clickFunc = event => {
+        // TODO add check for deletion that's not just blocked by UI
         event.stopPropagation();
         event.preventDefault();
 
@@ -45,19 +47,28 @@ class InfoSubCard extends SubCard {
         points.splice(index, 1); // remove points from the region data
         poly.setLatLngs(points); // change the points of the poly
         this.coordData.splice(index, 1); // cut this object out of coordData
-        // TODO bump all the indices down for the coordDivs
         for (let j = 0; j < this.coordData.length; j++) {
           this.coordData[j].div.setAttribute("data-index", j.toString());
         }
         coordDiv.parentNode.removeChild(coordDiv);
+        this.hideButtonsWhenTriangle();
       };
 
-      this.coordData.push({ index: i, div: coordDiv });
+      this.coordData.push({ index: i, div: coordDiv, button: xButton });
 
       xButton.onclick = clickFunc;
       this.enclosingDiv.appendChild(coordDiv);
     }
-
+    this.hideButtonsWhenTriangle();
     this.setToggleButton(superCard.infoButton, "Hide Info");
+  }
+
+  hideButtonsWhenTriangle() {
+    // length should not be less than 3
+    if (this.coordData.length <= 3) {
+      for (let j = 0; j < this.coordData.length; j++) {
+        this.coordData[j].button.disabled = true;
+      }
+    }
   }
 }

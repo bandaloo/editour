@@ -63,11 +63,6 @@ p {
   overflow-wrap: break-word;
 }
 
-.instructions {
-  text-align: justify;
-  text-justify: inter-word;
-}
-
 .button {
   --bg-color: #ff0000;
   --bottom-color: #bb0000;
@@ -189,6 +184,10 @@ p {
 
 .xbutton:focus {
   outline: none;
+}
+
+.xbutton:disabled {
+  color: #cccccc;
 }
 
 .text {
