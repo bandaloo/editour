@@ -202,3 +202,11 @@ p {
 .coordbox:hover {
   background-color: #fff5d4;
 }
+
+.circle {
+  box-sizing: border-box;
+  background: #ffffff; /* color of the circle */
+  border-radius: 50%; /* make the div a circular shape */
+  border: solid;
+  margin: auto;
+}

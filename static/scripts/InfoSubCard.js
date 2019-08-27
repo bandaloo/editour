@@ -120,7 +120,9 @@ class InfoSubCard extends SubCard {
       const midPoint = polyline.getCenter();
       polyline.remove();
       console.log(midPoint);
-      const circleMarker = Leaflet.circleMarker(midPoint, 10);
+      // TODO change html option from blank
+      var circleDiv = Leaflet.divIcon({ className: "circle", html: "" });
+      const circleMarker = Leaflet.marker(midPoint, { icon: circleDiv });
       circleMarker.addTo(myMap);
       this.circleMarkers.push(circleMarker);
     }
