@@ -1,4 +1,4 @@
-const admZip = require("adm-zip");
+const AdmZip = require("adm-zip");
 
 /**
  * Extracts a zip to a directory
@@ -8,7 +8,14 @@ const admZip = require("adm-zip");
  */
 const extractZip = (zipName, dir) => {
   return new Promise((resolve, reject) => {
-    const zip = new admZip(zipName);
+    let zip;
+    try {
+      zip = new AdmZip(zipName);
+    } catch (err) {
+      if (err) {
+        reject({ status: 500, message: "Failed to unzip" });
+      }
+    }
     // extract all to the directory without overwriting
     // this prevents newer files and the newer metadata from being overwritten
     zip.extractAllToAsync(dir, false, err => {

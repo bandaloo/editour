@@ -63,11 +63,6 @@ p {
   overflow-wrap: break-word;
 }
 
-.instructions {
-  text-align: justify;
-  text-justify: inter-word;
-}
-
 .button {
   --bg-color: #ff0000;
   --bottom-color: #bb0000;
@@ -145,11 +140,6 @@ p {
   display: flex;
 }
 
-.sidebox.internalbox {
-  margin-top: 4px;
-  margin-bottom: 4px;
-}
-
 .vertical {
   flex-direction: column;
 }
@@ -168,8 +158,9 @@ p {
   margin-right: 0px;
 }
 
-.uploadmessage {
-  font-weight: bolder;
+.servermessage {
+  font-weight: bold;
+  font-family: "Roboto Mono";
   color: #adadad;
 }
 
@@ -185,6 +176,7 @@ p {
   padding-right: 0px;
   font-size: 20pt;
   cursor: pointer;
+  background: transparent;
 }
 
 .xbutton:hover {
@@ -195,6 +187,18 @@ p {
   outline: none;
 }
 
+.xbutton:disabled {
+  color: #cccccc;
+}
+
 .text {
   min-width: 0px;
+}
+
+.coordbox {
+  cursor: pointer;
+}
+
+.coordbox:hover {
+  background-color: #fff5d4;
 }

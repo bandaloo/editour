@@ -1,5 +1,4 @@
-const yazl = require("yazl");
-const fs = require("fs");
+const AdmZip = require("adm-zip");
 
 /**
  * Zips up a temp directory into the tours directory, using the tour name and
@@ -18,24 +17,20 @@ const zipUp = (toursLoc, tourName, tempDir, filenames, metadata) => {
   return new Promise((resolve, reject) => {
     // prepare archive
     const zipName = tourName + "-" + new Date().valueOf() + ".zip";
-    const zip = new yazl.ZipFile();
+    const zip = new AdmZip();
 
-    // add metadata as file
-    zip.addBuffer(Buffer.alloc(metadata.length, metadata), "metadata.json");
-
-    // add all files from `filenames`
     try {
+      // add metadata as file
+      zip.addFile("metadata.json", Buffer.alloc(metadata.length, metadata));
+      // add all files from `filenames`
       for (const f in filenames) {
-        zip.addFile(tempDir + filenames[f], filenames[f]);
+        zip.addLocalFile(tempDir + filenames[f], "", filenames[f]);
       }
-      zip.end();
-      zip.outputStream.pipe(fs.createWriteStream(toursLoc + zipName));
+      //write to disk
+      zip.writeZip(toursLoc + zipName);
     } catch (err) {
-      reject({ status: 500, message: "Failed creating zip" });
-      return;
+      reject({ status: 500, message: "Failed to create zip: " + err.message });
     }
-
-    // we're done!
     resolve();
   });
 };

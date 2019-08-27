@@ -10,7 +10,10 @@ npm start
 ```
 
 Navigate to `http://localhost:3000/` and upload some files. Then request them at
-`http://localhost:3000/tour/:name` (replace `:name` with the name you input)
+`http://localhost:3000/tour/:name` (replace `:name` with the name you input).
+
+Running with `npm run prod` will redirect stdout and stderr to
+`./log/editour.log`
 
 ## Code Formatter
 
