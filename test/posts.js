@@ -278,4 +278,119 @@ describe("POST Methods", function() {
         });
     });
   });
+
+  describe("POST /edit endpoint", function() {
+    it("Should return 200 and edit tour on successful POST", function(done) {
+      const metadata = {
+        regions: [
+          {
+            name: "my region",
+            points: [
+              { lat: 34.97463008623145, lng: 135.95066070556643 },
+              { lat: 34.97473558142708, lng: 135.95984458923343 },
+              { lat: 34.97698611323032, lng: 135.9720325469971 }
+            ],
+            audio: ["gunbuster-opening.mp3"],
+            images: []
+          },
+          {
+            name: "my other region",
+            points: [
+              { lat: 34.83141242342445, lng: 135.99029230923093 },
+              { lat: 34.90213295023509, lng: 135.9920589235823 },
+              { lat: 34.9930290101391, lng: 135.99320930239209 }
+            ],
+            audio: ["cruel-angels-thesis.mp3"],
+            images: ["shinji.png"]
+          }
+        ]
+      };
+      new Promise((resolve, reject) => {
+        server
+          .post("/upload")
+          .expect("Content-type", /json/)
+          .expect(201)
+          .attach("audio_name_x6ozqq", testFileDir + "cruel-angels-thesis.mp3")
+          .attach("audio_name_x6ozqq", testFileDir + "gunbuster-opening.mp3")
+          .attach("image_name_x6ozqq", testFileDir + "shinji.png")
+          .field("tourName", "yourTest")
+          .field("metadata", JSON.stringify(metadata))
+          .end((err, res) => {
+            if (err) {
+              reject(err);
+            }
+            resolve(res);
+          });
+      })
+        .then(res => {
+          assert.strictEqual(res.status, 201);
+          assert.strictEqual(res.body.status, 201);
+          assert.strictEqual(
+            res.body.message,
+            "Uploaded under the name 'yourtest'"
+          );
+          // now post to the edit endpoint with one region deleted and an image added
+          const newMetadata = {
+            regions: [
+              {
+                name: "my region",
+                points: [
+                  { lat: 34.97463008623145, lng: 135.95066070556643 },
+                  { lat: 34.97473558142708, lng: 135.95984458923343 },
+                  { lat: 34.97698611323032, lng: 135.9720325469971 }
+                ],
+                audio: ["gunbuster-opening.mp3"],
+                images: ["misato.jpg"]
+              }
+            ]
+          };
+          return new Promise((resolve, reject) => {
+            server
+              .post("/edit")
+              .expect("Content-type", /json/)
+              .expect(201)
+              .attach("image_name_10319rj", testFileDir + "misato.jpg")
+              .field("tourName", "yourTest")
+              .field("metadata", JSON.stringify(newMetadata))
+              .end((err, res) => {
+                if (err) {
+                  reject(err);
+                }
+                resolve(res);
+              });
+          });
+        })
+        .then(res => {
+          assert.strictEqual(res.status, 201);
+          assert.strictEqual(res.body.status, 201);
+          assert.strictEqual(
+            res.body.message,
+            "Updated under the name 'yourtest'"
+          );
+          return new Promise((resolve, reject) => {
+            // get new metadata to make sure it was changed
+            server.get("/edit/yourtest")
+            .expect("Content-type", /json/)
+            .expect(200)
+            .end((err, res) => {
+              if (err) {
+                reject(err);
+              }
+              resolve(res);
+            });
+          });
+        })
+        .then(res => {
+          assert.strictEqual(res.status, 200);
+          assert.strictEqual(res.body.status, 200);
+          const newMeta = JSON.parse(res.body.message);
+          assert.strictEqual(newMeta.regions.length, 1);
+          assert.deepEqual(newMeta.regions[0].images, ["misato.jpg"]);
+          done();
+        })
+        .catch(err => {
+          done(err);
+        });
+    });
+  });
 });

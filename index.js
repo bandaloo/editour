@@ -151,18 +151,22 @@ app.post("/edit", (req, res) => {
     })
     .then(files => {
       // find the full name of the tour
+      logger.log("Looking up zip name " + tour + "...");
       return pHelpers.findFileName(files, tour);
     })
     .then(zipName => {
       // unzip the old zip into the new temp directory without overwriting files
+      logger.log("Extracting old " + zipName + "...");
       return pHelpers.extractZip(constants.toursLoc + zipName, tempDirPath);
     })
     .then(() => {
       // make sure we have all the files we need
+      logger.log("Verifying " + tour + "...");
       return pHelpers.verify(tempDirPath, metadataString);
     })
     .then(files => {
       // finally zip the directory back up with the new metadata
+      logger.log("Zipping up " + tour);
       return pHelpers.zipUp(
         constants.toursLoc,
         tour,
@@ -185,7 +189,6 @@ app.post("/edit", (req, res) => {
         );
     })
     .catch(errObj => {
-      console.error("caught something: " + errObj.message);
       // send errors back to the client
       returnError(res, errObj.status, errObj.message, logger);
     });
