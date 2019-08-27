@@ -166,7 +166,7 @@ app.post("/edit", (req, res) => {
     })
     .then(zipName => {
       // unzip the old zip into the new temp directory without overwriting files
-      logger.log("Extracting old " + zipName + "...");
+      logger.log("Extracting old " + zipName + " to " + tempDirPath + " ...");
       return pHelpers.extractZip(constants.toursLoc + zipName, tempDirPath);
     })
     .then(() => {

@@ -20,7 +20,7 @@ const extractZip = (zipName, dir) => {
     // this prevents newer files and the newer metadata from being overwritten
     zip.extractAllToAsync(dir, false, err => {
       if (err) {
-        reject({ status: 500, message: "Failed to unzip" });
+        reject({ status: 500, message: "Failed to unzip: " + err.message });
         return;
       }
       resolve();
