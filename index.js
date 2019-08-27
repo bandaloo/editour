@@ -51,6 +51,7 @@ app.post("/upload", (req, res) => {
       );
     })
     .then(() => {
+      logger.log("Saved " + tour + ", returning 201 to client");
       // send successful response back to the client
       res
         .status(201)
@@ -63,7 +64,6 @@ app.post("/upload", (req, res) => {
         );
     })
     .catch(errObj => {
-      console.error("caught something: " + errObj.message);
       // send errors back to the client
       returnError(res, errObj.status, errObj.message, logger);
     });
@@ -172,6 +172,7 @@ app.post("/edit", (req, res) => {
       );
     })
     .then(() => {
+      logger.log(tour + " successfully edited");
       // send successful response back to the client
       res
         .status(201)

@@ -27,18 +27,32 @@ class Logger {
   }
 
   /**
+   * Front-pads a number with zeroes so it is exactly two digits
+   * @param {number} n a one- or two-digit number
+   * @return {string} the input padded to two digits
+   */
+  static to2Digits(n) {
+    if ((n = Math.floor(n)) < 0 || n > 99) {
+      throw new Error("to2Digits: invalid n: " + n);
+    }
+    return n.toString().padStart(2, "0");
+  }
+
+  /**
    * returns the current local date and time as a string, in a format like:
-   *   '[25/7/2019:11:18:59 -540] '
+   *   '[25/08/2019:11:18:59 -540] '
    * @return {string} the date/time string
    */
   dateTimeString() {
     const d = new Date();
     const offset = d.getTimezoneOffset();
-    let out = "[" + d.getDate() + "/" + d.getMonth() + "/" + d.getFullYear();
-    out += ":" + d.getHours() + ":" + d.getMinutes() + ":" + d.getSeconds();
-    out += " ";
+    let out = "[" + Logger.to2Digits(d.getDate()) + "/";
+    out += Logger.to2Digits(d.getMonth() + 1) + "/" + d.getFullYear();
+    out += ":" + Logger.to2Digits(d.getHours()) + ":";
+    out += Logger.to2Digits(d.getMinutes()) + ":";
+    out += Logger.to2Digits(d.getSeconds()) + " ";
     if (offset >= 0) out += "+";
-    out += offset + "] ";
+    out += offset.toString().padStart(3, "0") + "] ";
     return out;
   }
 
