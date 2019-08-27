@@ -65,7 +65,7 @@ app.post("/upload", (req, res) => {
     })
     .catch(errObj => {
       // send errors back to the client
-      returnError(res, errObj.status, errObj.message, logger);
+      returnError(res, errObj.status, errObj.message);
     });
 });
 
@@ -88,7 +88,7 @@ app.get("/tour/:name", (req, res) => {
     })
     .catch(errObj => {
       // send errors back to the client
-      returnError(res, errObj.status, errObj.message, logger);
+      returnError(res, errObj.status, errObj.message);
     });
 });
 
@@ -119,7 +119,7 @@ app.get("/edit/:name", (req, res) => {
     })
     .catch(errObj => {
       // send errors back to the client
-      returnError(res, errObj.status, errObj.message, logger);
+      returnError(res, errObj.status, errObj.message);
     });
 });
 
@@ -190,7 +190,7 @@ app.post("/edit", (req, res) => {
     })
     .catch(errObj => {
       // send errors back to the client
-      returnError(res, errObj.status, errObj.message, logger);
+      returnError(res, errObj.status, errObj.message);
     });
 });
 
