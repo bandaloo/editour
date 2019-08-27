@@ -84,7 +84,17 @@ app.get("/tour/:name", (req, res) => {
     })
     .then(zipFile => {
       logger.log("Sending file: " + zipFile);
-      res.status(200).sendFile(constants.toursLoc + zipFile);
+      res
+        .status(200)
+        .download(
+          constants.toursLoc + zipFile,
+          req.params.name + ".zip",
+          err => {
+            if (err) {
+              throw err;
+            }
+          }
+        );
     })
     .catch(errObj => {
       // send errors back to the client
