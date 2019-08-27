@@ -159,9 +159,32 @@ describe("GET Methods", function() {
           }
           assert.strictEqual(res.status, 404);
           assert.strictEqual(res.body.status, 404);
-          assert.strictEqual(res.body.message, "Couldn't find tour invalid-tour-name");
+          assert.strictEqual(
+            res.body.message,
+            "Couldn't find tour invalid-tour-name"
+          );
           done();
-        })
-    })
+        });
+    });
+  });
+
+  describe("GET /tours endpoint", function() {
+    it("Should properly return the list of tours", function(done) {
+      server
+        .get("/tours")
+        .expect(200)
+        .expect("Content-type", /json/)
+        .end((err, res) => {
+          if (err) {
+            done(err);
+          }
+          assert.strictEqual(res.status, 200);
+          assert.strictEqual(res.body.status, 200);
+          assert.deepEqual(JSON.parse(res.body.message), {
+            files: ["mytest", "this-tour"]
+          });
+          done();
+        });
+    });
   });
 });

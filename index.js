@@ -204,6 +204,47 @@ app.post("/edit", (req, res) => {
     });
 });
 
+// returns a list of tour names on the server
+app.get("/tours", (req, res) => {
+  // log this request
+  logger.logRequest(req);
+
+  // get the list of all files in the tours directory
+  pHelpers
+    .getTours(constants.toursLoc)
+    .then(files => {
+      /** @type string[] */
+      let out = [];
+      for (const f in files) {
+        const l = files[f].length;
+        // get only zips
+        if (files[f].substring(l - 4) === ".zip") {
+          // this works as long as the timestamp was made between 1973 and 5138
+          const trimmedName = files[f].substring(0, l - 18);
+          // deduplicate
+          if (out.indexOf(trimmedName) < 0) {
+            out.push(trimmedName);
+          }
+        }
+      }
+      // return the list of names to the client
+      logger.log("Successfully returning list of filenames");
+      res
+        .status(200)
+        .contentType("application/json")
+        .send(
+          JSON.stringify({
+            status: 200,
+            message: JSON.stringify({ files: out })
+          })
+        );
+    })
+    .catch(errObj => {
+      // send errors back to the client
+      returnError(res, errObj.status, errObj.message);
+    });
+});
+
 app.listen(port, () => {
   logger.log("Started listening on port " + port + "...");
 });
