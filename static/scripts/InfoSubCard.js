@@ -10,7 +10,14 @@ class InfoSubCard extends SubCard {
     let points = regions[superCard.hash].points;
     let poly = regions[superCard.hash].poly;
 
-    /** @type {{index: number, button: HTMLButtonElement, div: HTMLElement}[]} */
+    /**
+     * @typedef {Object} CoordDatum
+     * @property {number} index
+     * @property {HTMLButtonElement} button
+     * @property {HTMLDivElement} div
+     * @property {HTMLParagraphElement} paragraph
+     */
+    /** @type {CoordDatum[]} */
     this.coordData = [];
 
     for (let i = 0; i < points.length; i++) {
@@ -22,22 +29,26 @@ class InfoSubCard extends SubCard {
 
       // create new p elements for latitude and longitude
       const coordParagraph = document.createElement("p");
-      const fLat = points[i].lat.toFixed(5);
-      const fLng = points[i].lng.toFixed(5);
-      coordParagraph.innerHTML = `latitude: ${fLat}<br>longitude: ${fLng}`;
+      coordParagraph.innerHTML = InfoSubCard.makeCoordParagraphText(points[i]);
       coordParagraph.classList.add("fillwidth");
       coordDiv.appendChild(coordParagraph);
       coordDiv.appendChild(xButton);
 
       // clicking on the coordinate
       coordDiv.addEventListener("click", () => {
-        // not problematic to add to a map to which control already belongs
         let index = parseInt(coordDiv.getAttribute("data-index"));
-        console.log(coordDiv.getAttribute("data-index"));
         marker.setLatLng(points[index]);
+        // not problematic to add to a map to which control already belongs
         marker.addTo(myMap);
-        marker.point = points[index];
+        // TODO check to see if this needs to be enabled every time
+        marker.dragging.enable();
+        marker.points = points;
         marker.poly = regions[superCard.hash].poly;
+        marker.index = index;
+        marker.paragraph = coordParagraph;
+        if (regions[superCard.hash].poly === popup.poly) {
+          myMap.closePopup();
+        }
         myMap.panTo(points[index]);
       });
 
@@ -47,12 +58,13 @@ class InfoSubCard extends SubCard {
         event.stopPropagation();
         event.preventDefault();
 
+        let index = parseInt(coordDiv.getAttribute("data-index"));
+
         // delete the marker if the point under it is being deleted
-        if (marker.point === points[i]) {
+        if (marker.index === index) {
           marker.remove();
         }
 
-        let index = parseInt(coordDiv.getAttribute("data-index"));
         console.log(index);
         points.splice(index, 1); // remove points from the region data
         poly.setLatLngs(points); // change the points of the poly
@@ -63,7 +75,12 @@ class InfoSubCard extends SubCard {
         coordDiv.parentNode.removeChild(coordDiv);
         this.hideButtonsWhenTriangle();
       };
-      this.coordData.push({ index: i, div: coordDiv, button: xButton });
+      this.coordData.push({
+        index: i,
+        div: coordDiv,
+        button: xButton,
+        paragraph: coordParagraph
+      });
       this.enclosingDiv.appendChild(coordDiv);
     }
 
@@ -78,5 +95,16 @@ class InfoSubCard extends SubCard {
         this.coordData[j].button.disabled = true;
       }
     }
+  }
+
+  /**
+   * Fills the coordinate tag in the info card with correct info
+   * @param {{lat: number, lng: number}} point
+   * @returns {string}
+   */
+  static makeCoordParagraphText(point) {
+    const fLat = point.lat.toFixed(5);
+    const fLng = point.lng.toFixed(5);
+    return `latitude: ${fLat}<br>longitude: ${fLng}`;
   }
 }

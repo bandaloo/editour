@@ -212,8 +212,21 @@ function addRegionDiv(hash, name, audio, images) {
 
 myMap.on("click", onMapClick);
 
-var popup = Leaflet.popup(); // popup moved around and used for stuff
-var marker = Leaflet.marker({ lat: 0, lng: 0 }); // marker created when clicking on coordinate box
+const popup = Leaflet.popup(); // popup moved around and used for stuff
+const marker = Leaflet.marker({ lat: 0, lng: 0 }); // marker created when clicking on coordinate box
+
+marker.on("dragstart", () => {
+  if (marker.poly === popup.poly) {
+    myMap.closePopup();
+  }
+});
+
+marker.on("drag", () => {
+  marker.points[marker.index] = marker.getLatLng();
+  marker.poly.setLatLngs(marker.points);
+  const point = marker.points[marker.index];
+  marker.paragraph.innerHTML = InfoSubCard.makeCoordParagraphText(point);
+});
 
 /**
  * Brings up popup when clicking on region polygon on map
