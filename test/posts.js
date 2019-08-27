@@ -1,12 +1,15 @@
 const mocha = require("mocha");
 const supertest = require("supertest");
 const assert = require("assert");
-const admZip = require("adm-zip");
 
 const server = supertest.agent("localhost:3000");
 
 const testFileDir = __dirname + "/files/";
 let basicMetadata;
+
+after(function() {
+  require("child_process").exec("rm -r temp/*/ tours/*.zip");
+})
 
 before(function(done) {
   basicMetadata = {
