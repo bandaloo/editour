@@ -321,7 +321,7 @@ function mod(a, b) {
  * @param {any[]} array
  */
 function empty(array) {
-  array.length;
+  array.length = 0;
 }
 
 /**
