@@ -219,6 +219,7 @@ marker.on("dragstart", () => {
   if (marker.poly === popup.poly) {
     myMap.closePopup();
   }
+  // get the circle markers to move along with the drag
 });
 
 marker.on("drag", () => {
@@ -226,6 +227,23 @@ marker.on("drag", () => {
   marker.poly.setLatLngs(marker.points);
   const point = marker.points[marker.index];
   marker.paragraph.innerHTML = InfoSubCard.makeCoordParagraphText(point);
+  const prevCircle =
+    marker.circleMarkers[mod(marker.index, marker.circleMarkers.length)];
+  const nextCircle =
+    marker.circleMarkers[mod(marker.index + 1, marker.circleMarkers.length)];
+  // TODO change this
+  prevCircle.setLatLng(
+    calcMidPoint(
+      point,
+      marker.points[mod(marker.index - 1, marker.points.length)]
+    )
+  );
+  nextCircle.setLatLng(
+    calcMidPoint(
+      point,
+      marker.points[mod(marker.index + 1, marker.points.length)]
+    )
+  );
 });
 
 /**
@@ -287,4 +305,34 @@ function makeXButton() {
   xButton.classList.add("xbutton");
   xButton.innerHTML = "×";
   return xButton;
+}
+
+/**
+ * Modulus that actually works for negative numbers
+ * @param {number} a
+ * @param {number} b
+ */
+function mod(a, b) {
+  return (a + b) % b;
+}
+
+/**
+ * Function to empty array without reassignment
+ * @param {any[]} array
+ */
+function empty(array) {
+  array.length;
+}
+
+/**
+ * @param {{lat: number, lng: number}} point1
+ * @param {{lat: number, lng: number}} point2
+ * @returns {{lat: number, lng: number}}
+ */
+function calcMidPoint(point1, point2) {
+  const polyline = Leaflet.polyline([point1, point2]);
+  polyline.addTo(myMap);
+  const midPoint = polyline.getCenter();
+  polyline.remove();
+  return midPoint;
 }

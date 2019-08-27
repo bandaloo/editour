@@ -7,6 +7,7 @@ class InfoSubCard extends SubCard {
   constructor(superCard) {
     super(superCard, "block");
 
+    /** @type {Object} */
     this.circleMarkers = [];
 
     let points = regions[superCard.hash].points;
@@ -47,6 +48,7 @@ class InfoSubCard extends SubCard {
         marker.points = points;
         marker.poly = regions[superCard.hash].poly;
         marker.index = index;
+        marker.circleMarkers = this.circleMarkers;
         marker.paragraph = coordParagraph;
         if (regions[superCard.hash].poly === popup.poly) {
           myMap.closePopup();
@@ -100,11 +102,10 @@ class InfoSubCard extends SubCard {
   }
 
   whenMadeHidden() {
-    // TODO put this in whenMadeHidden()
     for (let i = 0; i < this.circleMarkers.length; i++) {
       this.circleMarkers[i].remove();
     }
-    this.circleMarkers = [];
+    empty(this.circleMarkers);
   }
 
   whenMadeVisible() {
@@ -113,13 +114,7 @@ class InfoSubCard extends SubCard {
     for (let i = 0; i < points.length; i++) {
       const p = i === 0 ? points.length - 1 : i - 1;
       console.log(`${p}, ${i}`);
-      const prevPoint = points[p];
-      const currPoint = points[i];
-      const polyline = Leaflet.polyline([prevPoint, currPoint]);
-      polyline.addTo(myMap);
-      const midPoint = polyline.getCenter();
-      polyline.remove();
-      console.log(midPoint);
+      const midPoint = calcMidPoint(points[p], points[i]);
       // TODO change html option from blank
       var circleDiv = Leaflet.divIcon({ className: "circle", html: "" });
       const circleMarker = Leaflet.marker(midPoint, { icon: circleDiv });
