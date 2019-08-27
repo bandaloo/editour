@@ -63,7 +63,7 @@ class MediaSubCard extends SubCard {
    */
   makeInternalDiv(name, input, filenames, regionFiles) {
     let internalDiv = document.createElement("div");
-    internalDiv.classList.add("sidebox", "internalbox");
+    internalDiv.classList.add("sidebox");
     let nameHeader = document.createElement("h3");
     nameHeader.innerHTML = name;
     internalDiv.appendChild(nameHeader);
@@ -79,11 +79,7 @@ class MediaSubCard extends SubCard {
         let filenameText = document.createElement("p");
         filenameText.classList.add("fillwidth", "filename");
         filenameText.innerHTML = filenames[i];
-        // TODO add logic to button
-        let xButton = document.createElement("button");
-        xButton.type = "button";
-        xButton.classList.add("xbutton");
-        xButton.innerHTML = "×";
+        let xButton = makeXButton();
         // remove the file from the region data when x is clicked
         const clickFunc = () => {
           this.removeFile(regionFiles, filenames[i]);
