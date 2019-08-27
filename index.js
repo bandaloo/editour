@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const admZip = require("adm-zip");
-const Logger = require("./Logger");
+const logger = require("./Logger");
 const pHelpers = require("./pHelpers");
 const returnError = require("./returnError");
 const constants = require("./constants");
@@ -10,9 +10,6 @@ const randName = require("./randName");
 // static directory
 // requests that don't match any of the other endpoints will be served from here
 app.use(express.static(__dirname + "/static"));
-
-// initialize the logger
-const logger = new Logger(constants.logPath);
 
 // endpoint for file uploads
 app.post("/upload", (req, res) => {
@@ -166,7 +163,7 @@ app.post("/edit", (req, res) => {
     })
     .then(files => {
       // finally zip the directory back up with the new metadata
-      logger.log("Zipping up " + tour);
+      logger.log("Zipping up " + tour + "...");
       return pHelpers.zipUp(
         constants.toursLoc,
         tour,
@@ -196,5 +193,4 @@ app.post("/edit", (req, res) => {
 
 app.listen(3000, () => {
   logger.log("Started listening on port 3000...");
-  console.log("Now listening on port 3000...");
 });
