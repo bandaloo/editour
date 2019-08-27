@@ -215,15 +215,17 @@ myMap.on("click", onMapClick);
 const popup = Leaflet.popup(); // popup moved around and used for stuff
 const marker = Leaflet.marker({ lat: 0, lng: 0 }); // marker created when clicking on coordinate box
 
+marker.on("dragstart", () => {
+  if (marker.poly === popup.poly) {
+    myMap.closePopup();
+  }
+});
+
 marker.on("drag", () => {
-  console.log(marker);
-  console.log(marker.getLatLng());
-  console.log(marker.points);
   marker.points[marker.index] = marker.getLatLng();
   marker.poly.setLatLngs(marker.points);
   const point = marker.points[marker.index];
   marker.paragraph.innerHTML = InfoSubCard.makeCoordParagraphText(point);
-  console.log("test");
 });
 
 /**

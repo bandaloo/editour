@@ -36,20 +36,19 @@ class InfoSubCard extends SubCard {
 
       // clicking on the coordinate
       coordDiv.addEventListener("click", () => {
-        console.log(points);
         let index = parseInt(coordDiv.getAttribute("data-index"));
-        console.log(coordDiv.getAttribute("data-index"));
         marker.setLatLng(points[index]);
         // not problematic to add to a map to which control already belongs
         marker.addTo(myMap);
         // TODO check to see if this needs to be enabled every time
         marker.dragging.enable();
-        marker.point = points[index];
         marker.points = points;
-        console.log(marker.points);
         marker.poly = regions[superCard.hash].poly;
         marker.index = index;
         marker.paragraph = coordParagraph;
+        if (regions[superCard.hash].poly === popup.poly) {
+          myMap.closePopup();
+        }
         myMap.panTo(points[index]);
       });
 
