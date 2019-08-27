@@ -30,4 +30,7 @@ Use the Prettier code formatter when making PRs
 ## Testing
 
 We used mocha for testing. Make sure the server is running with `npm start`
-first, then run `npm test` and make sure all tests pass before pushing
+first, then run `npm test` and make sure all tests pass before pushing.
+
+**Caution**: running the test suite will wipe out all tour zips and temp
+directories, so don't do it if you have anything important in there

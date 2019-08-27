@@ -84,7 +84,17 @@ app.get("/tour/:name", (req, res) => {
     })
     .then(zipFile => {
       logger.log("Sending file: " + zipFile);
-      res.status(200).sendFile(constants.toursLoc + zipFile);
+      res
+        .status(200)
+        .download(
+          constants.toursLoc + zipFile,
+          req.params.name + ".zip",
+          err => {
+            if (err) {
+              throw err;
+            }
+          }
+        );
     })
     .catch(errObj => {
       // send errors back to the client
@@ -156,7 +166,7 @@ app.post("/edit", (req, res) => {
     })
     .then(zipName => {
       // unzip the old zip into the new temp directory without overwriting files
-      logger.log("Extracting old " + zipName + "...");
+      logger.log("Extracting old " + zipName + " to " + tempDirPath + " ...");
       return pHelpers.extractZip(constants.toursLoc + zipName, tempDirPath);
     })
     .then(() => {
@@ -185,6 +195,47 @@ app.post("/edit", (req, res) => {
           JSON.stringify({
             status: 201,
             message: "Updated under the name '" + tour + "'"
+          })
+        );
+    })
+    .catch(errObj => {
+      // send errors back to the client
+      returnError(res, errObj.status, errObj.message);
+    });
+});
+
+// returns a list of tour names on the server
+app.get("/tours", (req, res) => {
+  // log this request
+  logger.logRequest(req);
+
+  // get the list of all files in the tours directory
+  pHelpers
+    .getTours(constants.toursLoc)
+    .then(files => {
+      /** @type string[] */
+      let out = [];
+      for (const f in files) {
+        const l = files[f].length;
+        // get only zips
+        if (files[f].substring(l - 4) === ".zip") {
+          // this works as long as the timestamp was made between 1973 and 5138
+          const trimmedName = files[f].substring(0, l - 18);
+          // deduplicate
+          if (out.indexOf(trimmedName) < 0) {
+            out.push(trimmedName);
+          }
+        }
+      }
+      // return the list of names to the client
+      logger.log("Successfully returning list of filenames");
+      res
+        .status(200)
+        .contentType("application/json")
+        .send(
+          JSON.stringify({
+            status: 200,
+            message: JSON.stringify({ files: out })
           })
         );
     })
