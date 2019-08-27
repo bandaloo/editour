@@ -6,10 +6,38 @@ const server = supertest.agent("localhost:3000");
 
 const testFileDir = __dirname + "/files/";
 let basicMetadata;
+const newMetadata = {
+  regions: [
+    {
+      name: "my region",
+      points: [
+        { lat: 34.97463008623145, lng: 135.95066070556643 },
+        { lat: 34.97473558142708, lng: 135.95984458923343 },
+        { lat: 34.97698611323032, lng: 135.9720325469971 },
+        { lat: 34.98176828797155, lng: 135.9616041183472 },
+        { lat: 34.97930690938016, lng: 135.9463691711426 },
+        { lat: 34.97572019670047, lng: 135.9438800811768 },
+        { lat: 34.97691578504756, lng: 135.95525264739993 }
+      ],
+      audio: ["cruel-angels-thesis.mp3"],
+      images: ["shinji.png"]
+    },
+    {
+      name: "my other region",
+      points: [
+        { lat: 34.97930690938016, lng: 135.9463691711426 },
+        { lat: 34.97572019670047, lng: 135.9438800811768 },
+        { lat: 34.97691578504756, lng: 135.95525264739993 }
+      ],
+      audio: ["gunbuster-opening.mp3"],
+      images: []
+    }
+  ]
+};
 
 after(function() {
   require("child_process").exec("rm -r temp/*/ tours/*.zip");
-})
+});
 
 before(function(done) {
   basicMetadata = {
@@ -247,34 +275,6 @@ describe("POST Methods", function() {
 
   describe("POST /edit endpoint", function() {
     it("Should return 200 and edit tour on successful POST", function(done) {
-      const newMetadata = {
-        regions: [
-          {
-            name: "my region",
-            points: [
-              { lat: 34.97463008623145, lng: 135.95066070556643 },
-              { lat: 34.97473558142708, lng: 135.95984458923343 },
-              { lat: 34.97698611323032, lng: 135.9720325469971 },
-              { lat: 34.98176828797155, lng: 135.9616041183472 },
-              { lat: 34.97930690938016, lng: 135.9463691711426 },
-              { lat: 34.97572019670047, lng: 135.9438800811768 },
-              { lat: 34.97691578504756, lng: 135.95525264739993 }
-            ],
-            audio: ["cruel-angels-thesis.mp3"],
-            images: ["shinji.png"]
-          },
-          {
-            name: "my other region",
-            points: [
-              { lat: 34.97930690938016, lng: 135.9463691711426 },
-              { lat: 34.97572019670047, lng: 135.9438800811768 },
-              { lat: 34.97691578504756, lng: 135.95525264739993 }
-            ],
-            audio: ["gunbuster-opening.mp3"],
-            images: []
-          }
-        ]
-      };
       // now post to the edit endpoint with one region deleted and an image added
       new Promise((resolve, reject) => {
         server
@@ -334,7 +334,34 @@ describe("POST Methods", function() {
           }
           assert.strictEqual(res.status, 404);
           assert.strictEqual(res.body.status, 404);
-          assert.strictEqual(res.body.message, "Couldn't find tour invalid-name-here");
+          assert.strictEqual(
+            res.body.message,
+            "Couldn't find tour invalid-name-here"
+          );
+          done();
+        });
+    });
+
+    it("Should return 400 on missing files", function(done) {
+      // dumb way to clone object
+      let newMetadata2 = JSON.parse(JSON.stringify(newMetadata));
+      newMetadata2.regions[0].audio = ["this-file-doesn't-exist.wav"];
+      server
+        .post("/edit")
+        .expect("Content-type", /json/)
+        .expect(400)
+        .field("tourName", "mytest")
+        .field("metadata", JSON.stringify(newMetadata2))
+        .end((err, res) => {
+          if (err) {
+            done(err);
+          }
+          assert.strictEqual(res.status, 400);
+          assert.strictEqual(res.body.status, 400);
+          assert.strictEqual(
+            res.body.message,
+            "File this-file-doesn't-exist.wav in metadata not present on disk"
+          );
           done();
         });
     });
