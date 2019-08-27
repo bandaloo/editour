@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const admZip = require("adm-zip");
-const Logger = require("./Logger");
+const logger = require("./logger");
 const pHelpers = require("./pHelpers");
 const returnError = require("./returnError");
 const constants = require("./constants");
@@ -11,8 +11,8 @@ const randName = require("./randName");
 // requests that don't match any of the other endpoints will be served from here
 app.use(express.static(__dirname + "/static"));
 
-// initialize the logger
-const logger = new Logger(constants.logPath);
+// get port from environment variable, or use 3000 as the default
+const port = process.env.NODE_PORT || 3000;
 
 // endpoint for file uploads
 app.post("/upload", (req, res) => {
@@ -51,6 +51,7 @@ app.post("/upload", (req, res) => {
       );
     })
     .then(() => {
+      logger.log("Saved " + tour + ", returning 201 to client");
       // send successful response back to the client
       res
         .status(201)
@@ -63,9 +64,8 @@ app.post("/upload", (req, res) => {
         );
     })
     .catch(errObj => {
-      console.error("caught something: " + errObj.message);
       // send errors back to the client
-      returnError(res, errObj.status, errObj.message, logger);
+      returnError(res, errObj.status, errObj.message);
     });
 });
 
@@ -88,7 +88,7 @@ app.get("/tour/:name", (req, res) => {
     })
     .catch(errObj => {
       // send errors back to the client
-      returnError(res, errObj.status, errObj.message, logger);
+      returnError(res, errObj.status, errObj.message);
     });
 });
 
@@ -119,7 +119,7 @@ app.get("/edit/:name", (req, res) => {
     })
     .catch(errObj => {
       // send errors back to the client
-      returnError(res, errObj.status, errObj.message, logger);
+      returnError(res, errObj.status, errObj.message);
     });
 });
 
@@ -151,18 +151,22 @@ app.post("/edit", (req, res) => {
     })
     .then(files => {
       // find the full name of the tour
+      logger.log("Looking up zip name " + tour + "...");
       return pHelpers.findFileName(files, tour);
     })
     .then(zipName => {
       // unzip the old zip into the new temp directory without overwriting files
+      logger.log("Extracting old " + zipName + "...");
       return pHelpers.extractZip(constants.toursLoc + zipName, tempDirPath);
     })
     .then(() => {
       // make sure we have all the files we need
+      logger.log("Verifying " + tour + "...");
       return pHelpers.verify(tempDirPath, metadataString);
     })
     .then(files => {
       // finally zip the directory back up with the new metadata
+      logger.log("Zipping up " + tour + "...");
       return pHelpers.zipUp(
         constants.toursLoc,
         tour,
@@ -172,6 +176,7 @@ app.post("/edit", (req, res) => {
       );
     })
     .then(() => {
+      logger.log(tour + " successfully edited");
       // send successful response back to the client
       res
         .status(201)
@@ -184,13 +189,11 @@ app.post("/edit", (req, res) => {
         );
     })
     .catch(errObj => {
-      console.error("caught something: " + errObj.message);
       // send errors back to the client
-      returnError(res, errObj.status, errObj.message, logger);
+      returnError(res, errObj.status, errObj.message);
     });
 });
 
-app.listen(3000, () => {
-  logger.log("Started listening on port 3000...");
-  console.log("Now listening on port 3000...");
+app.listen(port, () => {
+  logger.log("Started listening on port " + port + "...");
 });

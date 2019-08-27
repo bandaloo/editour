@@ -52,7 +52,7 @@ const acceptForm = (tempDirPath, req) => {
         return;
       }
 
-      // format input name to it's URL-friendly
+      // format input name so it's URL-friendly
       const tourName = fields.tourName
         .trim()
         .toLowerCase()
