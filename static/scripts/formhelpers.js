@@ -111,7 +111,9 @@ function makeFileRegionData() {
 function requestTour(tourName) {
   const host = window.location.host;
   const xhr = new XMLHttpRequest();
-  const str = `http://${host}/edit/${tourName}`;
+  const scheme = window.location.href.split("/")[0];
+  const str = `${scheme}//${host}/edit/${tourName}`;
+  console.log(scheme);
   console.log(str);
 
   xhr.open("GET", str);
