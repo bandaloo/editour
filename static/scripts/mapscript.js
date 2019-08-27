@@ -283,6 +283,8 @@ function rebuild(strMetadata) {
     let region = regions[hash];
     // wipe out the map polygon
     region.poly.remove();
+    // wipe out any circle markers
+    region.card.infoSubCard.clearCircleMarkers();
     // wipe out the region card
     region.card.regionDiv.parentNode.removeChild(region.card.regionDiv);
     // delete region data from regions
