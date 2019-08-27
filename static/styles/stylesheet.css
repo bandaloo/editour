@@ -205,10 +205,28 @@ p {
 
 .circle {
   box-sizing: border-box;
-  background: #ffffff; /* color of the circle */
-  border-radius: 50%; /* make the div a circular shape */
+  background: #ffffff;
+  border-radius: 50%;
+  border: solid;
+  border-width: 2px;
+  border-color: #ff7373;
+  margin: auto;
+}
+
+/* 
+no good way to have leaflet div element have multiple
+classes so there is some repeated stuff from circle
+*/
+.cornercircle {
+  box-sizing: border-box;
+  background: #ffffff;
+  border-radius: 50%;
   border: solid;
   border-width: 2px;
   border-color: #8ab7ff;
   margin: auto;
+}
+
+.clickthrough {
+  pointer-events: none;
 }

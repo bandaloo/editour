@@ -7,11 +7,10 @@ class InfoSubCard extends SubCard {
   constructor(superCard) {
     super(superCard, "block");
 
-    /** @type {Object} */
+    /** @type {Object[]} */
     this.circleMarkers = [];
-
-    let points = regions[superCard.hash].points;
-    let poly = regions[superCard.hash].poly;
+    /** @type {Object[]} */
+    this.cornerMarkers = [];
 
     /**
      * @typedef {Object} CoordDatum
@@ -23,15 +22,22 @@ class InfoSubCard extends SubCard {
     /** @type {CoordDatum[]} */
     this.coordData = [];
 
-    for (let i = 0; i < points.length; i++) {
-      this.enclosingDiv.appendChild(this.makeCoordDiv(points, poly, i));
+    for (let i = 0; i < regions[superCard.hash].points.length; i++) {
+      this.enclosingDiv.appendChild(this.makeCoordDiv(i));
     }
 
     this.hideButtonsWhenTriangle();
     this.setToggleButton(superCard.infoButton, "Hide Info");
   }
 
-  makeCoordDiv(points, poly, i) {
+  /**
+   * Makes the the coord div and also adds info to the coord data list
+   * @param {number} i
+   */
+  makeCoordDiv(i) {
+    const poly = regions[this.superCard.hash].poly;
+    const points = regions[this.superCard.hash].points;
+
     let xButton = makeXButton();
 
     let coordDiv = document.createElement("div");
@@ -41,26 +47,18 @@ class InfoSubCard extends SubCard {
     // create new p elements for latitude and longitude
     const coordParagraph = document.createElement("p");
     coordParagraph.innerHTML = InfoSubCard.makeCoordParagraphText(points[i]);
-    coordParagraph.classList.add("fillwidth");
+    coordParagraph.classList.add("fillwidth", "clickthrough");
     coordDiv.appendChild(coordParagraph);
     coordDiv.appendChild(xButton);
 
     // clicking on the coordinate
-    coordDiv.addEventListener("click", () => {
-      let index = parseInt(coordDiv.getAttribute("data-index"));
-      marker.setLatLng(points[index]);
-      // not problematic to add to a map to which control already belongs
-      marker.addTo(myMap);
-      // TODO check to see if this needs to be enabled every time
-      marker.dragging.enable();
-      marker.points = points;
-      marker.poly = regions[this.superCard.hash].poly;
-      marker.index = index;
-      marker.circleMarkers = this.circleMarkers;
-      marker.paragraph = coordParagraph;
-      if (regions[this.superCard.hash].poly === popup.poly) {
-        myMap.closePopup();
-      }
+    coordDiv.addEventListener("click", event => {
+      console.log(event.target);
+      const index = parseInt(
+        /** @type {HTMLDivElement} */ (event.target).getAttribute("data-index")
+      );
+      this.startPointEdit(points, coordParagraph, index);
+      console.log(coordDiv.getAttribute("data-index"));
       myMap.panTo(points[index]);
     });
 
@@ -81,14 +79,16 @@ class InfoSubCard extends SubCard {
       points.splice(index, 1); // remove points from the region data
       poly.setLatLngs(points); // change the points of the poly
       this.coordData.splice(index, 1); // cut this object out of coordData
-      for (let j = 0; j < this.coordData.length; j++) {
-        this.coordData[j].div.setAttribute("data-index", j.toString());
-      }
+      this.updateDataIndices();
       coordDiv.parentNode.removeChild(coordDiv);
+      this.clearCircleMarkers();
+      this.populateCircleMarkers();
       this.hideButtonsWhenTriangle();
     };
-    this.coordData.push({
-      index: i,
+
+    //const index = parseInt(coordDiv.getAttribute("data-index"));
+    this.coordData.splice(i, 0, {
+      index: i, // TODO see if we even need this
       div: coordDiv,
       button: xButton,
       paragraph: coordParagraph
@@ -96,20 +96,28 @@ class InfoSubCard extends SubCard {
     return coordDiv;
   }
 
+  updateDataIndices() {
+    for (let i = 0; i < this.coordData.length; i++) {
+      this.coordData[i].div.setAttribute("data-index", i.toString());
+    }
+  }
+
   hideButtonsWhenTriangle() {
     // length should not be less than 3
-    if (this.coordData.length <= 3) {
-      for (let j = 0; j < this.coordData.length; j++) {
-        this.coordData[j].button.disabled = true;
-      }
+    const disabledBool = this.coordData.length <= 3 ? true : false;
+    for (let j = 0; j < this.coordData.length; j++) {
+      this.coordData[j].button.disabled = disabledBool;
     }
   }
 
   clearCircleMarkers() {
     for (let i = 0; i < this.circleMarkers.length; i++) {
+      // both should have the same length
       this.circleMarkers[i].remove();
+      this.cornerMarkers[i].remove();
     }
     empty(this.circleMarkers);
+    empty(this.cornerMarkers);
     marker.remove();
   }
 
@@ -117,21 +125,36 @@ class InfoSubCard extends SubCard {
     // create and show circle markers
     const points = regions[this.superCard.hash].points;
     for (let i = 0; i < points.length; i++) {
+      // add edge circle markers
       const p = i === 0 ? points.length - 1 : i - 1;
       console.log(`${p}, ${i}`);
-      const midPoint = calcMidPoint(points[p], points[i]);
       // TODO change html option from blank
-      var circleDiv = Leaflet.divIcon({ className: "circle", html: "" });
+      const midPoint = calcMidPoint(points[p], points[i]);
+      const circleDiv = Leaflet.divIcon({ className: "circle", html: "" });
       const circleMarker = Leaflet.marker(midPoint, { icon: circleDiv });
       // add an on click to the circle marker
       circleMarker.on("click", () => {
+        // mid point could have changed since circle marker was created
+        const newMidPoint = calcMidPoint(points[p], points[i]);
         console.log("click");
-        this.insertPoint(midPoint, i);
+        this.insertPoint(newMidPoint, i);
+        this.insertCoordDiv(newMidPoint, i);
         this.clearCircleMarkers();
         this.populateCircleMarkers();
       });
       circleMarker.addTo(myMap);
       this.circleMarkers.push(circleMarker);
+
+      // add corner circle markers
+      const cornerDiv = Leaflet.divIcon({ className: "cornercircle" });
+      console.log(cornerDiv);
+      //cornerDiv.classList.add("cornercircle");
+      const cornerMarker = Leaflet.marker(points[i], { icon: cornerDiv });
+      cornerMarker.on("click", () => {
+        this.startPointEdit(points, this.coordData[i].paragraph, i);
+      });
+      cornerMarker.addTo(myMap);
+      this.cornerMarkers.push(cornerMarker);
     }
   }
 
@@ -154,6 +177,15 @@ class InfoSubCard extends SubCard {
    */
   insertCoordDiv(point, index) {
     //parentElement.insertBefore(newElement, parentElement.children[2]);
+    // TODO add to coord data
+    console.log(index);
+    console.log(this.enclosingDiv.children);
+    this.enclosingDiv.insertBefore(
+      this.makeCoordDiv(index),
+      this.enclosingDiv.children[index]
+    );
+    this.updateDataIndices();
+    this.hideButtonsWhenTriangle();
   }
 
   whenMadeHidden() {
@@ -173,5 +205,29 @@ class InfoSubCard extends SubCard {
     const fLat = point.lat.toFixed(5);
     const fLng = point.lng.toFixed(5);
     return `latitude: ${fLat}<br>longitude: ${fLng}`;
+  }
+
+  /**
+   * @param {{lat: number, lng: number}[]} points
+   * @param {HTMLParagraphElement} coordParagraph
+   * @param {number} index
+   */
+  startPointEdit(points, coordParagraph, index) {
+    //let index = parseInt(coordDiv.getAttribute("data-index"));
+    marker.setLatLng(points[index]);
+    // not problematic to add to a map to which control already belongs
+    marker.addTo(myMap);
+    // TODO check to see if this needs to be enabled every time
+    marker.dragging.enable();
+    marker.points = points;
+    marker.poly = regions[this.superCard.hash].poly;
+    marker.index = index;
+    marker.circleMarkers = this.circleMarkers;
+    marker.cornerMarkers = this.cornerMarkers;
+    marker.paragraph = coordParagraph;
+    if (regions[this.superCard.hash].poly === popup.poly) {
+      myMap.closePopup();
+    }
+    //myMap.panTo(points[index]);
   }
 }

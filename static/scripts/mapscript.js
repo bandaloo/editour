@@ -231,7 +231,7 @@ marker.on("drag", () => {
     marker.circleMarkers[mod(marker.index, marker.circleMarkers.length)];
   const nextCircle =
     marker.circleMarkers[mod(marker.index + 1, marker.circleMarkers.length)];
-  // TODO change this
+  const midCircle = marker.cornerMarkers[marker.index];
   prevCircle.setLatLng(
     calcMidPoint(
       point,
@@ -244,6 +244,7 @@ marker.on("drag", () => {
       marker.points[mod(marker.index + 1, marker.points.length)]
     )
   );
+  midCircle.setLatLng(point);
 });
 
 /**
