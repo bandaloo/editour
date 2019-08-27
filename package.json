@@ -1,12 +1,11 @@
 {
   "name": "ar-tour-app-backend",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Backend for storing and organizing AR tours",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "mocha",
-    "prod": "node index.js >> ./log/editour.log 2>&1"
+    "test": "mocha"
   },
   "author": "Joseph Petitti",
   "dependencies": {

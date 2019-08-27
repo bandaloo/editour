@@ -11,6 +11,9 @@ const randName = require("./randName");
 // requests that don't match any of the other endpoints will be served from here
 app.use(express.static(__dirname + "/static"));
 
+// get port from environment variable, or use 3000 as the default
+const port = process.env.NODE_PORT || 3000;
+
 // endpoint for file uploads
 app.post("/upload", (req, res) => {
   // log this request
@@ -191,6 +194,6 @@ app.post("/edit", (req, res) => {
     });
 });
 
-app.listen(3000, () => {
-  logger.log("Started listening on port 3000...");
+app.listen(port, () => {
+  logger.log("Started listening on port " + port + "...");
 });
