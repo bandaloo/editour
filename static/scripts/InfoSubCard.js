@@ -7,6 +7,8 @@ class InfoSubCard extends SubCard {
   constructor(superCard) {
     super(superCard, "block");
 
+    this.circleMarkers = [];
+
     let points = regions[superCard.hash].points;
     let poly = regions[superCard.hash].poly;
 
@@ -94,6 +96,33 @@ class InfoSubCard extends SubCard {
       for (let j = 0; j < this.coordData.length; j++) {
         this.coordData[j].button.disabled = true;
       }
+    }
+  }
+
+  whenMadeHidden() {
+    // TODO put this in whenMadeHidden()
+    for (let i = 0; i < this.circleMarkers.length; i++) {
+      this.circleMarkers[i].remove();
+    }
+    this.circleMarkers = [];
+  }
+
+  whenMadeVisible() {
+    // create and show circle markers
+    const points = regions[this.superCard.hash].points;
+    for (let i = 0; i < points.length; i++) {
+      const p = i === 0 ? points.length - 1 : i - 1;
+      console.log(`${p}, ${i}`);
+      const prevPoint = points[p];
+      const currPoint = points[i];
+      const polyline = Leaflet.polyline([prevPoint, currPoint]);
+      polyline.addTo(myMap);
+      const midPoint = polyline.getCenter();
+      polyline.remove();
+      console.log(midPoint);
+      const circleMarker = Leaflet.circleMarker(midPoint, 10);
+      circleMarker.addTo(myMap);
+      this.circleMarkers.push(circleMarker);
     }
   }
 
