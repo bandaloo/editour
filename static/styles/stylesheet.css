@@ -208,5 +208,7 @@ p {
   background: #ffffff; /* color of the circle */
   border-radius: 50%; /* make the div a circular shape */
   border: solid;
+  border-width: 2px;
+  border-color: #8ab7ff;
   margin: auto;
 }
