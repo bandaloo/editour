@@ -32,6 +32,8 @@ class DeleteSubCard extends SubCard {
     if (poly === marker.poly) {
       marker.remove();
     }
+    // delete the circle markers so they aren't left behind
+    this.superCard.infoSubCard.clearCircleMarkers();
     regions[this.superCard.hash].poly.remove();
     delete regions[this.superCard.hash];
     let div = this.superCard.regionDiv;
