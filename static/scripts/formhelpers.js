@@ -185,6 +185,12 @@ function hitDownload() {
   const tourName = /** @type {HTMLInputElement} */ (document.getElementById(
     "download-text"
   )).value;
+  const processedTourName = tourName
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[\/\?\=&]/g, "");
+  console.log(processedTourName);
   // TODO only change the box when the download worked
   const uploadText = /** @type {HTMLInputElement} */ (document.getElementById(
     "upload-text"
@@ -196,7 +202,7 @@ function hitDownload() {
   let downloadMessage = document.getElementById("download-message");
   downloadMessage.style.color = colorEnum.waiting;
   downloadMessage.innerHTML = "Downloading...";
-  requestTour(tourName);
+  requestTour(processedTourName);
 }
 
 // set an onclick for the download button
