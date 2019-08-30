@@ -62,7 +62,7 @@ function sendData(form) {
 /**
  * @typedef {Object} Coordinate - latitude and longitude position
  * @property {number} lat - latitude
- * @property {lng} lng - longitude
+ * @property {number} lng - longitude
  */
 /**
  * @typedef {Object} RegionDatum - the metadata to describe a region
