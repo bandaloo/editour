@@ -24,6 +24,9 @@ function hitUpload(event) {
   let uploadMessage = document.getElementById("upload-message");
   uploadMessage.style.color = colorEnum.waiting;
   uploadMessage.innerHTML = "Uploading...";
+  downloadedTourName = /** @type {HTMLInputElement} */ (document.getElementById(
+    "upload-text"
+  )).value;
   sendData(form);
 }
 
@@ -42,9 +45,10 @@ function sendData(form) {
   // Bind the FormData object and the form element
   const fd = new FormData(form);
 
-  // successful data submission
+  // successful data submission uploading tour
   xhr.addEventListener("load", event => {
     let uploadMsgElem = document.getElementById("upload-message");
+    setZipMessage();
     statusChanger(uploadMsgElem, xhr.status, event, 201, text => {
       uploadMsgElem.innerHTML += " " + text;
     });
@@ -121,7 +125,9 @@ function requestTour(tourName) {
 
   xhr.open("GET", str);
 
+  // sucessfully downloaded tour
   xhr.addEventListener("load", event => {
+    setZipMessage();
     // set to download mode
     downloaded = true;
     const uploadText = /** @type {HTMLInputElement} */ (document.getElementById(
@@ -193,11 +199,7 @@ function hitDownload() {
   const tourName = /** @type {HTMLInputElement} */ (document.getElementById(
     "download-text"
   )).value;
-  const processedTourName = tourName
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[\/\?\=&]/g, "");
+  const processedTourName = processName(tourName);
   console.log(processedTourName);
 
   let downloadMessage = document.getElementById("download-message");
@@ -207,6 +209,21 @@ function hitDownload() {
   requestTour(processedTourName);
 }
 
+function setZipMessage() {
+  const zipMessage = document.getElementById("zip-message");
+  let link = window.location.href + "tour/" + processName(downloadedTourName);
+  zipMessage.innerHTML = `Get&nbsp;<a href="${link}">${processName(
+    downloadedTourName
+  )}.zip</a>`;
+}
+
+function processName(name) {
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[\/\?\=&]/g, "");
+}
 // set an onclick for the download button
 document.getElementById("download-button").onclick = hitDownload;
 
