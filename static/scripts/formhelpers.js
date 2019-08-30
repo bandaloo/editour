@@ -12,6 +12,7 @@ const jsonTextField = /** @type {HTMLInputElement} */ (document.getElementById(
 
 // determines whether to post to /upload or /edit
 var downloaded = false;
+var downloadedTourName = "";
 
 /**
  * Action for hitting the upload button (really happens on form submit)
@@ -121,6 +122,14 @@ function requestTour(tourName) {
   xhr.open("GET", str);
 
   xhr.addEventListener("load", event => {
+    // set to download mode
+    downloaded = true;
+    const uploadText = /** @type {HTMLInputElement} */ (document.getElementById(
+      "upload-text"
+    ));
+    uploadText.readOnly = true;
+    uploadText.value = downloadedTourName;
+
     statusChanger(
       document.getElementById("download-message"),
       xhr.status,
@@ -181,7 +190,6 @@ function errorChanger(msgElem) {
 
 function hitDownload() {
   // currently edited map will be posted to edit instead
-  downloaded = true;
   const tourName = /** @type {HTMLInputElement} */ (document.getElementById(
     "download-text"
   )).value;
@@ -191,17 +199,11 @@ function hitDownload() {
     .replace(/\s+/g, "-")
     .replace(/[\/\?\=&]/g, "");
   console.log(processedTourName);
-  // TODO only change the box when the download worked
-  const uploadText = /** @type {HTMLInputElement} */ (document.getElementById(
-    "upload-text"
-  ));
-  // TODO get rid of this (for now renaming is not enabled)
-  uploadText.readOnly = true;
-  uploadText.value = tourName;
-  // TODO extract this to function for hitDownload and hitUpload
+
   let downloadMessage = document.getElementById("download-message");
   downloadMessage.style.color = colorEnum.waiting;
   downloadMessage.innerHTML = "Downloading...";
+  downloadedTourName = tourName;
   requestTour(processedTourName);
 }
 
