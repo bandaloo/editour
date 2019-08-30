@@ -21,8 +21,8 @@ function hitUpload(event) {
   jsonTextField.value = JSON.stringify(makeFileRegionData());
   event.preventDefault();
   let uploadMessage = document.getElementById("upload-message");
-  uploadMessage.innerHTML = "Uploading...";
   uploadMessage.style.color = colorEnum.waiting;
+  uploadMessage.innerHTML = "Uploading...";
   sendData(form);
 }
 
@@ -50,9 +50,8 @@ function sendData(form) {
   });
 
   // error
-  xhr.addEventListener("error", err => {
-    console.error("Something went wrong :(");
-    console.log(err);
+  xhr.addEventListener("error", () => {
+    errorChanger(document.getElementById("upload-message"));
   });
 
   // set up request (ternery for pointing to correct endpoint)
@@ -63,7 +62,7 @@ function sendData(form) {
 /**
  * @typedef {Object} Coordinate - latitude and longitude position
  * @property {number} lat - latitude
- * @property {lng} lng - longitude
+ * @property {number} lng - longitude
  */
 /**
  * @typedef {Object} RegionDatum - the metadata to describe a region
@@ -132,7 +131,7 @@ function requestTour(tourName) {
   });
 
   xhr.addEventListener("error", () => {
-    alert("request failed");
+    errorChanger(document.getElementById("download-message"));
   });
 
   xhr.send();
@@ -148,24 +147,36 @@ function requestTour(tourName) {
  */
 function statusChanger(msgElem, status, event, successCode, sCallback) {
   if (status === 404) {
-    msgElem.style.color = colorEnum.failed;
     msgElem.innerHTML = "404 not found";
-    // won't get a nice json response if it's a 404, so break out
-    return;
   }
   let responseText = /** @type {XMLHttpRequest} */ (event.target).responseText;
   console.log(downloaded);
   console.log(responseText);
-  let parsedResponse = JSON.parse(responseText);
+  let parsedResponse;
+  try {
+    parsedResponse = JSON.parse(responseText);
+  } catch (err) {
+    console.error("could not parse json from response");
+    parsedResponse = { message: "Unexpected response" };
+  }
   if (status !== successCode) {
     msgElem.style.color = colorEnum.failed;
-    msgElem.innerHTML = `There was a problem: ${parsedResponse.message}`;
+    let message = parsedResponse.message;
+    if (status === 404) {
+      message = "404 not found";
+    }
+    msgElem.innerHTML = `There was a problem: ${message}`;
   } else {
     msgElem.style.color = colorEnum.successful;
-    msgElem.innerHTML = `Success!`;
+    msgElem.innerHTML = "Success!";
     console.log(parsedResponse);
     sCallback(parsedResponse.message);
   }
+}
+
+function errorChanger(msgElem) {
+  msgElem.style.color = colorEnum.failed;
+  msgElem.innerHTML = "Network error";
 }
 
 function hitDownload() {
@@ -183,8 +194,8 @@ function hitDownload() {
   uploadText.value = tourName;
   // TODO extract this to function for hitDownload and hitUpload
   let downloadMessage = document.getElementById("download-message");
-  downloadMessage.innerHTML = "Downloading...";
   downloadMessage.style.color = colorEnum.waiting;
+  downloadMessage.innerHTML = "Downloading...";
   requestTour(tourName);
 }
 
