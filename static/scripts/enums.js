@@ -12,5 +12,5 @@ const colorEnum = Object.freeze({
   region: "#0000ff",
   successful: "#3ddb62",
   failed: "#f26868",
-  waiting: "#4f79f"
+  waiting: "#4287f5"
 });
