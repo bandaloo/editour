@@ -12,6 +12,7 @@ const jsonTextField = /** @type {HTMLInputElement} */ (document.getElementById(
 
 // determines whether to post to /upload or /edit
 var downloaded = false;
+var downloadedTourName = "";
 
 /**
  * Action for hitting the upload button (really happens on form submit)
@@ -23,6 +24,9 @@ function hitUpload(event) {
   let uploadMessage = document.getElementById("upload-message");
   uploadMessage.style.color = colorEnum.waiting;
   uploadMessage.innerHTML = "Uploading...";
+  downloadedTourName = /** @type {HTMLInputElement} */ (document.getElementById(
+    "upload-text"
+  )).value;
   sendData(form);
 }
 
@@ -41,9 +45,10 @@ function sendData(form) {
   // Bind the FormData object and the form element
   const fd = new FormData(form);
 
-  // successful data submission
+  // successful data submission uploading tour
   xhr.addEventListener("load", event => {
     let uploadMsgElem = document.getElementById("upload-message");
+    setZipMessage();
     statusChanger(uploadMsgElem, xhr.status, event, 201, text => {
       uploadMsgElem.innerHTML += " " + text;
     });
@@ -120,7 +125,17 @@ function requestTour(tourName) {
 
   xhr.open("GET", str);
 
+  // sucessfully downloaded tour
   xhr.addEventListener("load", event => {
+    setZipMessage();
+    // set to download mode
+    downloaded = true;
+    const uploadText = /** @type {HTMLInputElement} */ (document.getElementById(
+      "upload-text"
+    ));
+    uploadText.readOnly = true;
+    uploadText.value = downloadedTourName;
+
     statusChanger(
       document.getElementById("download-message"),
       xhr.status,
@@ -181,24 +196,34 @@ function errorChanger(msgElem) {
 
 function hitDownload() {
   // currently edited map will be posted to edit instead
-  downloaded = true;
   const tourName = /** @type {HTMLInputElement} */ (document.getElementById(
     "download-text"
   )).value;
-  // TODO only change the box when the download worked
-  const uploadText = /** @type {HTMLInputElement} */ (document.getElementById(
-    "upload-text"
-  ));
-  // TODO get rid of this (for now renaming is not enabled)
-  uploadText.readOnly = true;
-  uploadText.value = tourName;
-  // TODO extract this to function for hitDownload and hitUpload
+  const processedTourName = processName(tourName);
+  console.log(processedTourName);
+
   let downloadMessage = document.getElementById("download-message");
   downloadMessage.style.color = colorEnum.waiting;
   downloadMessage.innerHTML = "Downloading...";
-  requestTour(tourName);
+  downloadedTourName = tourName;
+  requestTour(processedTourName);
 }
 
+function setZipMessage() {
+  const zipMessage = document.getElementById("zip-message");
+  let link = window.location.href + "tour/" + processName(downloadedTourName);
+  zipMessage.innerHTML = `Get&nbsp;<a href="${link}">${processName(
+    downloadedTourName
+  )}.zip</a>`;
+}
+
+function processName(name) {
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "-")
+    .replace(/[\/\?\=&]/g, "");
+}
 // set an onclick for the download button
 document.getElementById("download-button").onclick = hitDownload;
 

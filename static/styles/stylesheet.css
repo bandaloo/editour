@@ -22,6 +22,10 @@ p {
   margin-bottom: 0px;
 }
 
+a {
+  color: #4f79ff;
+}
+
 .regionname {
   cursor: pointer;
 }
