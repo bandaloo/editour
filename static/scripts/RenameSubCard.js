@@ -1,5 +1,3 @@
-"use strict";
-
 class RenameSubCard extends SubCard {
   /**
    * @param {RegionCard} superCard
@@ -19,6 +17,9 @@ class RenameSubCard extends SubCard {
       renameRegion(superCard.hash, this.textBox.value);
       superCard.regionName.innerHTML = this.textBox.value;
       this.toggleCard();
+      if (popup.poly === regions[superCard.hash].poly) {
+        popup.setContent(popupText(regions[superCard.hash]));
+      }
     };
 
     this.enclosingDiv.appendChild(this.textBox);
