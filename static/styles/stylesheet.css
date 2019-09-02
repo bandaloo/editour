@@ -200,11 +200,12 @@ a {
 }
 
 .coordbox {
+  --hover-color: #fff5d4;
   cursor: pointer;
 }
 
 .coordbox:hover {
-  background-color: #fff5d4;
+  background-color: var(--hover-color);
 }
 
 .circle {
@@ -233,4 +234,18 @@ classes so there is some repeated stuff from circle
 
 .clickthrough {
   pointer-events: none;
+}
+
+.coordpulse {
+  animation-name: coordpulse;
+  animation-duration: 0.5s;
+}
+
+@keyframes coordpulse {
+  from {
+    background-color: var(--hover-color);
+  }
+  to {
+    background-color: #ffffff;
+  }
 }

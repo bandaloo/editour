@@ -1,5 +1,3 @@
-"use strict";
-
 class InfoSubCard extends SubCard {
   /**
    * @param {RegionCard} superCard
@@ -27,7 +25,7 @@ class InfoSubCard extends SubCard {
     }
 
     this.hideButtonsWhenTriangle();
-    this.setToggleButton(superCard.infoButton, "Hide Info");
+    this.setToggleButton(superCard.infoButton, "Hide Points");
   }
 
   /**
@@ -41,7 +39,8 @@ class InfoSubCard extends SubCard {
     let xButton = makeXButton();
 
     let coordDiv = document.createElement("div");
-    coordDiv.classList.add("sidebox", "coordbox", "flex");
+    coordDiv.classList.add("sidebox", "coordbox", "flex", "coordpulse");
+    coordDiv.classList.toggle("coordpulse");
     coordDiv.setAttribute("data-index", i.toString());
 
     // create new p elements for latitude and longitude
@@ -124,6 +123,7 @@ class InfoSubCard extends SubCard {
   populateCircleMarkers() {
     // create and show circle markers
     const points = regions[this.superCard.hash].points;
+    const poly = regions[this.superCard.hash].poly;
     for (let i = 0; i < points.length; i++) {
       // add edge circle markers
       const p = i === 0 ? points.length - 1 : i - 1;
@@ -142,6 +142,7 @@ class InfoSubCard extends SubCard {
         this.clearCircleMarkers();
         this.populateCircleMarkers();
       });
+
       circleMarker.addTo(myMap);
       this.circleMarkers.push(circleMarker);
 
@@ -149,10 +150,52 @@ class InfoSubCard extends SubCard {
       const cornerDiv = Leaflet.divIcon({ className: "cornercircle" });
       console.log(cornerDiv);
       //cornerDiv.classList.add("cornercircle");
-      const cornerMarker = Leaflet.marker(points[i], { icon: cornerDiv });
+      const cornerMarker = Leaflet.marker(points[i], {
+        icon: cornerDiv,
+        draggable: true
+      });
+
       cornerMarker.on("click", () => {
         this.startPointEdit(points, this.coordData[i].paragraph, i);
+        this.coordData[i].div.scrollIntoView();
+        this.coordData[i].div.classList.toggle("coordpulse");
+        setTimeout(
+          () => this.coordData[i].div.classList.toggle("coordpulse"),
+          500
+        );
       });
+
+      cornerMarker.on("dragstart", () => {
+        if (poly === popup.poly) {
+          myMap.closePopup();
+        }
+      });
+
+      cornerMarker.on("drag", () => {
+        console.log("drag");
+        if (marker.poly === poly && marker.index === i) {
+          marker.remove();
+        }
+        points[i] = cornerMarker.getLatLng();
+        poly.setLatLngs(points);
+        const paragraphText = InfoSubCard.makeCoordParagraphText(points[i]);
+        this.coordData[i].paragraph.innerHTML = paragraphText;
+        const prevCircle = this.circleMarkers[
+          mod(i, this.circleMarkers.length)
+        ];
+        const nextCircle = this.circleMarkers[
+          mod(i + 1, this.circleMarkers.length)
+        ];
+        const midCircle = this.cornerMarkers[i];
+        prevCircle.setLatLng(
+          calcMidPoint(points[i], points[mod(i - 1, points.length)])
+        );
+        nextCircle.setLatLng(
+          calcMidPoint(points[i], points[mod(i + 1, points.length)])
+        );
+        midCircle.setLatLng(points[i]);
+      });
+
       cornerMarker.addTo(myMap);
       this.cornerMarkers.push(cornerMarker);
     }

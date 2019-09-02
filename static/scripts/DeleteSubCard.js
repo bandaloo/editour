@@ -1,5 +1,3 @@
-"use strict";
-
 class DeleteSubCard extends SubCard {
   /**
    * @param {RegionCard} superCard

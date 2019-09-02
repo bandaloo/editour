@@ -219,7 +219,6 @@ marker.on("dragstart", () => {
   if (marker.poly === popup.poly) {
     myMap.closePopup();
   }
-  // get the circle markers to move along with the drag
 });
 
 marker.on("drag", () => {
