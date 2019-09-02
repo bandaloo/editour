@@ -20,8 +20,16 @@ const extractZip = (zipName, dir) => {
     // this prevents newer files and the newer metadata from being overwritten
     zip.extractAllToAsync(dir, false, err => {
       if (err) {
-        reject({ status: 500, message: "Failed to unzip: " + err.message });
-        return;
+        if (err.message === "Failed to unzip: Unable to write") {
+          // This is a weird error that I can't duplicate. However, everything
+          // still works properly to let's just log it and keep going
+          console.error(
+            "Got a 'Failed to unzip: Unable to write' error, continuing"
+          );
+        } else {
+          reject({ status: 500, message: "Failed to unzip: " + err.message });
+          return;
+        }
       }
       resolve();
     });
