@@ -254,9 +254,13 @@ marker.on("drag", () => {
 function onPolyClick(e, region) {
   popup
     .setLatLng(e.latlng)
-    .setContent("<b>" + region.name + "</b>" + "<br>" + e.latlng)
+    .setContent(popupText(region))
     .openOn(myMap);
   popup.poly = region.poly;
+}
+
+function popupText(region) {
+  return "<b>" + region.name + "</b>" + "<br>" + popup.getLatLng();
 }
 
 myMap.on("mousemove", e => {
