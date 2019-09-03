@@ -54,9 +54,14 @@ function sendData(form) {
     });
   });
 
-  // error
   xhr.addEventListener("error", () => {
     errorChanger(document.getElementById("upload-message"));
+  });
+
+  xhr.upload.addEventListener("progress", event => {
+    const uploadMessage = document.getElementById("upload-message");
+    console.log(progressText(event));
+    uploadMessage.innerHTML = `Uploading...${progressText(event)}`;
   });
 
   // set up request (ternery for pointing to correct endpoint)
@@ -147,6 +152,12 @@ function requestTour(tourName) {
 
   xhr.addEventListener("error", () => {
     errorChanger(document.getElementById("download-message"));
+  });
+
+  xhr.addEventListener("progress", event => {
+    const downloadMessage = document.getElementById("download-message");
+    console.log(progressText(event));
+    downloadMessage.innerHTML = `Downloading...${progressText(event)}`;
   });
 
   xhr.send();
@@ -246,3 +257,16 @@ document.getElementById("upload-text").addEventListener("keypress", event => {
     hitUpload(event);
   }
 });
+
+/**
+ * @param {ProgressEvent} event
+ */
+function progressText(event) {
+  if (event.lengthComputable && event.total > 0) {
+    let loadFraction = event.loaded / event.total;
+    let percentString = `${Math.round(loadFraction * 100)}%`;
+    let byteString = `${event.loaded} of ${event.total} bytes`;
+    return `${percentString}<br>${byteString}`;
+  }
+  return "computing...";
+}
