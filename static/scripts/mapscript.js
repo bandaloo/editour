@@ -150,8 +150,6 @@ function addRegion(regionPoints, name, audio, images) {
 
   polygon.on("click", e => {
     onPolyClick(e, regions[hash]);
-    console.log(regions[hash].card);
-    regions[hash].card.infoSubCard.toggleCard();
   });
 
   addRegionDiv(hash, regionName, audio, images);
@@ -262,8 +260,9 @@ function onPolyClick(e, region) {
       .setContent("<b>" + region.name + "</b>" + "<br>" + e.latlng)
       .openOn(myMap);
     popup.poly = region.poly;
-    region.card.regionDiv.scrollIntoView();
   }
+  region.card.infoSubCard.toggleCard();
+  pulseDiv(region.card.regionDiv);
 }
 
 function popupText(region) {
@@ -391,6 +390,13 @@ function populateJumpBox(places) {
     };
     jumpBox.appendChild(button);
   }
+}
+
+function pulseDiv(div) {
+  // TODO currently doesn't work for scrolling smoothly to interior elements
+  div.scrollIntoView({ behavior: "smooth" });
+  div.classList.toggle("coordpulse");
+  setTimeout(() => div.classList.toggle("coordpulse"), 500);
 }
 
 populateJumpBox([

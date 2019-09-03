@@ -1,5 +1,3 @@
-"use strict";
-
 /** @abstract */
 class SubCard {
   /**
