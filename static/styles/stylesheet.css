@@ -164,7 +164,7 @@ a {
 
 .servermessage {
   font-weight: bold;
-  font-family: "Roboto Mono";
+  font-family: "Roboto Mono", "Monaco", "Lucida Console", "Monaco";
   color: #adadad;
 }
 
