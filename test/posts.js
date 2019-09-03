@@ -274,8 +274,8 @@ describe("POST Methods", function() {
   });
 
   describe("POST /edit endpoint", function() {
-    it("Should return 200 and edit tour on successful POST", function(done) {
-      // now post to the edit endpoint with one region deleted and an image added
+    it("Should return 200 and edit tour on POST with same name", function(done) {
+      // post to the edit endpoint with one region deleted and an image added
       new Promise((resolve, reject) => {
         server
           .post("/edit")
@@ -283,6 +283,7 @@ describe("POST Methods", function() {
           .expect(201)
           .attach("audio_name_10319rj", testFileDir + "gunbuster-opening.mp3")
           .field("tourName", "mytest")
+          .field("oldName", "mytest")
           .field("metadata", JSON.stringify(newMetadata))
           .end((err, res) => {
             if (err) {
@@ -327,6 +328,7 @@ describe("POST Methods", function() {
         .expect("Content-type", /json/)
         .expect(404)
         .field("tourName", "invalid-name-here")
+        .field("oldName", "invalid-name-here")
         .field("metadata", JSON.stringify({ asdf: "This shouldn't matter" }))
         .end((err, res) => {
           if (err) {
@@ -351,6 +353,7 @@ describe("POST Methods", function() {
         .expect("Content-type", /json/)
         .expect(400)
         .field("tourName", "mytest")
+        .field("oldName", "mytest")
         .field("metadata", JSON.stringify(newMetadata2))
         .end((err, res) => {
           if (err) {
@@ -364,6 +367,48 @@ describe("POST Methods", function() {
           );
           done();
         });
+    });
+
+    it("Should return 400 with no tourName field", function(done) {
+      server
+        .post("/edit")
+        .expect("Content-type", /json/)
+        .expect(400)
+        .field("oldName", "asdf")
+        .field("metadata", JSON.stringify(basicMetadata))
+        .end((err, res) => {
+          if (err) {
+            done(err);
+          }
+          assert.strictEqual(res.status, 400);
+          assert.strictEqual(res.body.status, 400);
+          assert.strictEqual(
+            res.body.message,
+            "Missing or invalid tourName field"
+          );
+        });
+      done();
+    });
+
+    it("Should return 400 with no oldName field", function(done) {
+      server
+        .post("/edit")
+        .expect("Content-type", /json/)
+        .expect(400)
+        .field("tourName", "asdf")
+        .field("metadata", JSON.stringify(basicMetadata))
+        .end((err, res) => {
+          if (err) {
+            done(err);
+          }
+          assert.strictEqual(res.status, 400);
+          assert.strictEqual(res.body.status, 400);
+          assert.strictEqual(
+            res.body.message,
+            "Missing or invalid oldName field"
+          );
+        });
+      done();
     });
   });
 });
