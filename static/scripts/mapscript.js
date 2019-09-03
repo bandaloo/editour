@@ -301,6 +301,7 @@ function rebuild(strMetadata) {
   }
   let newRegions = metadata.regions;
   console.log(newRegions);
+  let allPoints = [];
   for (let i = 0; i < newRegions.length; i++) {
     addRegion(
       newRegions[i].points,
@@ -308,7 +309,9 @@ function rebuild(strMetadata) {
       newRegions[i].audio,
       newRegions[i].images
     );
+    allPoints = allPoints.concat(newRegions[i].points);
   }
+  myMap.flyToBounds(allPoints, { paddingTopLeft: [320, 0] });
 }
 
 function makeXButton() {
