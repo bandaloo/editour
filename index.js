@@ -141,7 +141,9 @@ app.post("/edit", (req, res) => {
   // make it a little cleaner and handle errors better
   const tempDirPath = constants.tempLoc + randName(10) + "/";
   /** @type {string} */
-  let tour;
+  let tourName;
+  /** @type {string} */
+  let oldName;
   /** @type {string} */
   let metadataString;
 
@@ -150,19 +152,20 @@ app.post("/edit", (req, res) => {
     .makeTempDir(tempDirPath)
     .then(() => {
       // write the incoming form into it
-      return pHelpers.acceptForm(tempDirPath, req);
+      return pHelpers.acceptForm(tempDirPath, req, true);
     })
     .then(outObj => {
       // save tourName and metadata for later
-      tour = outObj.tourName;
+      tourName = outObj.tourName;
+      oldName = outObj.oldName;
       metadataString = outObj.metadata;
       // search for the right zip in the tours directory
       return pHelpers.getTours(constants.toursLoc);
     })
     .then(files => {
       // find the full name of the tour
-      logger.log("Looking up zip name " + tour + "...");
-      return pHelpers.findFileName(files, tour);
+      logger.log("Looking up zip name " + oldName + "...");
+      return pHelpers.findFileName(files, oldName);
     })
     .then(zipName => {
       // unzip the old zip into the new temp directory without overwriting files
@@ -171,22 +174,22 @@ app.post("/edit", (req, res) => {
     })
     .then(() => {
       // make sure we have all the files we need
-      logger.log("Verifying " + tour + "...");
+      logger.log("Verifying " + tourName + "...");
       return pHelpers.verify(tempDirPath, metadataString);
     })
     .then(files => {
       // finally zip the directory back up with the new metadata
-      logger.log("Zipping up " + tour + "...");
+      logger.log("Zipping up " + tourName + "...");
       return pHelpers.zipUp(
         constants.toursLoc,
-        tour,
+        tourName,
         tempDirPath,
         files,
         metadataString
       );
     })
     .then(() => {
-      logger.log(tour + " successfully edited");
+      logger.log(oldName + " successfully edited and saved as " + tourName);
       // send successful response back to the client
       res
         .status(201)
@@ -194,7 +197,7 @@ app.post("/edit", (req, res) => {
         .send(
           JSON.stringify({
             status: 201,
-            message: "Updated under the name '" + tour + "'"
+            message: "Updated under the name '" + tourName + "'"
           })
         );
     })
