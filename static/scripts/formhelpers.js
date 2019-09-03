@@ -300,21 +300,19 @@ function processName(name) {
 document.getElementById("download-button").onclick = hitDownload;
 
 form.addEventListener("keypress", event => {
-  if (event.keyCode == 13) {
+  if (event.keyCode === 13) {
     event.preventDefault();
   }
 });
 
 document.getElementById("download-text").addEventListener("keypress", event => {
-  if (event.keyCode == 13) {
-    console.log("hit enter on download textbox");
+  if (event.keyCode === 13) {
     hitDownload();
   }
 });
 
 document.getElementById("upload-text").addEventListener("keypress", event => {
-  if (event.keyCode == 13) {
-    console.log("hit enter on upload textbox");
+  if (event.keyCode === 13) {
     hitUpload(event);
   }
 });
