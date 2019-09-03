@@ -150,6 +150,8 @@ function addRegion(regionPoints, name, audio, images) {
 
   polygon.on("click", e => {
     onPolyClick(e, regions[hash]);
+    console.log(regions[hash].card);
+    regions[hash].card.infoSubCard.toggleCard();
   });
 
   addRegionDiv(hash, regionName, audio, images);
@@ -253,11 +255,16 @@ marker.on("drag", () => {
  * @param {Object} region
  */
 function onPolyClick(e, region) {
-  popup
-    .setLatLng(e.latlng)
-    .setContent("<b>" + region.name + "</b>" + "<br>" + e.latlng)
-    .openOn(myMap);
-  popup.poly = region.poly;
+  if (popup.poly === region.poly && !region.card.infoSubCard.isHidden()) {
+    myMap.closePopup();
+  } else {
+    popup
+      .setLatLng(e.latlng)
+      .setContent("<b>" + region.name + "</b>" + "<br>" + e.latlng)
+      .openOn(myMap);
+    popup.poly = region.poly;
+    region.card.regionDiv.scrollIntoView();
+  }
 }
 
 myMap.on("mousemove", e => {
