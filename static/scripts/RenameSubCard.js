@@ -21,7 +21,7 @@ class RenameSubCard extends SubCard {
     };
 
     this.textBox.addEventListener("keypress", event => {
-      if (event.keyCode == 13) {
+      if (event.keyCode === 13) {
         rename();
       }
     });
