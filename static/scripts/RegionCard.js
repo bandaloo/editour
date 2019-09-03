@@ -1,5 +1,3 @@
-"use strict";
-
 class RegionCard {
   /**
    * Construct a region card that appears on the side
@@ -42,7 +40,7 @@ class RegionCard {
       "outlinebutton",
       "revealer"
     );
-    this.infoButton.innerHTML = "Info";
+    this.infoButton.innerHTML = "Points";
 
     this.renameButton = document.createElement("button");
     this.renameButton.type = "button";

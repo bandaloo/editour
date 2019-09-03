@@ -1,6 +1,6 @@
 {
   "name": "ar-tour-app-backend",
-  "version": "0.3.3",
+  "version": "1.0.0",
   "description": "Backend for storing and organizing AR tours",
   "main": "index.js",
   "scripts": {

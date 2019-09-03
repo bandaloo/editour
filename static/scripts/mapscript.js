@@ -221,7 +221,6 @@ marker.on("dragstart", () => {
   if (marker.poly === popup.poly) {
     myMap.closePopup();
   }
-  // get the circle markers to move along with the drag
 });
 
 marker.on("drag", () => {
@@ -265,6 +264,10 @@ function onPolyClick(e, region) {
     popup.poly = region.poly;
     region.card.regionDiv.scrollIntoView();
   }
+}
+
+function popupText(region) {
+  return "<b>" + region.name + "</b>" + "<br>" + popup.getLatLng();
 }
 
 myMap.on("mousemove", e => {
