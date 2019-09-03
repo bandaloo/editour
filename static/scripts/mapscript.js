@@ -372,6 +372,11 @@ function jumpFromInput() {
 }
 
 document.getElementById("jump-button").addEventListener("click", jumpFromInput);
+document.getElementById("jump-text").addEventListener("keypress", event => {
+  if (event.keyCode == 13) {
+    jumpFromInput();
+  }
+});
 
 /**
  * Function to fill the jump box with places you can click and jump to

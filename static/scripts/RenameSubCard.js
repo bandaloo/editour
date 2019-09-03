@@ -13,11 +13,20 @@ class RenameSubCard extends SubCard {
     okayButton.type = "button";
     okayButton.classList.add("button", "greenbutton");
     okayButton.innerHTML = "Okay";
-    okayButton.onclick = () => {
+
+    const rename = () => {
       renameRegion(superCard.hash, this.textBox.value);
       superCard.regionName.innerHTML = this.textBox.value;
       this.toggleCard();
     };
+
+    this.textBox.addEventListener("keypress", event => {
+      if (event.keyCode == 13) {
+        rename();
+      }
+    });
+
+    okayButton.onclick = rename;
 
     this.enclosingDiv.appendChild(this.textBox);
     this.enclosingDiv.appendChild(okayButton);
