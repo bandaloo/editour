@@ -342,3 +342,53 @@ function calcMidPoint(point1, point2) {
   polyline.remove();
   return midPoint;
 }
+
+function jumpFromInput() {
+  const coordElem = /** @type {HTMLInputElement} */ (document.getElementById(
+    "jump-text"
+  ));
+  // get rid of the commas
+  const coordString = coordElem.value.replace(/,/, "");
+  const coords = coordString.split(" ").map(str => parseInt(str));
+  if (
+    coords[0] >= -90 &&
+    coords[0] <= 90 &&
+    coords[1] >= -180 &&
+    coords[1] <= 180
+  ) {
+    // should be a valid coordinate string
+    myMap.panTo(coords);
+  } else {
+    // clear the text box (to show the default text again)
+    coordElem.value = "";
+    console.log("invalid coordinate inputted");
+  }
+}
+
+document.getElementById("jump-button").addEventListener("click", jumpFromInput);
+
+/**
+ * Function to fill the jump box with places you can click and jump to
+ * @param {{name: string, point: {lat: number, lng: number}}[]} places
+ */
+function populateJumpBox(places) {
+  const jumpBox = document.getElementById("jump-container");
+  for (let i = 0; i < places.length; i++) {
+    const place = places[i];
+    const button = document.createElement("button");
+    button.classList.add("button", "orangebutton", "outlinebutton");
+    button.type = "button";
+    button.innerHTML = place.name;
+    button.onclick = () => {
+      myMap.panTo(place.point);
+    };
+    jumpBox.appendChild(button);
+  }
+}
+
+populateJumpBox([
+  { name: "Ritsumeikan", point: { lat: 34.982832, lng: 135.964555 } },
+  { name: "Fushimi Inari", point: { lat: 34.967122, lng: 135.77257 } },
+  { name: "Kinkakuji", point: { lat: 35.039312, lng: 135.729476 } },
+  { name: "Injoji", point: { lat: 35.035181, lng: 135.740549 } }
+]);
