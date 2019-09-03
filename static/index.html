@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="styles/leaflet.css" />
     <script src="scripts/leaflet.js"></script>
   </head>
+
   <body>
     <form id="sideform">
       <div class="sidenav" id="sidenavid">
@@ -25,6 +26,13 @@
           name="metadata"
           id="metadata"
           placeholder="Region JSON"
+          style="display: none"
+        />
+        <input
+          type="text"
+          name="oldName"
+          id="old-name"
+          placeholder="Old name"
           style="display: none"
         />
         <div class="sidebox" id="instructions">
@@ -79,6 +87,7 @@
         </div>
       </div>
     </form>
+
     <div id="mapid" class="map"></div>
     <script src="scripts/formhelpers.js"></script>
     <script src="scripts/enums.js"></script>

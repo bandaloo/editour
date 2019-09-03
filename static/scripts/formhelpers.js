@@ -12,7 +12,7 @@ const jsonTextField = /** @type {HTMLInputElement} */ (document.getElementById(
 
 // determines whether to post to /upload or /edit
 var downloaded = false;
-var downloadedTourName = "";
+var currentTourName = "";
 
 /**
  * Action for hitting the upload button (really happens on form submit)
@@ -24,7 +24,7 @@ function hitUpload(event) {
   let uploadMessage = document.getElementById("upload-message");
   uploadMessage.style.color = colorEnum.waiting;
   uploadMessage.innerHTML = "Uploading...";
-  downloadedTourName = /** @type {HTMLInputElement} */ (document.getElementById(
+  currentTourName = /** @type {HTMLInputElement} */ (document.getElementById(
     "upload-text"
   )).value;
   sendData(form);
@@ -45,18 +45,30 @@ function sendData(form) {
   // Bind the FormData object and the form element
   const fd = new FormData(form);
 
-  // successful data submission uploading tour
+  // uploaded tour
   xhr.addEventListener("load", event => {
     let uploadMsgElem = document.getElementById("upload-message");
-    setZipMessage();
-    statusChanger(uploadMsgElem, xhr.status, event, 201, text => {
-      uploadMsgElem.innerHTML += " " + text;
-    });
+    if (
+      statusChanger(uploadMsgElem, xhr.status, event, 201, text => {
+        uploadMsgElem.innerHTML += " " + text;
+      })
+    ) {
+      const oldNameText = /** @type{HTMLInputElement} */ (document.getElementById(
+        "old-name"
+      ));
+      oldNameText.value = processName(currentTourName);
+      setZipMessage();
+    }
   });
 
-  // error
   xhr.addEventListener("error", () => {
     errorChanger(document.getElementById("upload-message"));
+  });
+
+  xhr.upload.addEventListener("progress", event => {
+    const uploadMessage = document.getElementById("upload-message");
+    console.log(progressText(event));
+    uploadMessage.innerHTML = `Uploading...${progressText(event)}`;
   });
 
   // set up request (ternery for pointing to correct endpoint)
@@ -125,28 +137,41 @@ function requestTour(tourName) {
 
   xhr.open("GET", str);
 
-  // sucessfully downloaded tour
+  // downloaded tour
   xhr.addEventListener("load", event => {
-    setZipMessage();
     // set to download mode
     downloaded = true;
     const uploadText = /** @type {HTMLInputElement} */ (document.getElementById(
       "upload-text"
     ));
-    uploadText.readOnly = true;
-    uploadText.value = downloadedTourName;
+    const oldNameText = /** @type {HTMLInputElement} */ (document.getElementById(
+      "old-name"
+    ));
+    //uploadText.readOnly = true;
+    uploadText.value = currentTourName;
+    oldNameText.value = processName(currentTourName);
 
-    statusChanger(
-      document.getElementById("download-message"),
-      xhr.status,
-      event,
-      200,
-      rebuild
-    );
+    if (
+      statusChanger(
+        document.getElementById("download-message"),
+        xhr.status,
+        event,
+        200,
+        rebuild
+      )
+    ) {
+      setZipMessage();
+    }
   });
 
   xhr.addEventListener("error", () => {
     errorChanger(document.getElementById("download-message"));
+  });
+
+  xhr.addEventListener("progress", event => {
+    const downloadMessage = document.getElementById("download-message");
+    console.log(progressText(event));
+    downloadMessage.innerHTML = `Downloading...${progressText(event)}`;
   });
 
   xhr.send();
@@ -159,6 +184,7 @@ function requestTour(tourName) {
  * @param {ProgressEvent} event
  * @param {number} successCode
  * @param {Function} sCallback
+ * @returns {boolean} whether it was a success or not
  */
 function statusChanger(msgElem, status, event, successCode, sCallback) {
   if (status === 404) {
@@ -181,11 +207,13 @@ function statusChanger(msgElem, status, event, successCode, sCallback) {
       message = "404 not found";
     }
     msgElem.innerHTML = `There was a problem: ${message}`;
+    return false;
   } else {
     msgElem.style.color = colorEnum.successful;
     msgElem.innerHTML = "Success!";
     console.log(parsedResponse);
     sCallback(parsedResponse.message);
+    return true;
   }
 }
 
@@ -205,15 +233,15 @@ function hitDownload() {
   let downloadMessage = document.getElementById("download-message");
   downloadMessage.style.color = colorEnum.waiting;
   downloadMessage.innerHTML = "Downloading...";
-  downloadedTourName = tourName;
+  currentTourName = tourName;
   requestTour(processedTourName);
 }
 
 function setZipMessage() {
   const zipMessage = document.getElementById("zip-message");
-  let link = window.location.href + "tour/" + processName(downloadedTourName);
+  let link = window.location.href + "tour/" + processName(currentTourName);
   zipMessage.innerHTML = `Get&nbsp;<a href="${link}">${processName(
-    downloadedTourName
+    currentTourName
   )}.zip</a>`;
 }
 
@@ -246,3 +274,16 @@ document.getElementById("upload-text").addEventListener("keypress", event => {
     hitUpload(event);
   }
 });
+
+/**
+ * @param {ProgressEvent} event
+ */
+function progressText(event) {
+  if (event.lengthComputable && event.total > 0) {
+    let loadFraction = event.loaded / event.total;
+    let percentString = `${Math.round(loadFraction * 100)}%`;
+    let byteString = `${event.loaded} of ${event.total} bytes`;
+    return `${percentString}<br>${byteString}`;
+  }
+  return "computing...";
+}
