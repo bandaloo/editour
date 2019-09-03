@@ -177,6 +177,45 @@ function requestTour(tourName) {
   xhr.send();
 }
 
+function requestTourList() {
+  const xhr = new XMLHttpRequest();
+
+  const host = window.location.host;
+  // TODO extract this to a function
+  const scheme = window.location.href.split("/")[0];
+  const str = `${scheme}//${host}/tours`;
+
+  xhr.open("GET", str);
+
+  xhr.addEventListener("load", event => {
+    // populate the tours container
+    let parsedResponse = makeParsedResponse(event);
+    let parsedResponseMessage = { files: [] };
+    try {
+      parsedResponseMessage = JSON.parse(parsedResponse.message);
+    } catch (err) {
+      console.error("could not parse the files list from the server");
+    }
+
+    const files = parsedResponseMessage.files;
+    const toursContainer = document.getElementById("tours-container");
+    for (let i = 0; i < files.length; i++) {
+      const button = document.createElement("button");
+      button.classList.add("button", "bluebutton", "outlinebutton");
+      button.type = "button";
+      button.innerHTML = files[i];
+      button.onclick = () => {
+        /** @type{HTMLInputElement} */ (document.getElementById(
+          "download-text"
+        )).value = files[i];
+      };
+      toursContainer.appendChild(button);
+    }
+  });
+
+  xhr.send();
+}
+
 /**
  * Changes status of message area based on response from server
  * @param {HTMLElement} msgElem
@@ -187,19 +226,7 @@ function requestTour(tourName) {
  * @returns {boolean} whether it was a success or not
  */
 function statusChanger(msgElem, status, event, successCode, sCallback) {
-  if (status === 404) {
-    msgElem.innerHTML = "404 not found";
-  }
-  let responseText = /** @type {XMLHttpRequest} */ (event.target).responseText;
-  console.log(downloaded);
-  console.log(responseText);
-  let parsedResponse;
-  try {
-    parsedResponse = JSON.parse(responseText);
-  } catch (err) {
-    console.error("could not parse json from response");
-    parsedResponse = { message: "Unexpected response" };
-  }
+  let parsedResponse = makeParsedResponse(event);
   if (status !== successCode) {
     msgElem.style.color = colorEnum.failed;
     let message = parsedResponse.message;
@@ -215,6 +242,23 @@ function statusChanger(msgElem, status, event, successCode, sCallback) {
     sCallback(parsedResponse.message);
     return true;
   }
+}
+
+/**
+ * Returns a parsed response, handling error if cannot be parsed
+ * @param {ProgressEvent} event
+ * @return {{message: string}}
+ */
+function makeParsedResponse(event) {
+  let responseText = /** @type {XMLHttpRequest} */ (event.target).responseText;
+  let parsedResponse;
+  try {
+    parsedResponse = JSON.parse(responseText);
+  } catch (err) {
+    console.error("could not parse json from response");
+    parsedResponse = { message: "Unexpected response" };
+  }
+  return parsedResponse;
 }
 
 function errorChanger(msgElem) {

@@ -389,3 +389,5 @@ populateJumpBox([
   { name: "Kinkakuji", point: { lat: 35.039312, lng: 135.729476 } },
   { name: "Injoji", point: { lat: 35.035181, lng: 135.740549 } }
 ]);
+
+requestTourList();
