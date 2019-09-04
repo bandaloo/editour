@@ -164,7 +164,8 @@ function addRegion(regionPoints, name, audio, images) {
  */
 function onMapClick(e) {
   console.log("clicked map at: " + e.latlng);
-  if (shifting) {
+  console.log(e);
+  if (shifting || e.originalEvent.shiftKey) {
     if (state === stateEnum.drawing) {
       if (drawnPoints.length > 1) {
         endDraw();
