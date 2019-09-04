@@ -164,7 +164,7 @@ a {
 
 .servermessage {
   font-weight: bold;
-  font-family: "Roboto Mono";
+  font-family: "Roboto Mono", "Monaco", "Lucida Console", "Monaco";
   color: #adadad;
 }
 
@@ -200,12 +200,11 @@ a {
 }
 
 .coordbox {
-  --hover-color: #fff5d4;
   cursor: pointer;
 }
 
 .coordbox:hover {
-  background-color: var(--hover-color);
+  background-color: #fff5d4;
 }
 
 .circle {
@@ -243,7 +242,7 @@ classes so there is some repeated stuff from circle
 
 @keyframes coordpulse {
   from {
-    background-color: var(--hover-color);
+    background-color: #ffe89e;
   }
   to {
     background-color: #ffffff;

@@ -253,11 +253,17 @@ marker.on("drag", () => {
  * @param {Object} region
  */
 function onPolyClick(e, region) {
-  popup
-    .setLatLng(e.latlng)
-    .setContent(popupText(region))
-    .openOn(myMap);
-  popup.poly = region.poly;
+  if (popup.poly === region.poly && !region.card.infoSubCard.isHidden()) {
+    myMap.closePopup();
+  } else {
+    popup
+      .setLatLng(e.latlng)
+      .setContent("<b>" + region.name + "</b>" + "<br>" + e.latlng)
+      .openOn(myMap);
+    popup.poly = region.poly;
+  }
+  region.card.infoSubCard.toggleCard();
+  pulseDiv(region.card.regionDiv);
 }
 
 function popupText(region) {
@@ -296,6 +302,7 @@ function rebuild(strMetadata) {
   }
   let newRegions = metadata.regions;
   console.log(newRegions);
+  let allPoints = [];
   for (let i = 0; i < newRegions.length; i++) {
     addRegion(
       newRegions[i].points,
@@ -303,7 +310,9 @@ function rebuild(strMetadata) {
       newRegions[i].audio,
       newRegions[i].images
     );
+    allPoints = allPoints.concat(newRegions[i].points);
   }
+  myMap.flyToBounds(allPoints, { paddingTopLeft: [320, 0] });
 }
 
 function makeXButton() {
@@ -367,6 +376,11 @@ function jumpFromInput() {
 }
 
 document.getElementById("jump-button").addEventListener("click", jumpFromInput);
+document.getElementById("jump-text").addEventListener("keypress", event => {
+  if (event.keyCode === 13) {
+    jumpFromInput();
+  }
+});
 
 /**
  * Function to fill the jump box with places you can click and jump to
@@ -387,9 +401,18 @@ function populateJumpBox(places) {
   }
 }
 
+function pulseDiv(div) {
+  // TODO currently doesn't work for scrolling smoothly to interior elements
+  div.scrollIntoView({ behavior: "smooth" });
+  div.classList.toggle("coordpulse");
+  setTimeout(() => div.classList.toggle("coordpulse"), 500);
+}
+
 populateJumpBox([
   { name: "Ritsumeikan", point: { lat: 34.982832, lng: 135.964555 } },
   { name: "Fushimi Inari", point: { lat: 34.967122, lng: 135.77257 } },
   { name: "Kinkakuji", point: { lat: 35.039312, lng: 135.729476 } },
   { name: "Injoji", point: { lat: 35.035181, lng: 135.740549 } }
 ]);
+
+requestTourList();

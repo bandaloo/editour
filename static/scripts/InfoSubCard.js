@@ -158,11 +158,7 @@ class InfoSubCard extends SubCard {
       cornerMarker.on("click", () => {
         this.startPointEdit(points, this.coordData[i].paragraph, i);
         this.coordData[i].div.scrollIntoView();
-        this.coordData[i].div.classList.toggle("coordpulse");
-        setTimeout(
-          () => this.coordData[i].div.classList.toggle("coordpulse"),
-          500
-        );
+        pulseDiv(this.coordData[i].div);
       });
 
       cornerMarker.on("dragstart", () => {
