@@ -28,10 +28,14 @@ const deleteTour = (req, res) => {
       res
         .status(200)
         .contentType("application/json")
-        .send(JSON.stringify({
-          status: 200,
-          message: `Successfully deleted ${count} versions of ${req.params.name}`
-        }));
+        .send(
+          JSON.stringify({
+            status: 200,
+            message: `Deleted ${count} version${count > 1 ? "s" : ""} of ${
+              req.params.name
+            }`
+          })
+        );
     })
     .catch(errObj => {
       constants.returnError(res, errObj.status, errObj.message);
