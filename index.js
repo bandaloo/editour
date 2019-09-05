@@ -26,6 +26,9 @@ app.post("/edit", endpoints.postEdit);
 // returns a list of tour names on the server
 app.get("/tours", endpoints.getTours);
 
+// deletes a particular tour from the server
+app.delete("/tour/:name", endpoints.deleteTour);
+
 app.listen(port, () => {
   logger.log("Started listening on port " + port + "...");
 });
