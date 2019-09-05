@@ -423,7 +423,8 @@ populateJumpBox([
   { name: "Ritsumeikan", point: { lat: 34.982832, lng: 135.964555 } },
   { name: "Fushimi Inari", point: { lat: 34.967122, lng: 135.77257 } },
   { name: "Kinkakuji", point: { lat: 35.039312, lng: 135.729476 } },
-  { name: "Injoji", point: { lat: 35.035181, lng: 135.740549 } }
+  { name: "Injoji", point: { lat: 35.035181, lng: 135.740549 } },
+  { name: "Kiyomizu", point: { lat: 34.994874, lng: 135.784948 } }
 ]);
 
 requestTourList();
