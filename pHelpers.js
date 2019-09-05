@@ -5,6 +5,7 @@ const makeTempDir = require("./pHelpers/makeTempDir");
 const extractZip = require("./pHelpers/extractZip");
 const zipUp = require("./pHelpers/zipUp");
 const verify = require("./pHelpers/verify");
+const removeTour = require("./pHelpers/removeTour");
 
 /**
  * Lots of helpers that return promises
@@ -16,7 +17,8 @@ const pHelpers = {
   makeTempDir,
   extractZip,
   zipUp,
-  verify
+  verify,
+  removeTour
 };
 
 module.exports = pHelpers;
