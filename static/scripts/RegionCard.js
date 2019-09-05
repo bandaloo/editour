@@ -10,7 +10,8 @@ class RegionCard {
     this.hash = hash;
 
     this.regionDiv = document.createElement("div");
-    this.regionDiv.className = "sidebox";
+    this.regionDiv.classList.add("sidebox", "coordpulse");
+    this.regionDiv.classList.toggle("coordpulse");
 
     this.regionName = document.createElement("h3");
     this.regionName.className = "regionname";

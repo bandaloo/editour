@@ -265,6 +265,11 @@ function onPolyClick(e, region) {
   pulseDiv(region.card.regionDiv);
 }
 
+/**
+ * Creates the inner HTML for the map popup
+ * @param {{name: string}} region
+ * @returns {string}
+ */
 function popupText(region) {
   return "<b>" + region.name + "</b>" + "<br>" + popup.getLatLng();
 }
@@ -352,6 +357,9 @@ function calcMidPoint(point1, point2) {
   return midPoint;
 }
 
+/**
+ * Read the coordinate text box and jump there on the map
+ */
 function jumpFromInput() {
   const coordElem = /** @type {HTMLInputElement} */ (document.getElementById(
     "jump-text"
@@ -400,6 +408,10 @@ function populateJumpBox(places) {
   }
 }
 
+/**
+ * Make the div blink and scroll to it
+ * @param {HTMLDivElement} div
+ */
 function pulseDiv(div) {
   // TODO currently doesn't work for scrolling smoothly to interior elements
   div.scrollIntoView({ behavior: "smooth" });
