@@ -30,6 +30,13 @@ function hitUpload(event) {
   sendData(form);
 }
 
+function hitDelete(event) {
+  requestTourDeletion(
+    /** @type {HTMLInputElement} */ (document.getElementById("delete-text"))
+      .value
+  );
+}
+
 form.addEventListener("submit", hitUpload);
 
 /**
@@ -124,16 +131,30 @@ function makeFileRegionData() {
 }
 
 /**
+ * Creates a url to send a request to
+ * @param {string} endpointName
+ * @param {string} [tourName]
+ * @returns {string}
+ */
+function createEndpointString(endpointName, tourName = "") {
+  const host = window.location.host;
+  const scheme = window.location.href.split("/")[0];
+  return `${scheme}//${host}/${endpointName}/${tourName}`;
+}
+
+/**
  * Request download of tour from server
  * @param {string} tourName
  */
 function requestTour(tourName) {
-  const host = window.location.host;
   const xhr = new XMLHttpRequest();
+
+  const str = createEndpointString("edit", tourName);
+  /*
+  const host = window.location.host;
   const scheme = window.location.href.split("/")[0];
   const str = `${scheme}//${host}/edit/${tourName}`;
-  console.log(scheme);
-  console.log(str);
+  */
 
   xhr.open("GET", str);
 
@@ -177,13 +198,23 @@ function requestTour(tourName) {
   xhr.send();
 }
 
+function requestTourDeletion(tourName) {
+  const xhr = new XMLHttpRequest();
+  const str = createEndpointString("tours", tourName);
+
+  xhr.open("DELETE", str);
+
+  xhr.addEventListener("load", event => {
+    // TODO change this
+    console.log("got a delete response back");
+  });
+
+  xhr.send();
+}
+
 function requestTourList() {
   const xhr = new XMLHttpRequest();
-
-  const host = window.location.host;
-  // TODO extract this to a function
-  const scheme = window.location.href.split("/")[0];
-  const str = `${scheme}//${host}/tours`;
+  const str = createEndpointString("tours");
 
   xhr.open("GET", str);
 
@@ -299,6 +330,9 @@ function processName(name) {
 // set an onclick for the download button
 document.getElementById("download-button").onclick = hitDownload;
 
+// set an onclick for the delete button
+document.getElementById("delete-button").onclick = hitDelete;
+
 form.addEventListener("keypress", event => {
   if (event.keyCode === 13) {
     event.preventDefault();
@@ -314,6 +348,12 @@ document.getElementById("download-text").addEventListener("keypress", event => {
 document.getElementById("upload-text").addEventListener("keypress", event => {
   if (event.keyCode === 13) {
     hitUpload(event);
+  }
+});
+
+document.getElementById("delete-text").addEventListener("keypress", event => {
+  if (event.keyCode === 13) {
+    hitDelete();
   }
 });
 
