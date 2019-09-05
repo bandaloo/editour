@@ -246,6 +246,11 @@ function onPolyClick(e, region) {
   pulseDiv(region.card.regionDiv);
 }
 
+/**
+ * Creates the inner HTML for the map popup
+ * @param {{name: string}} region
+ * @returns {string}
+ */
 function popupText(region) {
   return "<b>" + region.name + "</b>" + "<br>" + popup.getLatLng();
 }
@@ -333,6 +338,9 @@ function calcMidPoint(point1, point2) {
   return midPoint;
 }
 
+/**
+ * Read the coordinate text box and jump there on the map
+ */
 function jumpFromInput() {
   const coordElem = /** @type {HTMLInputElement} */ (document.getElementById(
     "jump-text"
@@ -381,6 +389,10 @@ function populateJumpBox(places) {
   }
 }
 
+/**
+ * Make the div blink and scroll to it
+ * @param {HTMLDivElement} div
+ */
 function pulseDiv(div) {
   // TODO currently doesn't work for scrolling smoothly to interior elements
   div.scrollIntoView({ behavior: "smooth" });
@@ -392,7 +404,8 @@ populateJumpBox([
   { name: "Ritsumeikan", point: { lat: 34.982832, lng: 135.964555 } },
   { name: "Fushimi Inari", point: { lat: 34.967122, lng: 135.77257 } },
   { name: "Kinkakuji", point: { lat: 35.039312, lng: 135.729476 } },
-  { name: "Injoji", point: { lat: 35.035181, lng: 135.740549 } }
+  { name: "Injoji", point: { lat: 35.035181, lng: 135.740549 } },
+  { name: "Kiyomizu", point: { lat: 34.994874, lng: 135.784948 } }
 ]);
 
 requestTourList();
