@@ -9,9 +9,6 @@ var regions = {};
 // list of points, which are lists of length 2 and contain numbers
 var drawnPoints = [];
 
-// whether the user is holding shift
-var shifting = false;
-
 // div where all the region cards are added
 const sideNav = document.getElementById("sidenavid");
 
@@ -54,23 +51,6 @@ Leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(myMap);
-
-// set event listener for shortcuts
-document.addEventListener("keydown", function(e) {
-  let code = e.keyCode;
-  //let key = String.fromCharCode(code);
-  if (code === 16) {
-    shifting = true;
-  }
-});
-
-document.addEventListener("keyup", function(e) {
-  let code = e.keyCode;
-  //let key = String.fromCharCode(code);
-  if (code === 16) {
-    shifting = false;
-  }
-});
 
 /**
  * super simple hash for regions
@@ -166,7 +146,7 @@ function addRegion(regionPoints, name, audio, images) {
  */
 function onMapClick(e) {
   console.log("clicked map at: " + e.latlng);
-  if (shifting) {
+  if (e.originalEvent.shiftKey) {
     if (state === stateEnum.drawing) {
       if (drawnPoints.length > 1) {
         endDraw();
