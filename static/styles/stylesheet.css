@@ -240,6 +240,10 @@ classes so there is some repeated stuff from circle
   animation-duration: 0.5s;
 }
 
+.transcriptarea {
+  resize: vertical;
+}
+
 @keyframes coordpulse {
   from {
     background-color: #ffe89e;
