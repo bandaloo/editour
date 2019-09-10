@@ -94,6 +94,7 @@ function sendData(form) {
  * @property {Coordinate[]} points
  * @property {string[]} audio
  * @property {string[]} images
+ * @property {string} transcript
  */
 /**
  * @typedef {Object} RegionData - the metadata for the tour file
@@ -120,12 +121,14 @@ function makeFileRegionData() {
         .concat(realRegion.audio ? realRegion.audio : []),
       images: realRegion.card
         .getImageNames()
-        .concat(realRegion.images ? realRegion.images : [])
+        .concat(realRegion.images ? realRegion.images : []),
+      transcript: realRegion.card.mediaSubCard.transcriptArea.value
     };
 
     // add the json region to json data
     data.regions.push(jsonRegion);
   }
+  console.log("logging data");
   console.log(data);
   return data;
 }
@@ -340,6 +343,7 @@ document.getElementById("download-button").onclick = hitDownload;
 // set an onclick for the delete button
 document.getElementById("delete-button").onclick = hitDelete;
 
+// TODO get rid of this repeated code
 form.addEventListener("keypress", event => {
   if (event.keyCode === 13) {
     event.preventDefault();
