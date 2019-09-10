@@ -9,6 +9,9 @@ var regions = {};
 // list of points, which are lists of length 2 and contain numbers
 var drawnPoints = [];
 
+// whether the user is holding shift
+var shifting = false;
+
 // div where all the region cards are added
 const sideNav = document.getElementById("sidenavid");
 
@@ -52,6 +55,22 @@ Leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(myMap);
 
+// set event listener for shortcuts
+document.addEventListener("keydown", function(e) {
+  let code = e.keyCode;
+  //let key = String.fromCharCode(code);
+  if (code === 16) {
+    shifting = true;
+  }
+});
+
+document.addEventListener("keyup", function(e) {
+  let code = e.keyCode;
+  //let key = String.fromCharCode(code);
+  if (code === 16) {
+    shifting = false;
+  }
+});
 
 /**
  * super simple hash for regions
@@ -114,7 +133,6 @@ function addRegion(regionPoints, name, audio, images) {
       }
       // add region to the list of regions
       regions[hash] = {
-        // TODO points is kind of redundant since poly stores these
         points: regionPoints,
         name: regionName,
         poly: polygon
@@ -137,6 +155,9 @@ function addRegion(regionPoints, name, audio, images) {
 
   // adds polygon to map
   polygon.addTo(myMap);
+
+  // TODO once hash is removed add region as a typedef and return type
+  return regions[hash];
 }
 
 /**
@@ -145,7 +166,7 @@ function addRegion(regionPoints, name, audio, images) {
  */
 function onMapClick(e) {
   console.log("clicked map at: " + e.latlng);
-  if (e.originalEvent.shiftKey) {
+  if (shifting) {
     if (state === stateEnum.drawing) {
       if (drawnPoints.length > 1) {
         endDraw();
@@ -289,14 +310,18 @@ function rebuild(strMetadata) {
   console.log(newRegions);
   let allPoints = [];
   for (let i = 0; i < newRegions.length; i++) {
-    addRegion(
+    const addedRegion = addRegion(
       newRegions[i].points,
       newRegions[i].name,
       newRegions[i].audio,
       newRegions[i].images
     );
     allPoints = allPoints.concat(newRegions[i].points);
+
+    addedRegion.card.mediaSubCard.transcriptArea.value =
+      newRegions[i].transcript;
   }
+  // TODO get rid of this magic number 320 (used in another place)
   myMap.flyToBounds(allPoints, { paddingTopLeft: [320, 0] });
 }
 
@@ -364,6 +389,7 @@ function jumpFromInput() {
 }
 
 document.getElementById("jump-button").addEventListener("click", jumpFromInput);
+
 document.getElementById("jump-text").addEventListener("keypress", event => {
   if (event.keyCode === 13) {
     jumpFromInput();
