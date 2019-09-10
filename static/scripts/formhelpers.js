@@ -30,13 +30,6 @@ function hitUpload(event) {
   sendData(form);
 }
 
-function hitDelete(event) {
-  requestTourDeletion(
-    /** @type {HTMLInputElement} */ (document.getElementById("delete-text"))
-      .value
-  );
-}
-
 form.addEventListener("submit", hitUpload);
 
 /**
@@ -94,7 +87,6 @@ function sendData(form) {
  * @property {Coordinate[]} points
  * @property {string[]} audio
  * @property {string[]} images
- * @property {string} transcript
  */
 /**
  * @typedef {Object} RegionData - the metadata for the tour file
@@ -121,28 +113,14 @@ function makeFileRegionData() {
         .concat(realRegion.audio ? realRegion.audio : []),
       images: realRegion.card
         .getImageNames()
-        .concat(realRegion.images ? realRegion.images : []),
-      transcript: realRegion.card.mediaSubCard.transcriptArea.value
+        .concat(realRegion.images ? realRegion.images : [])
     };
 
     // add the json region to json data
     data.regions.push(jsonRegion);
   }
-  console.log("logging data");
   console.log(data);
   return data;
-}
-
-/**
- * Creates a url to send a request to
- * @param {string} endpointName
- * @param {string} [tourName]
- * @returns {string}
- */
-function createEndpointString(endpointName, tourName = "") {
-  const host = window.location.host;
-  const scheme = window.location.href.split("/")[0];
-  return `${scheme}//${host}/${endpointName}/${tourName}`;
 }
 
 /**
@@ -150,14 +128,12 @@ function createEndpointString(endpointName, tourName = "") {
  * @param {string} tourName
  */
 function requestTour(tourName) {
-  const xhr = new XMLHttpRequest();
-
-  const str = createEndpointString("edit", tourName);
-  /*
   const host = window.location.host;
+  const xhr = new XMLHttpRequest();
   const scheme = window.location.href.split("/")[0];
   const str = `${scheme}//${host}/edit/${tourName}`;
-  */
+  console.log(scheme);
+  console.log(str);
 
   xhr.open("GET", str);
 
@@ -201,30 +177,13 @@ function requestTour(tourName) {
   xhr.send();
 }
 
-function requestTourDeletion(tourName) {
-  const xhr = new XMLHttpRequest();
-  const str = createEndpointString("tour", tourName);
-
-  xhr.open("DELETE", str);
-
-  xhr.addEventListener("load", event => {
-    console.log("got a delete response back");
-    console.log(event);
-    let parsedResponse = makeParsedResponse(event);
-    //const deleteMessage = document.getElementById("delete-message");
-    //deleteMessage.innerHTML = parsedResponse.message;
-    const deleteMessage = document.getElementById("delete-message");
-    statusChanger(deleteMessage, xhr.status, event, 200, () => {
-      deleteMessage.innerHTML += " " + parsedResponse.message;
-    });
-  });
-
-  xhr.send();
-}
-
 function requestTourList() {
   const xhr = new XMLHttpRequest();
-  const str = createEndpointString("tours");
+
+  const host = window.location.host;
+  // TODO extract this to a function
+  const scheme = window.location.href.split("/")[0];
+  const str = `${scheme}//${host}/tours`;
 
   xhr.open("GET", str);
 
@@ -340,10 +299,6 @@ function processName(name) {
 // set an onclick for the download button
 document.getElementById("download-button").onclick = hitDownload;
 
-// set an onclick for the delete button
-document.getElementById("delete-button").onclick = hitDelete;
-
-// TODO get rid of this repeated code
 form.addEventListener("keypress", event => {
   if (event.keyCode === 13) {
     event.preventDefault();
@@ -359,12 +314,6 @@ document.getElementById("download-text").addEventListener("keypress", event => {
 document.getElementById("upload-text").addEventListener("keypress", event => {
   if (event.keyCode === 13) {
     hitUpload(event);
-  }
-});
-
-document.getElementById("delete-text").addEventListener("keypress", event => {
-  if (event.keyCode === 13) {
-    hitDelete();
   }
 });
 

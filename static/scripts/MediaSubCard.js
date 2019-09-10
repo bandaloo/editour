@@ -42,31 +42,12 @@ class MediaSubCard extends SubCard {
     this.imageFileInput.id = "image_id_" + superCard.hash;
     this.imageFileInput.name = "image_name_" + superCard.hash;
 
-    let transcriptFlex = document.createElement("div");
-    transcriptFlex.classList.add("flex");
-
-    let transcriptHeader = document.createElement("h3");
-    transcriptHeader.innerHTML = "Transcript";
-
-    this.transcriptArea = document.createElement("textarea");
-    this.transcriptArea.classList.add("hundredwidth", "transcriptarea");
-    this.transcriptArea.rows = 6;
-
-    let transcriptBox = document.createElement("div");
-    transcriptBox.classList.add("sidebox");
-
-    transcriptBox.appendChild(transcriptHeader);
-    transcriptFlex.appendChild(this.transcriptArea);
-    transcriptBox.appendChild(transcriptFlex);
-
     this.makeInternalDiv(
       "Image files",
       this.imageFileInput,
       images,
       regions[superCard.hash].images
     );
-
-    this.enclosingDiv.appendChild(transcriptBox);
 
     this.setToggleButton(superCard.mediaButton, "Hide Media");
   }
