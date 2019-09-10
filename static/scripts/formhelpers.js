@@ -107,9 +107,9 @@ function sendData(form) {
 function makeFileRegionData() {
   /** @type {RegionData} */
   let data = { regions: [] };
-  for (let hash in regions) {
+  for (let i = 0; i < tourRegions.length; i++) {
     // real region to build a json region out of
-    let realRegion = regions[hash];
+    let realRegion = tourRegions[i];
 
     // json region to reflect the real region
     /** @type {RegionDatum} */
@@ -175,6 +175,7 @@ function requestTour(tourName) {
     uploadText.value = currentTourName;
     oldNameText.value = processName(currentTourName);
 
+    // TODO no need to pass in an sCallback if statusChanger returns a boolean
     if (
       statusChanger(
         document.getElementById("download-message"),

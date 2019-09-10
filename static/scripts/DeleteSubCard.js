@@ -23,7 +23,7 @@ class DeleteSubCard extends SubCard {
    */
   deleteRegion() {
     console.log(this);
-    const poly = regions[this.superCard.hash].poly;
+    const poly = this.superCard.region.poly;
     if (poly === popup.poly) {
       myMap.closePopup();
     }
@@ -32,8 +32,10 @@ class DeleteSubCard extends SubCard {
     }
     // delete the circle markers so they aren't left behind
     this.superCard.infoSubCard.clearCircleMarkers();
-    regions[this.superCard.hash].poly.remove();
-    delete regions[this.superCard.hash];
+    this.superCard.region.poly.remove();
+    filterInPlace(tourRegions, region => {
+      return region === this.superCard.region;
+    });
     let div = this.superCard.regionDiv;
     div.parentNode.removeChild(div);
   }

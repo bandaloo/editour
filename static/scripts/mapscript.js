@@ -4,10 +4,15 @@
 var mouseLatLng;
 
 // a list of region objects
-var regions = {};
+var regions = {}; // TODO get rid of this and celebrate
+/** @type{Object[]} */
+var tourRegions = [];
 
 // list of points, which are lists of length 2 and contain numbers
 var drawnPoints = [];
+
+// unique identifier for region (used to create unique form element name)
+var lastId = 0;
 
 // div where all the region cards are added
 const sideNav = document.getElementById("sidenavid");
@@ -95,13 +100,28 @@ function endDraw() {
   drawnPoints = [];
 }
 
-function addRegion(regionPoints, name, audio, images) {
+function addRegion(regionPoints, name = "Unnamed Region", audio, images) {
   // audio and images are optional
-  let found = false;
-
   let polygon = Leaflet.polygon(regionPoints);
+  const newRegion = {
+    id: lastId,
+    points: regionPoints,
+    name: name,
+    poly: polygon
+  };
+
+  lastId++; // increment so nothing else has the same id
+
+  if (audio !== undefined) {
+    newRegion.audio = audio;
+  }
+
+  if (images !== undefined) {
+    newRegion.images = images;
+  }
   // handles coming up with same hash
-  let hash, regionName;
+  //let hash, regionName;
+  /*
   while (!found) {
     hash = randomHash();
     if (!regions[hash]) {
@@ -126,18 +146,22 @@ function addRegion(regionPoints, name, audio, images) {
       }
     }
   }
+  */
 
   polygon.on("click", e => {
-    onPolyClick(e, regions[hash]);
+    onPolyClick(e, newRegion);
   });
 
-  addRegionDiv(hash, regionName, audio, images);
+  addRegionDiv(newRegion);
 
   // adds polygon to map
   polygon.addTo(myMap);
 
+  // adds the region data
+  tourRegions.push(newRegion);
+
   // TODO once hash is removed add region as a typedef and return type
-  return regions[hash];
+  return newRegion;
 }
 
 /**
@@ -170,32 +194,27 @@ function onMapClick(e) {
   }
 }
 
-/**
- * Renames region in the regions object
- * @param {string} hash
- * @param {string} newName
- */
-function renameRegion(hash, newName) {
-  regions[hash].name = newName;
+// TODO this function might not be necessary
+function renameRegion(region, newName) {
+  region.name = newName;
 }
 
 /**
  * Adds region div to the document and region data for easy reference
- * @param {string} hash
- * @param {string} name
- * @param {string[]} [audio]
- * @param {string[]} [images]
+ * @param {Object} region
  */
-function addRegionDiv(hash, name, audio, images) {
-  let regionCard = new RegionCard(hash, name, audio, images);
+function addRegionDiv(region) {
+  let regionCard = new RegionCard(region);
   sideNav.appendChild(regionCard.regionDiv);
-  regions[hash].card = regionCard;
+  region.card = regionCard;
 }
 
 myMap.on("click", onMapClick);
 
-const popup = Leaflet.popup(); // popup moved around and used for stuff
-const marker = Leaflet.marker({ lat: 0, lng: 0 }); // marker created when clicking on coordinate box
+// popup moved around and used for pointing to region
+const popup = Leaflet.popup();
+// marker created when clicking on coordinate box
+const marker = Leaflet.marker({ lat: 0, lng: 0 });
 
 marker.on("dragstart", () => {
   if (marker.poly === popup.poly) {
@@ -271,12 +290,13 @@ myMap.on("mousemove", e => {
  * @param {string} strMetadata - metadata to be parsed
  */
 function rebuild(strMetadata) {
+  lastId = 0; // start counting from zero again
   marker.remove();
   myMap.closePopup();
   let metadata = JSON.parse(strMetadata);
   console.log(metadata);
-  for (let hash in regions) {
-    let region = regions[hash];
+  for (let i = 0; i < tourRegions.length; i++) {
+    let region = tourRegions[i];
     // wipe out the map polygon
     region.poly.remove();
     // wipe out any circle markers
@@ -284,8 +304,9 @@ function rebuild(strMetadata) {
     // wipe out the region card
     region.card.regionDiv.parentNode.removeChild(region.card.regionDiv);
     // delete region data from regions
-    delete regions[hash];
   }
+  empty(tourRegions);
+
   let newRegions = metadata.regions;
   console.log(newRegions);
   let allPoints = [];
@@ -298,6 +319,7 @@ function rebuild(strMetadata) {
     );
     allPoints = allPoints.concat(newRegions[i].points);
 
+    // fill in the textbox with the transcript in the media card
     addedRegion.card.mediaSubCard.transcriptArea.value =
       newRegions[i].transcript;
   }
@@ -415,3 +437,12 @@ populateJumpBox([
 ]);
 
 requestTourList();
+
+function filterInPlace(list, func) {
+  // remove without reassignment with splice
+  for (let i = 0; i < list.length; i++) {
+    if (func(list[i])) {
+      list.splice(i, 1);
+    }
+  }
+}

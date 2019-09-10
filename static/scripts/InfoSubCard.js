@@ -20,7 +20,7 @@ class InfoSubCard extends SubCard {
     /** @type {CoordDatum[]} */
     this.coordData = [];
 
-    for (let i = 0; i < regions[superCard.hash].points.length; i++) {
+    for (let i = 0; i < superCard.region.points.length; i++) {
       this.enclosingDiv.appendChild(this.makeCoordDiv(i));
     }
 
@@ -33,8 +33,8 @@ class InfoSubCard extends SubCard {
    * @param {number} i
    */
   makeCoordDiv(i) {
-    const poly = regions[this.superCard.hash].poly;
-    const points = regions[this.superCard.hash].points;
+    const poly = this.superCard.region.poly;
+    const points = this.superCard.region.points;
 
     let xButton = makeXButton();
 
@@ -122,8 +122,8 @@ class InfoSubCard extends SubCard {
 
   populateCircleMarkers() {
     // create and show circle markers
-    const points = regions[this.superCard.hash].points;
-    const poly = regions[this.superCard.hash].poly;
+    const points = this.superCard.region.points;
+    const poly = this.superCard.region.poly;
     for (let i = 0; i < points.length; i++) {
       // add edge circle markers
       const p = i === 0 ? points.length - 1 : i - 1;
@@ -202,8 +202,8 @@ class InfoSubCard extends SubCard {
    * @param {number} index
    */
   insertPoint(point, index) {
-    const poly = regions[this.superCard.hash].poly;
-    const points = regions[this.superCard.hash].points;
+    const poly = this.superCard.region.poly;
+    const points = this.superCard.region.points;
     points.splice(index, 0, point);
     poly.setLatLngs(points);
   }
@@ -258,12 +258,12 @@ class InfoSubCard extends SubCard {
     // TODO check to see if this needs to be enabled every time
     marker.dragging.enable();
     marker.points = points;
-    marker.poly = regions[this.superCard.hash].poly;
+    marker.poly = this.superCard.region.poly;
     marker.index = index;
     marker.circleMarkers = this.circleMarkers;
     marker.cornerMarkers = this.cornerMarkers;
     marker.paragraph = coordParagraph;
-    if (regions[this.superCard.hash].poly === popup.poly) {
+    if (this.superCard.region.poly === popup.poly) {
       myMap.closePopup();
     }
     //myMap.panTo(points[index]);
