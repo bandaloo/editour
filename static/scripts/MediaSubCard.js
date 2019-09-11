@@ -13,8 +13,8 @@ class MediaSubCard extends SubCard {
     this.audioFileInput.accept = "audio/*";
 
     // TODO check if these are needed
-    this.audioFileInput.id = "audio_id_" + superCard.id;
-    this.audioFileInput.name = "audio_name_" + superCard.id;
+    this.audioFileInput.id = "audio_id_" + superCard.region.id;
+    this.audioFileInput.name = "audio_name_" + superCard.region.id;
 
     let removeFuncs = this.makeInternalDiv(
       "Audio file",
@@ -36,8 +36,8 @@ class MediaSubCard extends SubCard {
     this.imageFileInput.multiple = true;
 
     // TODO check if these are needed
-    this.imageFileInput.id = "image_id_" + superCard.id;
-    this.imageFileInput.name = "image_name_" + superCard.id;
+    this.imageFileInput.id = "image_id_" + superCard.region.id;
+    this.imageFileInput.name = "image_name_" + superCard.region.id;
 
     let transcriptFlex = document.createElement("div");
     transcriptFlex.classList.add("flex");
@@ -117,16 +117,8 @@ class MediaSubCard extends SubCard {
    * @param {string} filename
    */
   removeFile(list, filename) {
-    // remove without reassignment with splice
     filterInPlace(list, name => {
       return filename === name;
     });
-    /*
-    for (let i = 0; i < list.length; i++) {
-      if (list[i] === filename) {
-        list.splice(i, 1);
-      }
-    }
-    */
   }
 }
