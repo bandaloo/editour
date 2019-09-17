@@ -65,6 +65,7 @@ function sendData(form) {
       ));
       oldNameText.value = processName(currentTourName);
       setZipMessage();
+      requestTourList();
     }
   });
 
@@ -212,13 +213,26 @@ function requestTourDeletion(tourName) {
     const deleteMessage = document.getElementById("delete-message");
     statusChanger(deleteMessage, xhr.status, event, 200, () => {
       deleteMessage.innerHTML += " " + parsedResponse.message;
+      requestTourList();
     });
   });
 
   xhr.send();
 }
 
+/**
+ * Gets the tour list from the server and fills up tours container
+ */
 function requestTourList() {
+  const toursContainer = document.getElementById("tours-container");
+
+  // empty the tours container
+  while (toursContainer.firstChild !== null) {
+    toursContainer.removeChild(toursContainer.firstChild);
+  }
+
+  console.log(toursContainer.firstChild);
+
   const xhr = new XMLHttpRequest();
   const str = createEndpointString("tours");
 
@@ -235,7 +249,6 @@ function requestTourList() {
     }
 
     const files = parsedResponseMessage.files;
-    const toursContainer = document.getElementById("tours-container");
     for (let i = 0; i < files.length; i++) {
       const button = document.createElement("button");
       button.classList.add("button", "bluebutton", "outlinebutton");

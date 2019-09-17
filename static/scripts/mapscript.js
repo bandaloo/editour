@@ -15,7 +15,7 @@ var mouseLatLng;
  * @property {string[]} [audio]
  * @property {string[]} [images]
  * @property {Object} poly
- * @property {RegionCard} card
+ * @property {RegionCard} [card]
  */
 /** @type{Region[]} */
 var tourRegions = [];
@@ -337,9 +337,9 @@ function empty(array) {
 }
 
 /**
- * @param {{lat: number, lng: number}} point1
- * @param {{lat: number, lng: number}} point2
- * @returns {{lat: number, lng: number}}
+ * @param {Coordinate} point1
+ * @param {Coordinate} point2
+ * @returns {Coordinate}
  */
 function calcMidPoint(point1, point2) {
   const polyline = Leaflet.polyline([point1, point2]);
@@ -384,7 +384,7 @@ document.getElementById("jump-text").addEventListener("keypress", event => {
 
 /**
  * Function to fill the jump box with places you can click and jump to
- * @param {{name: string, point: {lat: number, lng: number}}[]} places
+ * @param {{name: string, point: Coordinate}[]} places
  */
 function populateJumpBox(places) {
   const jumpBox = document.getElementById("jump-container");
