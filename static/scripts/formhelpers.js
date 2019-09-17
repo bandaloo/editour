@@ -84,11 +84,6 @@ function sendData(form) {
 }
 
 /**
- * @typedef {Object} Coordinate - latitude and longitude position
- * @property {number} lat - latitude
- * @property {number} lng - longitude
- */
-/**
  * @typedef {Object} RegionDatum - the metadata to describe a region
  * @property {string} name
  * @property {Coordinate[]} points
@@ -344,27 +339,30 @@ document.getElementById("download-button").onclick = hitDownload;
 // set an onclick for the delete button
 document.getElementById("delete-button").onclick = hitDelete;
 
-// TODO get rid of this repeated code
+function hitEnter(event) {
+  return event.keyCode === 13;
+}
+
 form.addEventListener("keypress", event => {
-  if (event.keyCode === 13) {
+  if (hitEnter(event)) {
     event.preventDefault();
   }
 });
 
 document.getElementById("download-text").addEventListener("keypress", event => {
-  if (event.keyCode === 13) {
+  if (hitEnter(event)) {
     hitDownload();
   }
 });
 
 document.getElementById("upload-text").addEventListener("keypress", event => {
-  if (event.keyCode === 13) {
+  if (hitEnter(event)) {
     hitUpload(event);
   }
 });
 
 document.getElementById("delete-text").addEventListener("keypress", event => {
-  if (event.keyCode === 13) {
+  if (hitEnter(event)) {
     hitDelete();
   }
 });

@@ -3,9 +3,21 @@
 // last position of mouse on mouse move, important for drawing
 var mouseLatLng;
 
-// a list of region objects
-var regions = {}; // TODO get rid of this and celebrate
-/** @type{Object[]} */
+/**
+ * @typedef {Object} Coordinate - latitude and longitude position
+ * @property {number} lat - latitude
+ * @property {number} lng - longitude
+ */
+/**
+ * @typedef {Object} Region
+ * @property {Coordinate[]} points
+ * @property {string} name
+ * @property {string[]} [audio]
+ * @property {string[]} [images]
+ * @property {Object} poly
+ * @property {RegionCard} card
+ */
+/** @type{Region[]} */
 var tourRegions = [];
 
 // list of points, which are lists of length 2 and contain numbers
@@ -119,34 +131,6 @@ function addRegion(regionPoints, name = "Unnamed Region", audio, images) {
   if (images !== undefined) {
     newRegion.images = images;
   }
-  // handles coming up with same hash
-  //let hash, regionName;
-  /*
-  while (!found) {
-    hash = randomHash();
-    if (!regions[hash]) {
-      found = true;
-      if (name === undefined) {
-        regionName = "unnamed region " + hash;
-      } else {
-        regionName = name;
-      }
-      // add region to the list of regions
-      regions[hash] = {
-        points: regionPoints,
-        name: regionName,
-        poly: polygon
-      };
-
-      if (audio !== undefined) {
-        regions[hash].audio = audio;
-      }
-      if (images !== undefined) {
-        regions[hash].images = images;
-      }
-    }
-  }
-  */
 
   polygon.on("click", e => {
     onPolyClick(e, newRegion);
