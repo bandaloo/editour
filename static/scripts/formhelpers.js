@@ -208,8 +208,6 @@ function requestTourDeletion(tourName) {
     console.log("got a delete response back");
     console.log(event);
     let parsedResponse = makeParsedResponse(event);
-    //const deleteMessage = document.getElementById("delete-message");
-    //deleteMessage.innerHTML = parsedResponse.message;
     const deleteMessage = document.getElementById("delete-message");
     statusChanger(deleteMessage, xhr.status, event, 200, () => {
       deleteMessage.innerHTML += " " + parsedResponse.message;
