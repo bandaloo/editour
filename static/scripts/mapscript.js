@@ -16,6 +16,7 @@ var mouseLatLng;
  * @property {string[]} [images]
  * @property {Object} poly
  * @property {RegionCard} [card]
+ * @property {number} [id]
  */
 /** @type{Region[]} */
 var tourRegions = [];
