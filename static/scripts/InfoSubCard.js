@@ -198,7 +198,7 @@ class InfoSubCard extends SubCard {
 
   /**
    * Inserts a new point at the given index
-   * @param {{lat: number, lng: number}} point
+   * @param {Coordinate} point
    * @param {number} index
    */
   insertPoint(point, index) {
@@ -210,7 +210,7 @@ class InfoSubCard extends SubCard {
 
   /**
    * Inserts a new coordinate tag at the given index in the subcard
-   * @param {{lat: number, lng: number}} point
+   * @param {Coordinate} point
    * @param {number} index
    */
   insertCoordDiv(point, index) {
@@ -236,7 +236,7 @@ class InfoSubCard extends SubCard {
 
   /**
    * Fills the coordinate tag in the info card with correct info
-   * @param {{lat: number, lng: number}} point
+   * @param {Coordinate} point
    * @returns {string}
    */
   static makeCoordParagraphText(point) {
@@ -246,7 +246,7 @@ class InfoSubCard extends SubCard {
   }
 
   /**
-   * @param {{lat: number, lng: number}[]} points
+   * @param {Coordinate[]} points
    * @param {HTMLParagraphElement} coordParagraph
    * @param {number} index
    */
