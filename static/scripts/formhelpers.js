@@ -65,6 +65,7 @@ function sendData(form) {
       ));
       oldNameText.value = processName(currentTourName);
       setZipMessage();
+      requestTourList();
     }
   });
 
@@ -84,11 +85,6 @@ function sendData(form) {
 }
 
 /**
- * @typedef {Object} Coordinate - latitude and longitude position
- * @property {number} lat - latitude
- * @property {number} lng - longitude
- */
-/**
  * @typedef {Object} RegionDatum - the metadata to describe a region
  * @property {string} name
  * @property {Coordinate[]} points
@@ -107,9 +103,9 @@ function sendData(form) {
 function makeFileRegionData() {
   /** @type {RegionData} */
   let data = { regions: [] };
-  for (let hash in regions) {
+  for (let i = 0; i < tourRegions.length; i++) {
     // real region to build a json region out of
-    let realRegion = regions[hash];
+    let realRegion = tourRegions[i];
 
     // json region to reflect the real region
     /** @type {RegionDatum} */
@@ -175,6 +171,7 @@ function requestTour(tourName) {
     uploadText.value = currentTourName;
     oldNameText.value = processName(currentTourName);
 
+    // TODO no need to pass in an sCallback if statusChanger returns a boolean
     if (
       statusChanger(
         document.getElementById("download-message"),
@@ -216,13 +213,26 @@ function requestTourDeletion(tourName) {
     const deleteMessage = document.getElementById("delete-message");
     statusChanger(deleteMessage, xhr.status, event, 200, () => {
       deleteMessage.innerHTML += " " + parsedResponse.message;
+      requestTourList();
     });
   });
 
   xhr.send();
 }
 
+/**
+ * Gets the tour list from the server and fills up tours container
+ */
 function requestTourList() {
+  const toursContainer = document.getElementById("tours-container");
+
+  // empty the tours container
+  while (toursContainer.firstChild !== null) {
+    toursContainer.removeChild(toursContainer.firstChild);
+  }
+
+  console.log(toursContainer.firstChild);
+
   const xhr = new XMLHttpRequest();
   const str = createEndpointString("tours");
 
@@ -239,7 +249,6 @@ function requestTourList() {
     }
 
     const files = parsedResponseMessage.files;
-    const toursContainer = document.getElementById("tours-container");
     for (let i = 0; i < files.length; i++) {
       const button = document.createElement("button");
       button.classList.add("button", "bluebutton", "outlinebutton");
@@ -343,27 +352,30 @@ document.getElementById("download-button").onclick = hitDownload;
 // set an onclick for the delete button
 document.getElementById("delete-button").onclick = hitDelete;
 
-// TODO get rid of this repeated code
+function hitEnter(event) {
+  return event.keyCode === 13;
+}
+
 form.addEventListener("keypress", event => {
-  if (event.keyCode === 13) {
+  if (hitEnter(event)) {
     event.preventDefault();
   }
 });
 
 document.getElementById("download-text").addEventListener("keypress", event => {
-  if (event.keyCode === 13) {
+  if (hitEnter(event)) {
     hitDownload();
   }
 });
 
 document.getElementById("upload-text").addEventListener("keypress", event => {
-  if (event.keyCode === 13) {
+  if (hitEnter(event)) {
     hitUpload(event);
   }
 });
 
 document.getElementById("delete-text").addEventListener("keypress", event => {
-  if (event.keyCode === 13) {
+  if (hitEnter(event)) {
     hitDelete();
   }
 });

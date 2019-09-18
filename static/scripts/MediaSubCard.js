@@ -3,10 +3,8 @@ class MediaSubCard extends SubCard {
    * Constructor for media card that will show audio and images when it is
    * rebuilding from a downloaded file
    * @param {RegionCard} superCard
-   * @param {string[]} [audio]
-   * @param {string[]} [images]
    */
-  constructor(superCard, audio, images) {
+  constructor(superCard) {
     super(superCard, "block");
 
     // setting up audio file input
@@ -15,14 +13,13 @@ class MediaSubCard extends SubCard {
     this.audioFileInput.accept = "audio/*";
 
     // TODO check if these are needed
-    this.audioFileInput.id = "audio_id_" + superCard.hash;
-    this.audioFileInput.name = "audio_name_" + superCard.hash;
+    this.audioFileInput.id = "audio_id_" + superCard.region.id;
+    this.audioFileInput.name = "audio_name_" + superCard.region.id;
 
     let removeFuncs = this.makeInternalDiv(
       "Audio file",
       this.audioFileInput,
-      audio,
-      regions[superCard.hash].audio
+      superCard.region.audio
     );
 
     // clear the original tags when audio file input is updated
@@ -39,8 +36,8 @@ class MediaSubCard extends SubCard {
     this.imageFileInput.multiple = true;
 
     // TODO check if these are needed
-    this.imageFileInput.id = "image_id_" + superCard.hash;
-    this.imageFileInput.name = "image_name_" + superCard.hash;
+    this.imageFileInput.id = "image_id_" + superCard.region.id;
+    this.imageFileInput.name = "image_name_" + superCard.region.id;
 
     let transcriptFlex = document.createElement("div");
     transcriptFlex.classList.add("flex");
@@ -59,11 +56,11 @@ class MediaSubCard extends SubCard {
     transcriptFlex.appendChild(this.transcriptArea);
     transcriptBox.appendChild(transcriptFlex);
 
+    // TODO test the refactoring of this
     this.makeInternalDiv(
       "Image files",
       this.imageFileInput,
-      images,
-      regions[superCard.hash].images
+      this.superCard.region.images
     );
 
     this.enclosingDiv.appendChild(transcriptBox);
@@ -75,10 +72,9 @@ class MediaSubCard extends SubCard {
    * Makes internal file section div
    * @param {string} name
    * @param {HTMLInputElement} input
-   * @param {string[]} [filenames]
-   * @param {string[]} [regionFiles] - the region files to remove from
+   * @param {string[]} [filenames] - list to create tags out of and remove from
    */
-  makeInternalDiv(name, input, filenames, regionFiles) {
+  makeInternalDiv(name, input, filenames) {
     let internalDiv = document.createElement("div");
     internalDiv.classList.add("sidebox");
     let nameHeader = document.createElement("h3");
@@ -99,7 +95,7 @@ class MediaSubCard extends SubCard {
         let xButton = makeXButton();
         // remove the file from the region data when x is clicked
         const clickFunc = () => {
-          this.removeFile(regionFiles, filenames[i]);
+          this.removeFile(filenames, filenames[i]);
           filenameDiv.parentNode.removeChild(filenameDiv);
         };
 
@@ -121,11 +117,8 @@ class MediaSubCard extends SubCard {
    * @param {string} filename
    */
   removeFile(list, filename) {
-    // remove without reassignment with splice
-    for (let i = 0; i < list.length; i++) {
-      if (list[i] === filename) {
-        list.splice(i, 1);
-      }
-    }
+    filterInPlace(list, name => {
+      return filename === name;
+    });
   }
 }

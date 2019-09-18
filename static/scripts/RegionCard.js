@@ -1,13 +1,7 @@
 class RegionCard {
-  /**
-   * Construct a region card that appears on the side
-   * @param {string} hash
-   * @param {string} name
-   * @param {string[]} [audio]
-   * @param {string[]} [images]
-   */
-  constructor(hash, name = "unnamed region", audio, images) {
-    this.hash = hash;
+  constructor(region) {
+    this.region = region;
+    // id should just be an integer to uniquely identify region
 
     this.regionDiv = document.createElement("div");
     this.regionDiv.classList.add("sidebox", "coordpulse");
@@ -15,7 +9,7 @@ class RegionCard {
 
     this.regionName = document.createElement("h3");
     this.regionName.className = "regionname";
-    this.regionName.innerHTML = name;
+    this.regionName.innerHTML = region.name;
     this.regionDiv.appendChild(this.regionName);
 
     this.deleteButton = document.createElement("button");
@@ -61,7 +55,7 @@ class RegionCard {
 
     this.regionDiv.appendChild(this.mediaButton);
 
-    this.mediaSubCard = new MediaSubCard(this, audio, images);
+    this.mediaSubCard = new MediaSubCard(this);
     this.mediaSubCard.addDiv(this.regionDiv);
 
     this.regionDiv.appendChild(this.infoButton);
@@ -77,7 +71,7 @@ class RegionCard {
     // set onclick event to zoom to bounds of region
     this.regionName.onclick = () =>
       // padding is because sidebar covers map
-      myMap.flyToBounds(regions[hash].points, { paddingTopLeft: [320, 0] });
+      myMap.flyToBounds(region.points, { paddingTopLeft: [320, 0] });
   }
 
   getAudioNames() {
