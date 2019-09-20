@@ -21,10 +21,16 @@ class RegionCard {
     this.arrowDivDown = document.createElement("div");
     this.arrowDivDown.classList.add("xbutton", "arrowbutton");
     this.arrowDivDown.innerHTML = "▼";
+    this.arrowDivDown.onclick = () => {
+      moveRegion(this, 1);
+    };
 
     this.arrowDivUp = document.createElement("div");
     this.arrowDivUp.classList.add("xbutton", "arrowbutton");
     this.arrowDivUp.innerHTML = "▲";
+    this.arrowDivUp.onclick = () => {
+      moveRegion(this, -1);
+    };
 
     this.nameDiv.appendChild(this.regionName);
     this.nameDiv.appendChild(this.arrowDivDown);

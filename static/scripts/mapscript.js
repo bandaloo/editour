@@ -179,11 +179,6 @@ function onMapClick(e) {
   }
 }
 
-// TODO this function might not be necessary
-function renameRegion(region, newName) {
-  region.name = newName;
-}
-
 /**
  * Adds region div to the document and region data for easy reference
  * @param {Object} region
@@ -243,7 +238,7 @@ function onPolyClick(e, region) {
   } else {
     popup
       .setLatLng(e.latlng)
-      .setContent("<b>" + region.name + "</b>" + "<br>" + e.latlng)
+      .setContent(popupText(region))
       .openOn(myMap);
     popup.poly = region.poly;
   }
@@ -253,7 +248,7 @@ function onPolyClick(e, region) {
 
 /**
  * Creates the inner HTML for the map popup
- * @param {{name: string}} region
+ * @param {Region} region
  * @returns {string}
  */
 function popupText(region) {
