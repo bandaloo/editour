@@ -15,9 +15,12 @@ class RenameSubCard extends SubCard {
     okayButton.innerHTML = "Okay";
 
     const rename = () => {
-      renameRegion(superCard.region, this.textBox.value);
+      superCard.region.name = this.textBox.value;
       superCard.regionName.innerHTML = this.textBox.value;
       this.toggleCard();
+      if (popup.poly === superCard.region.poly) {
+        popup.setContent(popupText(superCard.region));
+      }
     };
 
     this.textBox.addEventListener("keypress", event => {
