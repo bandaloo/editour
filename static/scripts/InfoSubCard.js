@@ -20,7 +20,7 @@ class InfoSubCard extends SubCard {
     /** @type {CoordDatum[]} */
     this.coordData = [];
 
-    for (let i = 0; i < superCard.region.points.length; i++) {
+    for (let i = 0; i < regions[superCard.hash].points.length; i++) {
       this.enclosingDiv.appendChild(this.makeCoordDiv(i));
     }
 
@@ -33,8 +33,8 @@ class InfoSubCard extends SubCard {
    * @param {number} i
    */
   makeCoordDiv(i) {
-    const poly = this.superCard.region.poly;
-    const points = this.superCard.region.points;
+    const poly = regions[this.superCard.hash].poly;
+    const points = regions[this.superCard.hash].points;
 
     let xButton = makeXButton();
 
@@ -122,8 +122,8 @@ class InfoSubCard extends SubCard {
 
   populateCircleMarkers() {
     // create and show circle markers
-    const points = this.superCard.region.points;
-    const poly = this.superCard.region.poly;
+    const points = regions[this.superCard.hash].points;
+    const poly = regions[this.superCard.hash].poly;
     for (let i = 0; i < points.length; i++) {
       // add edge circle markers
       const p = i === 0 ? points.length - 1 : i - 1;
@@ -198,19 +198,19 @@ class InfoSubCard extends SubCard {
 
   /**
    * Inserts a new point at the given index
-   * @param {Coordinate} point
+   * @param {{lat: number, lng: number}} point
    * @param {number} index
    */
   insertPoint(point, index) {
-    const poly = this.superCard.region.poly;
-    const points = this.superCard.region.points;
+    const poly = regions[this.superCard.hash].poly;
+    const points = regions[this.superCard.hash].points;
     points.splice(index, 0, point);
     poly.setLatLngs(points);
   }
 
   /**
    * Inserts a new coordinate tag at the given index in the subcard
-   * @param {Coordinate} point
+   * @param {{lat: number, lng: number}} point
    * @param {number} index
    */
   insertCoordDiv(point, index) {
@@ -236,7 +236,7 @@ class InfoSubCard extends SubCard {
 
   /**
    * Fills the coordinate tag in the info card with correct info
-   * @param {Coordinate} point
+   * @param {{lat: number, lng: number}} point
    * @returns {string}
    */
   static makeCoordParagraphText(point) {
@@ -246,7 +246,7 @@ class InfoSubCard extends SubCard {
   }
 
   /**
-   * @param {Coordinate[]} points
+   * @param {{lat: number, lng: number}[]} points
    * @param {HTMLParagraphElement} coordParagraph
    * @param {number} index
    */
@@ -258,12 +258,12 @@ class InfoSubCard extends SubCard {
     // TODO check to see if this needs to be enabled every time
     marker.dragging.enable();
     marker.points = points;
-    marker.poly = this.superCard.region.poly;
+    marker.poly = regions[this.superCard.hash].poly;
     marker.index = index;
     marker.circleMarkers = this.circleMarkers;
     marker.cornerMarkers = this.cornerMarkers;
     marker.paragraph = coordParagraph;
-    if (this.superCard.region.poly === popup.poly) {
+    if (regions[this.superCard.hash].poly === popup.poly) {
       myMap.closePopup();
     }
     //myMap.panTo(points[index]);

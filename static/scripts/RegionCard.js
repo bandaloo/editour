@@ -1,41 +1,22 @@
 class RegionCard {
   /**
-   * @param {Region} region
+   * Construct a region card that appears on the side
+   * @param {string} hash
+   * @param {string} name
+   * @param {string[]} [audio]
+   * @param {string[]} [images]
    */
-  constructor(region) {
-    this.region = region;
-    // id should just be an integer to uniquely identify region
+  constructor(hash, name = "unnamed region", audio, images) {
+    this.hash = hash;
 
     this.regionDiv = document.createElement("div");
     this.regionDiv.classList.add("sidebox", "coordpulse");
     this.regionDiv.classList.toggle("coordpulse");
 
-    this.nameDiv = document.createElement("div");
-    this.nameDiv.className = "flex";
-
-    // div for buttons for moving regions up and down
     this.regionName = document.createElement("h3");
-    this.regionName.classList.add("regionname", "fillwidth");
-    this.regionName.innerHTML = region.name;
-
-    this.arrowDivDown = document.createElement("div");
-    this.arrowDivDown.classList.add("xbutton", "arrowbutton");
-    this.arrowDivDown.innerHTML = "▼";
-    this.arrowDivDown.onclick = () => {
-      moveRegion(this, 1);
-    };
-
-    this.arrowDivUp = document.createElement("div");
-    this.arrowDivUp.classList.add("xbutton", "arrowbutton");
-    this.arrowDivUp.innerHTML = "▲";
-    this.arrowDivUp.onclick = () => {
-      moveRegion(this, -1);
-    };
-
-    this.nameDiv.appendChild(this.regionName);
-    this.nameDiv.appendChild(this.arrowDivDown);
-    this.nameDiv.appendChild(this.arrowDivUp);
-    this.regionDiv.appendChild(this.nameDiv);
+    this.regionName.className = "regionname";
+    this.regionName.innerHTML = name;
+    this.regionDiv.appendChild(this.regionName);
 
     this.deleteButton = document.createElement("button");
     this.deleteButton.type = "button";
@@ -80,7 +61,7 @@ class RegionCard {
 
     this.regionDiv.appendChild(this.mediaButton);
 
-    this.mediaSubCard = new MediaSubCard(this);
+    this.mediaSubCard = new MediaSubCard(this, audio, images);
     this.mediaSubCard.addDiv(this.regionDiv);
 
     this.regionDiv.appendChild(this.infoButton);
@@ -96,7 +77,7 @@ class RegionCard {
     // set onclick event to zoom to bounds of region
     this.regionName.onclick = () =>
       // padding is because sidebar covers map
-      myMap.flyToBounds(region.points, { paddingTopLeft: [320, 0] });
+      myMap.flyToBounds(regions[hash].points, { paddingTopLeft: [320, 0] });
   }
 
   getAudioNames() {
