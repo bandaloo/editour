@@ -370,38 +370,3 @@ function progressText(event) {
   }
   return "computing...";
 }
-
-/**
- * Move region up or down
- * @param {RegionCard} regionCard
- * @param {number} places
- */
-function moveRegion(regionCard, places) {
-  if (![1, -1].includes(places)) {
-    console.error("places param should only be 1 or -1");
-    return;
-  }
-
-  // move the actual region data in the list
-  let index;
-  for (let i = 0; i < tourRegions.length; i++) {
-    if (tourRegions[i].card === regionCard) {
-      index = i;
-      break;
-    }
-  }
-  let nextPos = index + places;
-  if (nextPos < 0 || nextPos >= tourRegions.length) {
-    console.log("at beginning or end; no move should take place");
-    return;
-  }
-  let tempRegion = tourRegions[index];
-  tourRegions[index] = tourRegions[nextPos];
-  tourRegions[nextPos] = tempRegion;
-
-  // move the card on the sidebar
-  sideNav.insertBefore(
-    tourRegions[Math.min(nextPos, index)].card.regionDiv,
-    tourRegions[Math.max(nextPos, index)].card.regionDiv
-  );
-}

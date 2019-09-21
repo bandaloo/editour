@@ -16,7 +16,6 @@ var mouseLatLng;
  * @property {string[]} [images]
  * @property {Object} poly
  * @property {RegionCard} [card]
- * @property {number} [id]
  */
 /** @type{Region[]} */
 var tourRegions = [];
@@ -180,6 +179,11 @@ function onMapClick(e) {
   }
 }
 
+// TODO this function might not be necessary
+function renameRegion(region, newName) {
+  region.name = newName;
+}
+
 /**
  * Adds region div to the document and region data for easy reference
  * @param {Object} region
@@ -239,7 +243,7 @@ function onPolyClick(e, region) {
   } else {
     popup
       .setLatLng(e.latlng)
-      .setContent(popupText(region))
+      .setContent("<b>" + region.name + "</b>" + "<br>" + e.latlng)
       .openOn(myMap);
     popup.poly = region.poly;
   }
@@ -249,7 +253,7 @@ function onPolyClick(e, region) {
 
 /**
  * Creates the inner HTML for the map popup
- * @param {Region} region
+ * @param {{name: string}} region
  * @returns {string}
  */
 function popupText(region) {
