@@ -51,7 +51,7 @@ const acceptForm = (tempDirPath, req, isEdit = false) => {
       };
 
       // check for missing or invalid tourName field
-      if (typeof fields.tourName !== "string") {
+      if (typeof fields.tourName !== "string" || fields.tourName.length < 1) {
         reject({ status: 400, message: "Missing or invalid tourName field" });
         return;
       } else {

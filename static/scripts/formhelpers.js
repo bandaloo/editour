@@ -58,6 +58,7 @@ function sendData(form) {
       ));
       oldNameText.value = processName(currentTourName);
       setZipMessage();
+      requestTourList();
     }
   });
 
@@ -77,11 +78,6 @@ function sendData(form) {
 }
 
 /**
- * @typedef {Object} Coordinate - latitude and longitude position
- * @property {number} lat - latitude
- * @property {number} lng - longitude
- */
-/**
  * @typedef {Object} RegionDatum - the metadata to describe a region
  * @property {string} name
  * @property {Coordinate[]} points
@@ -99,9 +95,9 @@ function sendData(form) {
 function makeFileRegionData() {
   /** @type {RegionData} */
   let data = { regions: [] };
-  for (let hash in regions) {
+  for (let i = 0; i < tourRegions.length; i++) {
     // real region to build a json region out of
-    let realRegion = regions[hash];
+    let realRegion = tourRegions[i];
 
     // json region to reflect the real region
     /** @type {RegionDatum} */
@@ -151,6 +147,7 @@ function requestTour(tourName) {
     uploadText.value = currentTourName;
     oldNameText.value = processName(currentTourName);
 
+    // TODO no need to pass in an sCallback if statusChanger returns a boolean
     if (
       statusChanger(
         document.getElementById("download-message"),
@@ -177,7 +174,39 @@ function requestTour(tourName) {
   xhr.send();
 }
 
+function requestTourDeletion(tourName) {
+  const xhr = new XMLHttpRequest();
+  const str = createEndpointString("tour", tourName);
+
+  xhr.open("DELETE", str);
+
+  xhr.addEventListener("load", event => {
+    console.log("got a delete response back");
+    console.log(event);
+    let parsedResponse = makeParsedResponse(event);
+    const deleteMessage = document.getElementById("delete-message");
+    statusChanger(deleteMessage, xhr.status, event, 200, () => {
+      deleteMessage.innerHTML += " " + parsedResponse.message;
+      requestTourList();
+    });
+  });
+
+  xhr.send();
+}
+
+/**
+ * Gets the tour list from the server and fills up tours container
+ */
 function requestTourList() {
+  const toursContainer = document.getElementById("tours-container");
+
+  // empty the tours container
+  while (toursContainer.firstChild !== null) {
+    toursContainer.removeChild(toursContainer.firstChild);
+  }
+
+  console.log(toursContainer.firstChild);
+
   const xhr = new XMLHttpRequest();
 
   const host = window.location.host;
@@ -198,7 +227,6 @@ function requestTourList() {
     }
 
     const files = parsedResponseMessage.files;
-    const toursContainer = document.getElementById("tours-container");
     for (let i = 0; i < files.length; i++) {
       const button = document.createElement("button");
       button.classList.add("button", "bluebutton", "outlinebutton");
@@ -299,21 +327,34 @@ function processName(name) {
 // set an onclick for the download button
 document.getElementById("download-button").onclick = hitDownload;
 
+// set an onclick for the delete button
+document.getElementById("delete-button").onclick = hitDelete;
+
+function hitEnter(event) {
+  return event.keyCode === 13;
+}
+
 form.addEventListener("keypress", event => {
-  if (event.keyCode === 13) {
+  if (hitEnter(event)) {
     event.preventDefault();
   }
 });
 
 document.getElementById("download-text").addEventListener("keypress", event => {
-  if (event.keyCode === 13) {
+  if (hitEnter(event)) {
     hitDownload();
   }
 });
 
 document.getElementById("upload-text").addEventListener("keypress", event => {
-  if (event.keyCode === 13) {
+  if (hitEnter(event)) {
     hitUpload(event);
+  }
+});
+
+document.getElementById("delete-text").addEventListener("keypress", event => {
+  if (hitEnter(event)) {
+    hitDelete();
   }
 });
 
@@ -328,4 +369,39 @@ function progressText(event) {
     return `${percentString}<br>${byteString}`;
   }
   return "computing...";
+}
+
+/**
+ * Move region up or down
+ * @param {RegionCard} regionCard
+ * @param {number} places
+ */
+function moveRegion(regionCard, places) {
+  if (![1, -1].includes(places)) {
+    console.error("places param should only be 1 or -1");
+    return;
+  }
+
+  // move the actual region data in the list
+  let index;
+  for (let i = 0; i < tourRegions.length; i++) {
+    if (tourRegions[i].card === regionCard) {
+      index = i;
+      break;
+    }
+  }
+  let nextPos = index + places;
+  if (nextPos < 0 || nextPos >= tourRegions.length) {
+    console.log("at beginning or end; no move should take place");
+    return;
+  }
+  let tempRegion = tourRegions[index];
+  tourRegions[index] = tourRegions[nextPos];
+  tourRegions[nextPos] = tempRegion;
+
+  // move the card on the sidebar
+  sideNav.insertBefore(
+    tourRegions[Math.min(nextPos, index)].card.regionDiv,
+    tourRegions[Math.max(nextPos, index)].card.regionDiv
+  );
 }

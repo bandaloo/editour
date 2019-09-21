@@ -15,9 +15,12 @@ class RenameSubCard extends SubCard {
     okayButton.innerHTML = "Okay";
 
     const rename = () => {
-      renameRegion(superCard.hash, this.textBox.value);
+      superCard.region.name = this.textBox.value;
       superCard.regionName.innerHTML = this.textBox.value;
       this.toggleCard();
+      if (popup.poly === superCard.region.poly) {
+        popup.setContent(popupText(superCard.region));
+      }
     };
 
     this.textBox.addEventListener("keypress", event => {
@@ -35,15 +38,6 @@ class RenameSubCard extends SubCard {
   }
 
   /**
-   * Renames only the region data
-   * @param {string} hash
-   * @param {string} newName
-   */
-  renameRegion(hash, newName) {
-    regions[hash].name = newName;
-  }
-
-  /**
    * Clears the textbox when card is hidden (shouldn't really matter)
    */
   whenMadeHidden() {
@@ -56,6 +50,6 @@ class RenameSubCard extends SubCard {
    */
   whenMadeVisible() {
     console.log(this.superCard);
-    this.textBox.value = regions[this.superCard.hash].name;
+    this.textBox.value = this.superCard.region.name;
   }
 }
