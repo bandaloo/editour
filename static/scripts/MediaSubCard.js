@@ -56,14 +56,11 @@ class MediaSubCard extends SubCard {
     transcriptFlex.appendChild(this.transcriptArea);
     transcriptBox.appendChild(transcriptFlex);
 
-    // TODO test the refactoring of this
     this.makeInternalDiv(
       "Image files",
       this.imageFileInput,
       this.superCard.region.images
     );
-
-    this.enclosingDiv.appendChild(transcriptBox);
 
     this.setToggleButton(superCard.mediaButton, "Hide Media");
   }

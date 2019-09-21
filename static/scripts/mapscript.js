@@ -70,6 +70,7 @@ Leaflet.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(myMap);
 
+
 /**
  * super simple hash for regions
  */
@@ -291,7 +292,7 @@ function rebuild(strMetadata) {
   console.log(newRegions);
   let allPoints = [];
   for (let i = 0; i < newRegions.length; i++) {
-    const addedRegion = addRegion(
+    addRegion(
       newRegions[i].points,
       newRegions[i].name,
       newRegions[i].audio,
@@ -303,7 +304,6 @@ function rebuild(strMetadata) {
     addedRegion.card.mediaSubCard.transcriptArea.value =
       newRegions[i].transcript;
   }
-  // TODO get rid of this magic number 320 (used in another place)
   myMap.flyToBounds(allPoints, { paddingTopLeft: [320, 0] });
 }
 
@@ -371,7 +371,6 @@ function jumpFromInput() {
 }
 
 document.getElementById("jump-button").addEventListener("click", jumpFromInput);
-
 document.getElementById("jump-text").addEventListener("keypress", event => {
   if (event.keyCode === 13) {
     jumpFromInput();

@@ -30,13 +30,6 @@ function hitUpload(event) {
   sendData(form);
 }
 
-function hitDelete(event) {
-  requestTourDeletion(
-    /** @type {HTMLInputElement} */ (document.getElementById("delete-text"))
-      .value
-  );
-}
-
 form.addEventListener("submit", hitUpload);
 
 /**
@@ -90,7 +83,6 @@ function sendData(form) {
  * @property {Coordinate[]} points
  * @property {string[]} audio
  * @property {string[]} images
- * @property {string} transcript
  */
 /**
  * @typedef {Object} RegionData - the metadata for the tour file
@@ -117,28 +109,14 @@ function makeFileRegionData() {
         .concat(realRegion.audio ? realRegion.audio : []),
       images: realRegion.card
         .getImageNames()
-        .concat(realRegion.images ? realRegion.images : []),
-      transcript: realRegion.card.mediaSubCard.transcriptArea.value
+        .concat(realRegion.images ? realRegion.images : [])
     };
 
     // add the json region to json data
     data.regions.push(jsonRegion);
   }
-  console.log("logging data");
   console.log(data);
   return data;
-}
-
-/**
- * Creates a url to send a request to
- * @param {string} endpointName
- * @param {string} [tourName]
- * @returns {string}
- */
-function createEndpointString(endpointName, tourName = "") {
-  const host = window.location.host;
-  const scheme = window.location.href.split("/")[0];
-  return `${scheme}//${host}/${endpointName}/${tourName}`;
 }
 
 /**
@@ -146,14 +124,12 @@ function createEndpointString(endpointName, tourName = "") {
  * @param {string} tourName
  */
 function requestTour(tourName) {
-  const xhr = new XMLHttpRequest();
-
-  const str = createEndpointString("edit", tourName);
-  /*
   const host = window.location.host;
+  const xhr = new XMLHttpRequest();
   const scheme = window.location.href.split("/")[0];
   const str = `${scheme}//${host}/edit/${tourName}`;
-  */
+  console.log(scheme);
+  console.log(str);
 
   xhr.open("GET", str);
 
@@ -232,7 +208,11 @@ function requestTourList() {
   console.log(toursContainer.firstChild);
 
   const xhr = new XMLHttpRequest();
-  const str = createEndpointString("tours");
+
+  const host = window.location.host;
+  // TODO extract this to a function
+  const scheme = window.location.href.split("/")[0];
+  const str = `${scheme}//${host}/tours`;
 
   xhr.open("GET", str);
 
