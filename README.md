@@ -98,7 +98,7 @@ successfully, a 400 if the request is invalid, or a 500 if a server error is
 encountered.
 
 
-### DELETE `/tour/name`
+### DELETE `/tour/:name`
 
 Deletes all versions of the tour with the given name from the server. Returns
 200 if successful, along with a message saying how many versions were deleted,
