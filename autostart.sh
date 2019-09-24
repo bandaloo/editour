@@ -1,8 +1,7 @@
 #! /bin/bash
 
 # change this
-# EDITOUR_PATH="/home/username/editour"
-EDITOUR_PATH="/home/joe/Documents/editour"
+EDITOUR_PATH="/home/username/editour"
 
 printUsage() {
 	echo "autostart.sh usage:"
