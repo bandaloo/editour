@@ -1,4 +1,5 @@
 const AdmZip = require("adm-zip");
+const logger = require("../logger");
 
 /**
  * Extracts a zip to a directory
@@ -11,24 +12,17 @@ const extractZip = (zipName, dir) => {
     let zip;
     try {
       zip = new AdmZip(zipName);
+      // extract all to the directory without overwriting
+      // this prevents newer files and the newer metadata from being overwritten
+      // this was originally done async, but the async version of this library
+      // function is incredibly buggy
+      zip.extractAllTo(dir, false)
     } catch (err) {
       if (err) {
         reject({ status: 500, message: "Failed to unzip" });
       }
     }
-    // extract all to the directory without overwriting
-    // this prevents newer files and the newer metadata from being overwritten
-    zip.extractAllToAsync(dir, false, err => {
-      if (err) {
-        // There's a weird error that's hard to reproduce (issue #74 on GitHub)
-        // that causes this to fail even though the zip was successfully
-        // extracted. Until I can find a solution we'll just ignore these errors
-        // TODO fix this
-        // reject({ status: 500, message: "Failed to unzip: " + err.message });
-        // return;
-      }
-      resolve();
-    });
+    resolve();
   });
 };
 
