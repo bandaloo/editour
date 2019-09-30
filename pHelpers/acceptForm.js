@@ -1,5 +1,6 @@
 const formidable = require("formidable");
 const express = require("express");
+const fs = require("fs");
 
 /**
  * parses an incoming form, writing its files into a temp directory
@@ -68,6 +69,16 @@ const acceptForm = (tempDirPath, req, isEdit = false) => {
         reject({ status: 400, message: "Missing or invalid metadata field" });
         return;
       } else {
+        // write metadata to file in temp dir
+        fs.writeFile(tempDirPath + "metadata.json", fields.metadata, err => {
+          if (err) {
+            reject({
+              status: 500,
+              message: "Error while writing metadata file"
+            });
+            return;
+          }
+        });
         out.metadata = fields.metadata;
       }
 

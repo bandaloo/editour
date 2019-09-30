@@ -10,7 +10,7 @@ const constants = require("../constants");
  * same temp directory, and then verifies that all the files in the new
  * metadata are present. It then zips up the new tour metadata dn files into a
  * new zip file with the tourName and timestamp.
- * 
+ *
  * Returns a 201 if the tour was edited successfully, a 400 if the request was
  * invalid, a 404 if the old tour couldn't be found, or a 500 if a server error
  * occurred while processing this request.
@@ -64,13 +64,7 @@ const postEdit = (req, res) => {
     .then(files => {
       // finally zip the directory back up with the new metadata
       logger.log("Zipping up " + tourName + "...");
-      return pHelpers.zipUp(
-        constants.toursLoc,
-        tourName,
-        tempDirPath,
-        files,
-        metadataString
-      );
+      return pHelpers.zipUp(constants.toursLoc, tourName, tempDirPath, files);
     })
     .then(() => {
       logger.log(oldName + " successfully edited and saved as " + tourName);
