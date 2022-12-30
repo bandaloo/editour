@@ -19,7 +19,7 @@
     "url": "https://github.com/bandaloo/poly-region"
   },
   "devDependencies": {
-    "mocha": "^6.2.0",
+    "mocha": "^10.2.0",
     "supertest": "^4.0.2"
   }
 }
